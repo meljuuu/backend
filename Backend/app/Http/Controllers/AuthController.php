@@ -3,51 +3,42 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\TeacherModel;
 
 class AuthController extends Controller
 {
-    // Login function
     public function login(Request $request)
+
     {
-        // Validate the incoming request data
-        $validator = Validator::make($request->all(), [
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:8',
         ]);
 
-        // Check if validation fails
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
+        $teacher = TeacherModel::where('Email', $credentials['email'])->first();
+
+        if (!$teacher || !Hash::check($credentials['password'], $teacher->Password)) {
+            return response()->json(['error' => 'Invalid email or password.'], 401);
         }
 
-        // Check if the user exists and the password matches
-        $user = \App\Models\User::where('email', $request->email)->first();
+        $token = $teacher->createToken('TeacherToken')->plainTextToken;
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Invalid credentials.'], 401);
-        }
-
-        // Generate a new token
-        $token = $user->createToken('YourAppName')->plainTextToken;
-
-        // Return the user and token in the response
         return response()->json([
             'message' => 'Login successful.',
-            'user' => $user,
+            'teacher' => $teacher,
             'token' => $token,
         ]);
     }
 
-    // Logout function
     public function logout(Request $request)
+
     {
-        // Revoke the user's current token
         $request->user()->currentAccessToken()->delete();
 
-        // Return a success message
-        return response()->json(['message' => 'Successfully logged out.']);
+        return response()->json([
+            'message' => 'Logged out successfully.'
+        ]);
     }
 }

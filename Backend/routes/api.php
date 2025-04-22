@@ -20,6 +20,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Public Routes Here
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/create-teacher', [TeacherController::class, 'createTeacherAccount']);
+
+
+
+// Protected Routes Here
+Route::middleware('auth:sanctum')->post('/create-teacher', [TeacherController::class, 'createTeacherAccount']);
 
