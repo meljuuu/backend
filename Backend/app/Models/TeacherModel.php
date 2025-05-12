@@ -16,6 +16,7 @@ class TeacherModel extends Authenticatable
 
     protected $fillable = [
         'Teacher_ID', 
+        'EmployeeNo',
         'Email',
         'Password',
         'FirstName',
@@ -26,6 +27,8 @@ class TeacherModel extends Authenticatable
         'Position',
         'ContactNumber',
         'Address',
+        'Research',
+        'Avatar',
     ];
 
     protected $hidden = [

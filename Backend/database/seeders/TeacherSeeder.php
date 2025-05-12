@@ -14,6 +14,7 @@ class TeacherSeeder extends Seeder
     public function run(): void
     {
         DB::table('teachers')->insert([
+            'EmployeeNo' => 'ADMIN001',
             'Email' => 'admin@example.com',
             'Password' => Hash::make('admin123'),
             'FirstName' => 'System',

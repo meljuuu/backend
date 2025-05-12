@@ -59,4 +59,22 @@ class TeacherController extends Controller
             'teacher' => $teacher,
         ], 201);
     }
+
+    public function getProfile(Request $request)
+    {
+        $teacher = $request->user(); // Assuming the teacher is authenticated
+        return response()->json([
+            'teacher' => [
+                'firstName' => $teacher->FirstName,
+                'lastName' => $teacher->LastName,
+                'middleName' => $teacher->MiddleName,
+                'employeeNo' => $teacher->EmployeeNo,
+                'email' => $teacher->Email,
+                'contactNumber' => $teacher->ContactNumber,
+                'address' => $teacher->Address,
+                'avatar' => $teacher->Avatar,
+                'research' => $teacher->research, // Assuming a relationship to research
+            ],
+        ]);
+    }
 }

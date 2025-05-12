@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,8 +24,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Public Routes Here
 Route::post('/login', [AuthController::class, 'login']);
 
-
-
 // Protected Routes Here
-Route::middleware('auth:sanctum')->post('/create-teacher', [TeacherController::class, 'createTeacherAccount']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/create-teacher', [TeacherController::class, 'createTeacherAccount']);
+    Route::put('/profile', [ProfileController::class, 'updateProfile']);
+    Route::post('/profile/research', [ProfileController::class, 'addResearch']);
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
+    Route::get('/teacher/profile', [TeacherController::class, 'getProfile']);
+    Route::put('/teacher/profile', [TeacherController::class, 'updateProfile']);
+    Route::post('/teacher/avatar', [TeacherController::class, 'updateAvatar']);
+    Route::post('/teacher/research', [TeacherController::class, 'addResearch']);
+});
+
+// Unprotected Profile Route
+Route::get('/profile', [ProfileController::class, 'getProfile']);
 
