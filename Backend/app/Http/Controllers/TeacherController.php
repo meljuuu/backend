@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Research;
 
 class TeacherController extends Controller
 {
@@ -62,7 +63,7 @@ class TeacherController extends Controller
 
     public function getProfile(Request $request)
     {
-        $teacher = $request->user(); // Assuming the teacher is authenticated
+        $teacher = $request->user()->load('researches');
         return response()->json([
             'teacher' => [
                 'firstName' => $teacher->FirstName,
@@ -73,7 +74,13 @@ class TeacherController extends Controller
                 'contactNumber' => $teacher->ContactNumber,
                 'address' => $teacher->Address,
                 'avatar' => $teacher->Avatar,
-                'research' => $teacher->research, // Assuming a relationship to research
+                'research' => $teacher->researches->map(function($research) {
+                    return [
+                        'Title' => $research->Title,
+                        'Abstract' => $research->Abstract,
+                        'created_at' => $research->created_at
+                    ];
+                }),
             ],
         ]);
     }
@@ -114,5 +121,19 @@ class TeacherController extends Controller
                 'address' => $teacher->Address,
             ]
         ]);
+    }
+
+    public function addResearch(Request $request) {
+        $validated = $request->validate([
+            'Title' => 'required|string|max:255',
+            'Abstract' => 'required|string',
+        ]);
+
+        $research = auth()->user()->researches()->create([
+            'Title' => $validated['Title'],
+            'Abstract' => $validated['Abstract']
+        ]);
+
+        return response()->json($research, 201);
     }
 }

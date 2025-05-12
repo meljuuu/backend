@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Research;
 
 class TeacherModel extends Authenticatable
 {
@@ -43,6 +44,11 @@ class TeacherModel extends Authenticatable
     public function classes()
     {
         return $this->hasMany(Classes::class, 'Teacher_ID');
+    }
+
+    public function researches()
+    {
+        return $this->hasMany(Research::class, 'Teacher_ID');
     }
 
     public function getAuthPassword()

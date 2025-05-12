@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ResearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/teacher/profile', [TeacherController::class, 'getProfile']);
     Route::put('/teacher/profile', [TeacherController::class, 'updateProfile']);
     Route::post('/teacher/avatar', [TeacherController::class, 'updateAvatar']);
-    Route::post('/teacher/research', [TeacherController::class, 'addResearch']);
+    Route::post('/teacher/research', [ResearchController::class, 'store']);
 });
 
 // Unprotected Profile Route
