@@ -76,6 +76,7 @@ class TeacherController extends Controller
                 'avatar' => $teacher->Avatar,
                 'research' => $teacher->researches->map(function($research) {
                     return [
+                        'Research_ID' => $research->Research_ID,
                         'Title' => $research->Title,
                         'Abstract' => $research->Abstract,
                         'created_at' => $research->created_at

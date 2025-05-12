@@ -6,6 +6,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResearchController;
+use Illuminate\Http\Exceptions\NotFoundHttpException;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/teacher/profile', [TeacherController::class, 'updateProfile']);
     Route::post('/teacher/avatar', [TeacherController::class, 'updateAvatar']);
     Route::post('/teacher/research', [ResearchController::class, 'store']);
+    Route::delete('/teacher/research/{research}', [ResearchController::class, 'destroy']);
 });
 
 // Unprotected Profile Route

@@ -27,4 +27,15 @@ class ResearchController extends Controller
             'research' => $research
         ], 201);
     }
+
+    public function destroy(Research $research)
+    {
+        if ($research->Teacher_ID !== auth()->user()->Teacher_ID) {
+            abort(403, 'Unauthorized action');
+        }
+
+        $research->delete();
+
+        return response()->json(['message' => 'Research deleted successfully']);
+    }
 }

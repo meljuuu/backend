@@ -11,9 +11,11 @@ class Research extends Model
     protected $primaryKey = 'Research_ID';
     
     protected $fillable = [
+        'Research_ID',
         'Teacher_ID',
         'Title',
-        'Abstract'
+        'Abstract',
+        'created_at'
     ];
 
     public function teacher()
