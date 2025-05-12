@@ -77,4 +77,42 @@ class TeacherController extends Controller
             ],
         ]);
     }
+
+    public function updateProfile(Request $request)
+    {
+        $teacher = $request->user();
+        
+        $validatedData = $request->validate([
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
+            'middleName' => 'nullable|string|max:255',
+            'employeeNo' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'contactNumber' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+        ]);
+
+        $teacher->update([
+            'FirstName' => $validatedData['firstName'],
+            'LastName' => $validatedData['lastName'],
+            'MiddleName' => $validatedData['middleName'],
+            'EmployeeNo' => $validatedData['employeeNo'],
+            'Email' => $validatedData['email'],
+            'ContactNumber' => $validatedData['contactNumber'],
+            'Address' => $validatedData['address'],
+        ]);
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'teacher' => [
+                'firstName' => $teacher->FirstName,
+                'lastName' => $teacher->LastName,
+                'middleName' => $teacher->MiddleName,
+                'employeeNo' => $teacher->EmployeeNo,
+                'email' => $teacher->Email,
+                'contactNumber' => $teacher->ContactNumber,
+                'address' => $teacher->Address,
+            ]
+        ]);
+    }
 }
