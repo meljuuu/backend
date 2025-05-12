@@ -44,10 +44,6 @@ class LessonPlanController extends Controller
             'link' => 'sometimes|url',
         ]);
 
-        // Only convert if present in request
-        if (isset($validated['lesson_plan_no'])) {
-            $validated['lesson_plan_no'] = (string)$validated['lesson_plan_no'];
-        }
 
         $lessonPlan->update($validated);
         return response()->json($lessonPlan);
@@ -55,7 +51,6 @@ class LessonPlanController extends Controller
 
     public function destroy(LessonPlan $lessonPlan)
     {
-        $this->authorize('delete', $lessonPlan);
         $lessonPlan->delete();
         return response()->json(null, 204);
     }

@@ -41,7 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/teacher/avatar', [TeacherController::class, 'updateAvatar']);
     Route::post('/teacher/research', [ResearchController::class, 'store']);
     Route::delete('/teacher/research/{research}', [ResearchController::class, 'destroy']);
-    Route::apiResource('/teacher/lesson-plans', \App\Http\Controllers\LessonPlanController::class)->except(['update']);
+    Route::apiResource('/teacher/lesson-plans', \App\Http\Controllers\LessonPlanController::class);
 });
 
 
