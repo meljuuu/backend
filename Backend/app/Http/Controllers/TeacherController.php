@@ -70,6 +70,7 @@ class TeacherController extends Controller
                 'lastName' => $teacher->LastName,
                 'middleName' => $teacher->MiddleName,
                 'employeeNo' => $teacher->EmployeeNo,
+                'position' => $teacher->Position,
                 'email' => $teacher->Email,
                 'contactNumber' => $teacher->ContactNumber,
                 'address' => $teacher->Address,
