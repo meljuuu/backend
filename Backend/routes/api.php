@@ -25,6 +25,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Public Routes Here
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/profile', [ProfileController::class, 'getProfile']);
+
+// Public route (no auth)
+Route::put('/teacher/lesson-plans/{id}', [\App\Http\Controllers\LessonPlanController::class, 'update']);
 
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {
@@ -37,8 +41,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/teacher/avatar', [TeacherController::class, 'updateAvatar']);
     Route::post('/teacher/research', [ResearchController::class, 'store']);
     Route::delete('/teacher/research/{research}', [ResearchController::class, 'destroy']);
+    Route::apiResource('/teacher/lesson-plans', \App\Http\Controllers\LessonPlanController::class)->except(['update']);
 });
 
-// Unprotected Profile Route
-Route::get('/profile', [ProfileController::class, 'getProfile']);
+
 

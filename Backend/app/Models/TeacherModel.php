@@ -51,6 +51,11 @@ class TeacherModel extends Authenticatable
         return $this->hasMany(Research::class, 'Teacher_ID');
     }
 
+    public function lessonPlans()
+    {
+        return $this->hasMany(LessonPlan::class, 'Teacher_ID');
+    }
+
     public function getAuthPassword()
     {
         return $this->Password;
