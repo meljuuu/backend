@@ -5,14 +5,15 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Faker\Factory as Faker;
 
 class TeacherSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        $faker = Faker::create();
+
+        // Create admin teacher
         DB::table('teachers')->insert([
             'EmployeeNo' => 'ADMIN001',
             'Email' => 'admin@example.com',
@@ -24,7 +25,11 @@ class TeacherSeeder extends Seeder
             'Sex' => 'M',
             'Position' => 'Admin',
             'ContactNumber' => '09171234567',
-            'Address' => 'Admin Office, Main Campus',
+            'Address' => 'Admin Address',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
+
+        // Create 100 regular teachers
     }
 }
