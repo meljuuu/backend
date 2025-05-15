@@ -12,6 +12,22 @@ class ClassesModel extends Model
     protected $table = 'class_table';
     protected $primaryKey = 'Class_ID';
 
+    protected $fillable = [
+        'ClassName',
+        'Section',
+        'SY_ID',
+        'Grade_Level',
+        'Track',
+        'classType',
+        'Teacher_ID',
+        'created_at',
+        'updated_at'
+    ];
+
+    protected $casts = [
+        'Grade_Level' => 'string', // Explicitly cast the enum to string
+    ];
+
     public function students()
     {
         return $this->hasMany(StudentClass::class, 'Class_ID');
