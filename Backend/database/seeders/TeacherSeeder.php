@@ -1,4 +1,4 @@
-`<?php
+<?php
 
 namespace Database\Seeders;
 
@@ -65,4 +65,3 @@ class TeacherSeeder extends Seeder
         ]);
     }
 }
-`
