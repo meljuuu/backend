@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResearchController;
@@ -29,6 +30,10 @@ Route::get('/profile', [ProfileController::class, 'getProfile']);
 
 // Public route (no auth)
 Route::put('/teacher/lesson-plans/{id}', [\App\Http\Controllers\LessonPlanController::class, 'update']);
+
+//STUDENT API
+Route::post('/student/add', [StudentController::class, 'store']);
+Route::get('/student/getAll', [StudentController::class, 'getAll']);
 
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {

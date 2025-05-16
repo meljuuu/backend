@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('MiddleName')->nullable();
             $table->date('BirthDate');
             $table->enum('Sex', ['M', 'F']);
-            $table->enum('Position', ['SuperAdmin', 'Admin', 'Teacher']);
+            $table->enum('Position', ['Admin', 'Teacher', 'SuperAdmin']);
             $table->string('ContactNumber');
             $table->string('Address');
             $table->timestamps();
