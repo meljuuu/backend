@@ -35,6 +35,7 @@ return new class extends Migration
             $table->enum('Curriculum', ['JHS', 'SHS']);
             $table->string('Track');
             $table->timestamps();
+            $table->enum('Status', ['Pending', 'Accepted', 'Declined']);
         });
     }
 
