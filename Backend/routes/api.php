@@ -34,6 +34,8 @@ Route::put('/teacher/lesson-plans/{id}', [\App\Http\Controllers\LessonPlanContro
 //STUDENT API
 Route::post('/student/add', [StudentController::class, 'store']);
 Route::get('/student/getAll', [StudentController::class, 'getAll']);
+Route::get('/student/getAllPending', [StudentController::class, 'getPendingStudent']);
+Route::get('/student/getAllAccepted', [StudentController::class, 'getAcceptedStudents']);
 
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {

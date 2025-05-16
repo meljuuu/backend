@@ -39,6 +39,7 @@ class StudentModel extends Model
         'ContactNumber',
         'Curriculum',
         'Track',
+        'Status',
     ];
 
     public function grades()

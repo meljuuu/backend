@@ -16,6 +16,26 @@ class StudentController extends Controller
         ]);
     }
 
+    public function getPendingStudents()
+    {
+        
+         $students = StudentModel::where('Status', 'pending')->get();
+
+        return response()->json([
+            'students' => $students
+        ]);
+    }
+
+        public function getAcceptedStudents()
+    {
+        
+         $students = StudentModel::where('Status', 'accepted')->get();
+
+        return response()->json([
+            'students' => $students
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -41,6 +61,9 @@ class StudentController extends Controller
             'Curriculum' => 'required|in:JHS,SHS',
             'Track' => 'required|string|max:255',
         ]);
+
+        // Add default status
+        $validatedData['status'] = 'pending';
 
         $student = StudentModel::create($validatedData);
 
