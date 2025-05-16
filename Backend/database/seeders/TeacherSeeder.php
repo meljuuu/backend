@@ -1,4 +1,4 @@
-<?php
+`<?php
 
 namespace Database\Seeders;
 
@@ -13,7 +13,24 @@ class TeacherSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        // Create admin teacher
+        // Create SuperAdmin teacher
+        DB::table('teachers')->insert([
+            'EmployeeNo' => 'SUPERADMIN001',
+            'Email' => 'superadmin@example.com',
+            'Password' => Hash::make('superadmin123'),
+            'FirstName' => 'Super',
+            'LastName' => 'Admin',
+            'MiddleName' => null,
+            'BirthDate' => '1975-01-01',
+            'Sex' => 'M',
+            'Position' => 'SuperAdmin',
+            'ContactNumber' => '09170000001',
+            'Address' => 'SuperAdmin Address',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Create Admin teacher
         DB::table('teachers')->insert([
             'EmployeeNo' => 'ADMIN001',
             'Email' => 'admin@example.com',
@@ -30,6 +47,22 @@ class TeacherSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // Create 100 regular teachers
+        // Create regular Teacher account
+        DB::table('teachers')->insert([
+            'EmployeeNo' => 'TEACHER001',
+            'Email' => 'teacher@example.com',
+            'Password' => Hash::make('teacher123'),
+            'FirstName' => 'Juan',
+            'LastName' => 'Dela Cruz',
+            'MiddleName' => 'Santos',
+            'BirthDate' => '1990-05-10',
+            'Sex' => 'F',
+            'Position' => 'Teacher',
+            'ContactNumber' => '09172345678',
+            'Address' => 'Teacher Address',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }
+`
