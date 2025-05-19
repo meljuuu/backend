@@ -4,6 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+
+use App\Models\TeacherModel;
+use App\Models\SchoolYearModel;
+use App\Models\ClassesModel;
+
+
 
 class ClassesModel extends Model
 {
@@ -20,6 +27,9 @@ class ClassesModel extends Model
         'Track',
         'classType',
         'Teacher_ID',
+        'Status',
+        'Curriculum',
+        'comments',
         'created_at',
         'updated_at'
     ];
@@ -33,6 +43,13 @@ class ClassesModel extends Model
         return $this->hasMany(StudentClass::class, 'Class_ID');
     }
 
+    public function getStudentCountByTrack()
+    {
+        return DB::table('students')
+            ->where('Track', $this->Track)
+            ->count();
+    }
+
     public function subjects()
     {
         return $this->hasMany(ClassSubject::class, 'Class_ID');
@@ -40,6 +57,11 @@ class ClassesModel extends Model
 
     public function schoolYear()
     {
-        return $this->belongsTo(SchoolYear::class, 'SY_ID');
+        return $this->belongsTo(SchoolYearModel::class, 'SY_ID');
+    }
+
+        public function adviser()
+    {
+        return $this->belongsTo(TeacherModel::class, 'Teacher_ID');
     }
 }

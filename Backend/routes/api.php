@@ -9,6 +9,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\AdminStudentClassController;
 use Illuminate\Http\Exceptions\NotFoundHttpException;
+use App\Http\Controllers\SuperAdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,15 @@ Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
 
 //ADMIN API
 Route::post('/assign-students', [AdminStudentClassController::class, 'assignStudentsToClass']);
+
+
+
+//SUPER ADMIN API
+Route::get('/superadmin/classes-with-students', [SuperAdminController::class, 'getAllWithStudentCount']);
+
+
+
+
 
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {
