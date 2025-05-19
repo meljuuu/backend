@@ -7,6 +7,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResearchController;
+use App\Http\Controllers\AdminStudentClassController;
 use Illuminate\Http\Exceptions\NotFoundHttpException;
 
 /*
@@ -36,6 +37,9 @@ Route::post('/student/add', [StudentController::class, 'store']);
 Route::get('/student/getAll', [StudentController::class, 'getAll']);
 Route::get('/student/getAllPending', [StudentController::class, 'getPendingStudent']);
 Route::get('/student/getAllAccepted', [StudentController::class, 'getAcceptedStudents']);
+
+//ADMIN API
+Route::post('/assign-students', [AdminStudentClassController::class, 'assignStudentsToClass']);
 
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {
