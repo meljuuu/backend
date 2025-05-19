@@ -60,8 +60,9 @@ class ClassesModel extends Model
         return $this->belongsTo(SchoolYearModel::class, 'SY_ID');
     }
 
-        public function adviser()
+    public function adviser()
     {
-        return $this->belongsTo(TeacherModel::class, 'Teacher_ID');
+        return $this->belongsTo(TeacherModel::class, 'Adviser_ID', 'Teacher_ID');
     }
+
 }
