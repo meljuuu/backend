@@ -9,21 +9,21 @@ class StudentClassModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'student_class_table__junction';
+    protected $table = 'student_class';
     protected $primaryKey = 'StudentClass_ID';
 
     public function student()
     {
-        return $this->belongsTo(Student::class, 'Student_ID');
+        return $this->belongsTo(StudentModel::class, 'Student_ID');
     }
 
     public function class()
     {
-        return $this->belongsTo(Classes::class, 'Class_ID');
+        return $this->belongsTo(ClassesModel::class, 'Class_ID');
     }
 
     public function schoolYear()
     {
-        return $this->belongsTo(SchoolYear::class, 'SY_ID');
+        return $this->belongsTo(SchoolYearModel::class, 'SY_ID');
     }
 }

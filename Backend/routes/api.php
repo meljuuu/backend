@@ -5,8 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResearchController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Http\Exceptions\NotFoundHttpException;
 
 /*
@@ -49,6 +51,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/teacher/research', [ResearchController::class, 'store']);
     Route::delete('/teacher/research/{research}', [ResearchController::class, 'destroy']);
     Route::apiResource('/teacher/lesson-plans', \App\Http\Controllers\LessonPlanController::class);
+    Route::get('/teacher/advisory-stats', [DashboardController::class, 'getAdvisoryStats']);
+    Route::get('/teacher/subject-classes', [DashboardController::class, 'getSubjectClasses']);
+    Route::get('/teacher/grade-summary', [DashboardController::class, 'getGradeSummary']);
+    Route::get('/teacher/recent-grades', [DashboardController::class, 'getRecentGrades']);
+   
+    // Class Routes
+    Route::get('/classes', [ClassController::class, 'getClasses']);
+    Route::get('/classes/{classId}', [ClassController::class, 'getClassDetails']);
+    Route::get('/classes/{classId}/students', [ClassController::class, 'getClassStudents']);
 });
 
 

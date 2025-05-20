@@ -13,6 +13,6 @@ class SchoolYearModel extends Model
 
     public function classes()
     {
-        return $this->hasMany(Classes::class, 'SY_ID');
+        return $this->hasMany(ClassesModel::class, 'SY_ID');
     }
 }
