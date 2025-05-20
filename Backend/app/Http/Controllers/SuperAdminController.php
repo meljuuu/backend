@@ -15,15 +15,16 @@ class SuperAdminController extends Controller
     //Classes API
 
     public function getAllWithStudentCount()
-        {
-            return ClassesModel::select(
-                    'classes.*',
-                    DB::raw('(SELECT COUNT(*) FROM students WHERE students.Track = classes.Track) as student_added')
-                )
-                ->with(['adviser:Teacher_ID,FirstName,LastName,MiddleName', 'schoolYear'])
-                ->get();
-        }
-
+    {
+        return ClassesModel::select(
+                'classes.*',
+                DB::raw('(SELECT COUNT(*) FROM students 
+                        WHERE students.Track = classes.Track 
+                        AND students.Curriculum = classes.Curriculum) as student_added')
+            )
+            ->with(['adviser:Teacher_ID,FirstName,LastName,MiddleName', 'schoolYear'])
+            ->get();
+    }
 
 
 }
