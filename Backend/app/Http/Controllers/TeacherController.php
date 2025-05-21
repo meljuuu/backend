@@ -8,6 +8,8 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Research;
+use App\Models\Subject;
+use Illuminate\Support\Facades\DB;
 
 class TeacherController extends Controller
 {
@@ -33,38 +35,150 @@ class TeacherController extends Controller
         }
     }
 
-
-    public function createTeacherAccount(Request $request)
-    {
+    // public function createTeacherAccount(Request $request)
+    // {
    
+    //     $request->validate([
+    //         'Teacher_ID' => 'required|unique:teachers,Teacher_ID',
+    //         'Email' => 'required|email|unique:teachers,Email',
+    //         'Password' => 'required|min:8',
+    //         'FirstName' => 'required|string|max:255',
+    //         'LastName' => 'required|string|max:255',
+    //         'MiddleName' => 'nullable|string|max:255',
+    //         'BirthDate' => 'required|date',
+    //         'Sex' => 'required|in:M,F',
+    //         'Position' => 'required|in:Admin,Coord,Teacher',
+    //         'ContactNumber' => 'required|string|max:15',
+    //         'Address' => 'required|string|max:255',
+    //     ]);
+
+    //     $authenticatedTeacher = Auth::user(); 
+    //     if ($authenticatedTeacher->Position !== 'Admin') {
+    //         return response()->json([
+    //             'error' => 'Only Admins can create teacher accounts.',
+    //         ], 403);
+    //     }
+
+    //     $teacher = TeacherModel::create([
+    //         'Teacher_ID' => $request->Teacher_ID,
+    //         'Email' => $request->Email,
+    //         'Password' => Hash::make($request->Password),
+    //         'FirstName' => $request->FirstName,
+    //         'LastName' => $request->LastName,
+    //         'MiddleName' => $request->MiddleName,
+    //         'BirthDate' => $request->BirthDate,
+    //         'Sex' => $request->Sex,
+    //         'Position' => $request->Position,
+    //         'ContactNumber' => $request->ContactNumber,
+    //         'Address' => $request->Address,
+    //     ]);
+
+    //     return response()->json([
+    //         'message' => 'Teacher account created successfully.',
+    //         'teacher' => $teacher,
+    //     ], 201);
+    // }
+
+public function createTeacherAccount(Request $request)
+{
+    $request->validate([
+        'Email' => 'required|email|unique:teachers,Email',
+        'Password' => 'required|min:8',
+        'EmployeeNo' => 'required|string|unique:teachers,EmployeeNo',
+        'Educational_Attainment' => 'required|string|max:255',
+        'Teaching_Position' => 'required|string|max:255',
+        'FirstName' => 'required|string|max:255',
+        'LastName' => 'required|string|max:255',
+        'MiddleName' => 'nullable|string|max:255',
+        'BirthDate' => 'required|date',
+        'Sex' => 'required|in:M,F',
+        'Position' => 'required|in:Admin,Book-Keeping,Teacher,SuperAdmin',
+        'ContactNumber' => 'required|string|max:15',
+        'Address' => 'required|string|max:255',
+        'Subject_IDs' => 'required|array|min:1|max:2',
+        'Subject_IDs.*' => 'exists:subjects,Subject_ID',
+    ]);
+
+    $authenticatedTeacher = Auth::user();
+    if (!in_array($authenticatedTeacher->Position, ['Admin', 'SuperAdmin'])) {
+        return response()->json([
+            'error' => 'Only Admins can create teacher accounts.',
+        ], 403);
+    }
+
+    $teacher = TeacherModel::create([
+        'Email' => $request->Email,
+        'Password' => Hash::make($request->Password),
+        'EmployeeNo' => $request->EmployeeNo,
+        'FirstName' => $request->FirstName,
+        'LastName' => $request->LastName,
+        'MiddleName' => $request->MiddleName,
+        'Suffix' => $request->Suffix,
+        'Educational_Attainment' => $request->Educational_Attainment,
+        'Teaching_Position' => $request->Teaching_Position,
+        'BirthDate' => $request->BirthDate,
+        'Sex' => $request->Sex,
+        'Position' => $request->Position,
+        'ContactNumber' => $request->ContactNumber,
+        'Address' => $request->Address,
+    ]);
+
+    $subjects = Subject::whereIn('Subject_ID', $request->Subject_IDs)->get();
+
+    // Prepare and insert into teachers_subject table directly
+    $now = now();
+    $insertData = [];
+    foreach ($subjects as $subject) {
+        $insertData[] = [
+            'teacher_id' => $teacher->Teacher_ID,
+            'subject_id' => $subject->Subject_ID,
+            'subject_code' => $subject->SubjectCode,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
+    }
+
+    DB::table('teachers_subject')->insert($insertData);
+
+    return response()->json([
+        'message' => 'Teacher account created and subjects assigned successfully.',
+        'teacher' => $teacher,
+        'assigned_subjects' => $subjects,
+    ], 201);
+}
+
+    public function updateTeacherAccount(Request $request, $id)
+    {
+        $teacher = TeacherModel::findOrFail($id);
+
         $request->validate([
-            'Teacher_ID' => 'required|unique:teachers,Teacher_ID',
-            'Email' => 'required|email|unique:teachers,Email',
-            'Password' => 'required|min:8',
+            'Email' => 'required|email|unique:teachers,Email,' . $teacher->id,
+            'Password' => 'nullable|min:8',
+            'EmployeeNo' => 'required|string|unique:teachers,EmployeeNo,' . $teacher->id,
+            'Educational_Attainment' => 'required|string|max:255',
+            'Teaching_Position' => 'required|string|max:255',
             'FirstName' => 'required|string|max:255',
             'LastName' => 'required|string|max:255',
             'MiddleName' => 'nullable|string|max:255',
             'BirthDate' => 'required|date',
             'Sex' => 'required|in:M,F',
-            'Position' => 'required|in:Admin,Coord,Teacher',
+            'Position' => 'required|in:Admin,Book-Keeping,Teacher,SuperAdmin',
             'ContactNumber' => 'required|string|max:15',
             'Address' => 'required|string|max:255',
+            'Subject_IDs' => 'required|array|min:1|max:2',
+            'Subject_IDs.*' => 'exists:subjects,Subject_ID',
         ]);
 
-        $authenticatedTeacher = Auth::user(); 
-        if ($authenticatedTeacher->Position !== 'Admin') {
-            return response()->json([
-                'error' => 'Only Admins can create teacher accounts.',
-            ], 403);
-        }
-
-        $teacher = TeacherModel::create([
-            'Teacher_ID' => $request->Teacher_ID,
+        $teacher->update([
             'Email' => $request->Email,
-            'Password' => Hash::make($request->Password),
+            'Password' => $request->Password ? Hash::make($request->Password) : $teacher->Password,
+            'EmployeeNo' => $request->EmployeeNo,
             'FirstName' => $request->FirstName,
             'LastName' => $request->LastName,
             'MiddleName' => $request->MiddleName,
+            'Suffix' => $request->Suffix,
+            'Educational_Attainment' => $request->Educational_Attainment,
+            'Teaching_Position' => $request->Teaching_Position,
             'BirthDate' => $request->BirthDate,
             'Sex' => $request->Sex,
             'Position' => $request->Position,
@@ -72,10 +186,47 @@ class TeacherController extends Controller
             'Address' => $request->Address,
         ]);
 
+        // Sync subjects in pivot table
+        \DB::table('teachers_subject')->where('teacher_id', $teacher->Teacher_ID)->delete();
+        $subjects = Subject::whereIn('Subject_ID', $request->Subject_IDs)->get();
+        foreach ($subjects as $subject) {
+            \DB::table('teachers_subject')->insert([
+                'teacher_id' => $teacher->Teacher_ID,
+                'subject_id' => $subject->Subject_ID,
+                'subject_code' => $subject->SubjectCode,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
         return response()->json([
-            'message' => 'Teacher account created successfully.',
+            'message' => 'Teacher account updated successfully.',
             'teacher' => $teacher,
-        ], 201);
+            'assigned_subjects' => $subjects,
+        ]);
+    }
+
+    public function deleteTeacherAccount($id)
+    {
+        $teacher = TeacherModel::findOrFail($id);
+
+        // Delete related subjects from pivot table
+        \DB::table('teachers_subject')->where('teacher_id', $teacher->Teacher_ID)->delete();
+
+        // Delete teacher record
+        $teacher->delete();
+
+        return response()->json([
+            'message' => 'Teacher account and related subject assignments deleted successfully.'
+        ]);
+    }
+
+
+
+    public function getAllTeachers()
+    {
+        $teachers = TeacherModel::all();
+        return response()->json($teachers);
     }
 
     public function getProfile(Request $request)

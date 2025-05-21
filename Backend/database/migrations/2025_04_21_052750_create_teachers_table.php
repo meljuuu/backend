@@ -9,27 +9,28 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('teachers', function (Blueprint $table) {
-            $table->id('Teacher_ID');
-            $table->string('EmployeeNo')->unique();
-            $table->string('Email');
-            $table->string('Password');
-            $table->string('FirstName');
-            $table->string('LastName');
-            $table->string('MiddleName')->nullable();
-            $table->string('Suffix')->nullable();
-            $table->string('Educational_Attainment');
-            $table->string('Teaching_Position');
-            $table->date('BirthDate');
-            $table->enum('Sex', ['M', 'F']);
-            $table->enum('Position', ['Admin', 'Teacher', 'SuperAdmin']);
-            $table->string('ContactNumber');
-            $table->string('Address');
-            $table->timestamps();
-        });
-    }
+public function up(): void
+{
+    Schema::create('teachers', function (Blueprint $table) {
+        $table->id('Teacher_ID');
+        $table->string('EmployeeNo')->unique();
+        $table->string('Email');
+        $table->string('Password');
+        $table->string('FirstName');
+        $table->string('LastName');
+        $table->string('MiddleName')->nullable();
+        $table->string('Suffix')->nullable();
+        $table->string('Educational_Attainment');
+        $table->string('Teaching_Position');
+        $table->date('BirthDate');
+        $table->enum('Sex', ['M', 'F']);
+        $table->enum('Position', ['Admin', 'Teacher', 'SuperAdmin', 'Book-keeping']);
+        $table->string('ContactNumber');
+        $table->string('Address');
+
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.

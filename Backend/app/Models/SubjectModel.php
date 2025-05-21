@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SubjectModel extends Model
+class Subject extends Model
 {
     use HasFactory;
 
@@ -15,15 +15,17 @@ class SubjectModel extends Model
     // Set the primary key
     protected $primaryKey = 'Subject_ID';
 
-    // Enable auto-incrementing primary key
-    public $incrementing = true;
+    protected $fillable = ['SubjectName', 'SubjectCode'];
 
-    // Primary key is an integer
-    protected $keyType = 'int';
+    public function grades()
+    {
+        return $this->hasMany(SubjectGrade::class, 'Subject_ID');
+    }
 
-    // Fillable fields for mass assignment
-    protected $fillable = [
-        'SubjectName',
-        'SubjectCode',
-    ];
+    public function teachers()
+    {
+        return $this->belongsToMany(TeacherModel::class, 'teachers_subject', 'subject_id', 'teacher_id')
+                    ->withPivot('subject_code')
+                    ->withTimestamps();
+    }
 }

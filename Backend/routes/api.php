@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SubjectController;
 // use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\AdminStudentClassController;
@@ -33,18 +34,28 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Public Routes Here
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
 // Route::get('/profile', [ProfileController::class, 'getProfile']);
 
 // Public route (no auth)
 Route::put('/teacher/lesson-plans/{id}', [\App\Http\Controllers\LessonPlanController::class, 'update']);
+
+//Subject API
+
+Route::get('subjects', [SubjectController::class, 'index']); 
+Route::post('subjects', [SubjectController::class, 'store']); 
+Route::get('subjects/{id}', [SubjectController::class, 'show']); 
+Route::put('subjects/{id}', [SubjectController::class, 'update']); 
+Route::patch('subjects/{id}', [SubjectController::class, 'update']);
+Route::delete('subjects/{id}', [SubjectController::class, 'destroy']);
 
 //STUDENT API
 Route::post('/student/add', [StudentController::class, 'store']);
 Route::get('/student/getAll', [StudentController::class, 'getAll']);
 Route::get('/student/getAllPending', [StudentController::class, 'getPendingStudents']);
 Route::get('/student/getAllAccepted', [StudentController::class, 'getAcceptedStudents']);
-Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
+Route::post('/student/accept', [StudentController::class, 'massAcceptFromDataHolder']);
+
 
 //ADMIN API
 Route::post('/assign-students', [AdminStudentClassController::class, 'assignStudentsToClass']);
@@ -75,7 +86,13 @@ Route::get('/admin/get-classes', [StudentClassController::class, 'index']);
 
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/create-teacher', [TeacherController::class, 'createTeacherAccount']);
+    
+    //FACULTY ROUTES
+    Route::post('/teacher/create', [TeacherController::class, 'createTeacherAccount']);
+    Route::get('/teacher/getAll', [TeacherController::class, 'getAllTeachers']);
+    Route::put('/teacher/update{id}', [TeacherController::class, 'updateTeacherAccount']);
+    Route::delete('/teacher/delete{id}', [TeacherController::class, 'deleteTeacherAccount']);
+    
     // Route::put('/profile', [ProfileController::class, 'updateProfile']);
     // Route::post('/profile/research', [ProfileController::class, 'addResearch']);
     // Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
