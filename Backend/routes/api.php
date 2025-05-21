@@ -10,6 +10,7 @@ use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\AdminStudentClassController;
 use Illuminate\Http\Exceptions\NotFoundHttpException;
 use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\AdminDashboardController;
 
 
 use App\Http\Controllers\SubjectController;
@@ -49,6 +50,7 @@ Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
 Route::post('/assign-students', [AdminStudentClassController::class, 'assignStudentsToClass']);
 Route::post('/get-all-classes', [AdminStudentClassController::class, 'indexClass']);
 Route::get('/get-super-classes', [AdminStudentClassController::class, 'indexExcludeIncomplete']);
+Route::get('/dashboard/students/count', [AdminDashboardController::class, 'getStudentCount']);
 
 //Teacher
 Route::get('/teacher/getTeachers', [TeacherController::class, 'getAllTeachers']);
