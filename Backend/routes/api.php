@@ -48,6 +48,9 @@ Route::post('/assign-students', [AdminStudentClassController::class, 'assignStud
 
 //SUPER ADMIN API
 Route::get('/superadmin/classes-with-students', [SuperAdminController::class, 'getAllWithStudentCount']);
+Route::get('/superadmin/students', [SuperadminController::class, 'getAllStudentsData']);
+Route::get('/superadmin/student/{id}', [SuperadminController::class, 'getStudentById']);
+
 
 
 
