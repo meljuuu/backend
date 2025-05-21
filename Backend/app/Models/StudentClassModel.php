@@ -4,45 +4,102 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TeacherModel;
+use App\Models\SubjectModel;
+use App\Models\ClassesModel;
+use App\Models\SchoolYearModel;
+use App\Models\TeachersSubject;
 
 class StudentClassModel extends Model
 {
     use HasFactory;
 
-    // Correct the table name
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'student_class';
 
-    // Primary key
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
     protected $primaryKey = 'StudentClass_ID';
 
-    // Fillable fields for mass assignment
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = true;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'Student_ID',
         'Class_ID',
+        'ClassName',
         'SY_ID',
         'Teacher_ID',
-        'ClassName',
+        'Adviser_ID',
+        'TeacherSubject_ID',
         'isAdvisory',
+        'Status',
     ];
 
-    // Relationships
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'isAdvisory' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Relationships
+     */
+
     public function student()
     {
-        return $this->belongsTo(Student::class, 'Student_ID');
+        return $this->belongsTo(SubjectModel::class, 'Student_ID', 'Student_ID');
     }
 
     public function class()
     {
-        return $this->belongsTo(Classes::class, 'Class_ID');
-    }
-
-    public function teacher()
-    {
-        return $this->belongsTo(Teacher::class, 'Teacher_ID');
+        return $this->belongsTo(ClassesModel::class, 'Class_ID', 'Class_ID');
     }
 
     public function schoolYear()
     {
-        return $this->belongsTo(SchoolYear::class, 'SY_ID');
+        return $this->belongsTo(SchoolYearModel::class, 'SY_ID', 'SY_ID');
+    }
+
+    public function teacher()
+    {
+        return $this->belongsTo(TeacherModel::class, 'Teacher_ID', 'Teacher_ID');
+    }
+
+    public function adviser()
+    {
+        return $this->belongsTo(TeacherModel::class, 'Adviser_ID', 'Teacher_ID');
+    }
+
+   
+    public function teacherSubjects()
+    {
+        return $this->belongsToMany(
+            TeachersSubject::class,
+            'student_class_teacher_subject',
+            'student_class_id', 
+            'teacher_subject_id' 
+        );
     }
 }

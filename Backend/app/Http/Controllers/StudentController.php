@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\StudentModel;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
@@ -26,12 +26,21 @@ class StudentController extends Controller
             'students' => $students
         ]);
     }
+    
+    public function getAllAcceptedStudents(){
 
-        public function getAcceptedStudents()
+    }
+
+    public function getAcceptedStudents()
     {
-        
-         $students = StudentModel::where('Status', 'accepted')->get();
-
+        // Get the list of student IDs that are already in the student_class table
+        $excludedStudentIDs = DB::table('student_class')->pluck('Student_ID');
+    
+        // Get accepted students who are not in the student_class table
+        $students = StudentModel::where('Status', 'accepted')
+            ->whereNotIn('Student_ID', $excludedStudentIDs)
+            ->get();
+    
         return response()->json([
             'students' => $students
         ]);

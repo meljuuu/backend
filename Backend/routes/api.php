@@ -11,6 +11,10 @@ use App\Http\Controllers\AdminStudentClassController;
 use Illuminate\Http\Exceptions\NotFoundHttpException;
 use App\Http\Controllers\SuperAdminController;
 
+
+use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherSubjectController;
+use App\Http\Controllers\StudentClassController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -43,15 +47,26 @@ Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
 
 //ADMIN API
 Route::post('/assign-students', [AdminStudentClassController::class, 'assignStudentsToClass']);
+Route::post('/get-all-classes', [AdminStudentClassController::class, 'indexClass']);
+Route::get('/get-super-classes', [AdminStudentClassController::class, 'indexExcludeIncomplete']);
 
-
+//Teacher
+Route::get('/teacher/getTeachers', [TeacherController::class, 'getAllTeachers']);
 
 //SUPER ADMIN API
 Route::get('/superadmin/classes-with-students', [SuperAdminController::class, 'getAllWithStudentCount']);
 Route::get('/superadmin/students', [SuperadminController::class, 'getAllStudentsData']);
 Route::get('/superadmin/student/{id}', [SuperadminController::class, 'getStudentById']);
 
+//SUBJECTS
+Route::get('/getSubjects', [SubjectController::class, 'getAllSubjects']);
 
+//TEACHER SUBJECTS
+Route::get('/teacher-subjects/getAll', [TeacherSubjectController::class, 'getAllSubject']);
+
+//STUDENTCLASSES
+Route::post('/admin/create-class', [StudentClassController::class, 'store']);
+Route::get('/admin/get-classes', [StudentClassController::class, 'index']);
 
 
 

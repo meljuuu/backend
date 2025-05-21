@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('FirstName');
             $table->string('LastName');
             $table->string('MiddleName')->nullable();
-            $table->enum('Suffix', ['Jr.', 'Sr.', 'II', 'III']);
+            $table->enum('Suffix', ['Jr.', 'Sr.', 'II', 'III'])->nullable();
             $table->date('BirthDate');
             $table->enum('Sex', ['M', 'F']);
             $table->string('Age');

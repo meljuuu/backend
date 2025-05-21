@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TeacherModel;
+use App\Models\SubjectModel;
 
 class TeachersSubject extends Model
 {
@@ -30,6 +32,16 @@ class TeachersSubject extends Model
 
     public function subject()
     {
-        return $this->belongsTo(Subject::class, 'subject_id', 'Subject_ID');
+        return $this->belongsTo(SubjectModel::class, 'subject_id', 'Subject_ID');
+    }
+    
+    public function studentClasses()
+    {
+        return $this->belongsToMany(
+            StudentClass::class,
+            'student_class_teacher_subject',
+            'teacher_subject_id',
+            'student_class_id'
+        );
     }
 }

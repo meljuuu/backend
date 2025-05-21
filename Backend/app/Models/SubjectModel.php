@@ -9,15 +9,21 @@ class SubjectModel extends Model
 {
     use HasFactory;
 
+    // Set the table name explicitly (optional if Laravel auto-detects)
+    protected $table = 'subjects';
+
+    // Set the primary key
     protected $primaryKey = 'Subject_ID';
 
-    public function grades()
-    {
-        return $this->hasMany(SubjectGrade::class, 'Subject_ID');
-    }
+    // Enable auto-incrementing primary key
+    public $incrementing = true;
 
-    public function teacher()
-    {
-        return $this->belongsTo(Teacher::class, 'Teacher_ID');
-    }
+    // Primary key is an integer
+    protected $keyType = 'int';
+
+    // Fillable fields for mass assignment
+    protected $fillable = [
+        'SubjectName',
+        'SubjectCode',
+    ];
 }

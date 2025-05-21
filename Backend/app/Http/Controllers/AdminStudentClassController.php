@@ -8,6 +8,37 @@ use App\Models\StudentClassModel;
 
 class AdminStudentClassController extends Controller
 {
+
+    public function indexClass()
+    {
+        // Get all classes
+        $classes = ClassesModel::where('Status', 'Incomplete')->get();
+
+        // Return as JSON (for API) or pass to a view
+        return response()->json($classes);
+    }
+
+    public function indexExcludeIncomplete()
+    {
+        $classes = ClassesModel::with(['studentClasses.adviser']) // Load adviser via studentClasses
+            ->withCount('studentClasses')
+            ->where('Status', '!=', 'Incomplete')
+            ->get()
+            ->map(function ($class) {
+                // Get the first StudentClass and retrieve adviser name if available
+                $firstStudentClass = $class->studentClasses->first();
+                $class->adviser_id = $firstStudentClass ? $firstStudentClass->Adviser_ID : null;
+                $class->adviser_name = $firstStudentClass && $firstStudentClass->adviser
+                    ? $firstStudentClass->adviser->name // Adjust this to your teacher's name column
+                    : 'Not assigned';
+                return $class;
+            });
+    
+        return response()->json($classes);
+    }
+    
+    
+
     /**
      * Assign multiple students to a class.
      */

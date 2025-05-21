@@ -12,10 +12,27 @@ use App\Models\Research;
 class TeacherController extends Controller
 {
 
-    public function __construct()
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:sanctum'); 
+    // }
+
+    public function getAllTeachers()
     {
-        $this->middleware('auth:sanctum'); 
+        try {
+            $teachers = TeacherModel::where('Position', 'Teacher')->get();
+
+            return response()->json([
+                'teachers' => $teachers
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to retrieve teachers.',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
+
 
     public function createTeacherAccount(Request $request)
     {
