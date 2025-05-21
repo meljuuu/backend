@@ -19,6 +19,23 @@ class TeacherController extends Controller
     //     $this->middleware('auth:sanctum'); 
     // }
 
+    public function getAll()
+    {
+        $teachers = TeacherModel::with('subjects')->get();
+
+        // Optionally, format the response to include subject IDs for each teacher
+        $data = $teachers->map(function ($teacher) {
+            return [
+                'teacher' => $teacher,
+                'Subject_IDs' => $teacher->subjects->pluck('Subject_ID')->toArray(),
+                'subjects' => $teacher->subjects,
+            ];
+        });
+
+        return response()->json([
+            'teachers' => $data
+        ]);
+    }
     public function getAllTeachers()
     {
         try {
@@ -147,64 +164,77 @@ public function createTeacherAccount(Request $request)
     ], 201);
 }
 
-    public function updateTeacherAccount(Request $request, $id)
-    {
-        $teacher = TeacherModel::findOrFail($id);
+  public function updateTeacherAccount(Request $request, $teacherId)
+{
+    $teacher = TeacherModel::findOrFail($teacherId);
 
-        $request->validate([
-            'Email' => 'required|email|unique:teachers,Email,' . $teacher->id,
-            'Password' => 'nullable|min:8',
-            'EmployeeNo' => 'required|string|unique:teachers,EmployeeNo,' . $teacher->id,
-            'Educational_Attainment' => 'required|string|max:255',
-            'Teaching_Position' => 'required|string|max:255',
-            'FirstName' => 'required|string|max:255',
-            'LastName' => 'required|string|max:255',
-            'MiddleName' => 'nullable|string|max:255',
-            'BirthDate' => 'required|date',
-            'Sex' => 'required|in:M,F',
-            'Position' => 'required|in:Admin,Book-Keeping,Teacher,SuperAdmin',
-            'ContactNumber' => 'required|string|max:15',
-            'Address' => 'required|string|max:255',
-            'Subject_IDs' => 'required|array|min:1|max:2',
-            'Subject_IDs.*' => 'exists:subjects,Subject_ID',
-        ]);
+    $request->validate([
+        'Email' => 'required|email|unique:teachers,Email,' . $teacherId . ',Teacher_ID',
+        'Password' => 'nullable|min:8',
+        'EmployeeNo' => 'required|string|unique:teachers,EmployeeNo,' . $teacherId . ',Teacher_ID',
+        'Educational_Attainment' => 'required|string|max:255',
+        'Teaching_Position' => 'required|string|max:255',
+        'FirstName' => 'required|string|max:255',
+        'LastName' => 'required|string|max:255',
+        'MiddleName' => 'nullable|string|max:255',
+        'BirthDate' => 'required|date',
+        'Sex' => 'required|in:M,F',
+        'Position' => 'required|in:Admin,Book-Keeping,Teacher,SuperAdmin',
+        'ContactNumber' => 'required|string|max:15',
+        'Address' => 'required|string|max:255',
+        'Subject_IDs' => 'required|array|min:1|max:2',
+        'Subject_IDs.*' => 'exists:subjects,Subject_ID',
+    ]);
 
-        $teacher->update([
-            'Email' => $request->Email,
-            'Password' => $request->Password ? Hash::make($request->Password) : $teacher->Password,
-            'EmployeeNo' => $request->EmployeeNo,
-            'FirstName' => $request->FirstName,
-            'LastName' => $request->LastName,
-            'MiddleName' => $request->MiddleName,
-            'Suffix' => $request->Suffix,
-            'Educational_Attainment' => $request->Educational_Attainment,
-            'Teaching_Position' => $request->Teaching_Position,
-            'BirthDate' => $request->BirthDate,
-            'Sex' => $request->Sex,
-            'Position' => $request->Position,
-            'ContactNumber' => $request->ContactNumber,
-            'Address' => $request->Address,
-        ]);
-
-        // Sync subjects in pivot table
-        \DB::table('teachers_subject')->where('teacher_id', $teacher->Teacher_ID)->delete();
-        $subjects = Subject::whereIn('Subject_ID', $request->Subject_IDs)->get();
-        foreach ($subjects as $subject) {
-            \DB::table('teachers_subject')->insert([
-                'teacher_id' => $teacher->Teacher_ID,
-                'subject_id' => $subject->Subject_ID,
-                'subject_code' => $subject->SubjectCode,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
+    $authenticatedTeacher = Auth::user();
+    if (!in_array($authenticatedTeacher->Position, ['Admin', 'SuperAdmin'])) {
         return response()->json([
-            'message' => 'Teacher account updated successfully.',
-            'teacher' => $teacher,
-            'assigned_subjects' => $subjects,
-        ]);
+            'error' => 'Only Admins can update teacher accounts.',
+        ], 403);
     }
+
+    $teacher->update([
+        'Email' => $request->Email,
+        'Password' => $request->filled('Password') ? Hash::make($request->Password) : $teacher->Password,
+        'EmployeeNo' => $request->EmployeeNo,
+        'FirstName' => $request->FirstName,
+        'LastName' => $request->LastName,
+        'MiddleName' => $request->MiddleName,
+        'Suffix' => $request->Suffix,
+        'Educational_Attainment' => $request->Educational_Attainment,
+        'Teaching_Position' => $request->Teaching_Position,
+        'BirthDate' => $request->BirthDate,
+        'Sex' => $request->Sex,
+        'Position' => $request->Position,
+        'ContactNumber' => $request->ContactNumber,
+        'Address' => $request->Address,
+    ]);
+
+    // Sync subjects
+    $subjects = Subject::whereIn('Subject_ID', $request->Subject_IDs)->get();
+
+    DB::table('teachers_subject')->where('teacher_id', $teacher->Teacher_ID)->delete();
+
+    $now = now();
+    $insertData = [];
+    foreach ($subjects as $subject) {
+        $insertData[] = [
+            'teacher_id' => $teacher->Teacher_ID,
+            'subject_id' => $subject->Subject_ID,
+            'subject_code' => $subject->SubjectCode,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
+    }
+
+    DB::table('teachers_subject')->insert($insertData);
+
+    return response()->json([
+        'message' => 'Teacher account updated successfully.',
+        'teacher' => $teacher,
+        'assigned_subjects' => $subjects,
+    ], 200);
+}
 
     public function deleteTeacherAccount($id)
     {
@@ -223,7 +253,7 @@ public function createTeacherAccount(Request $request)
 
 
 
-    public function getAllTeachers()
+    public function getAllPersonnel()
     {
         $teachers = TeacherModel::all();
         return response()->json($teachers);

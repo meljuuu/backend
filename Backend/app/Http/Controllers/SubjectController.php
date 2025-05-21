@@ -8,7 +8,7 @@ use App\Models\Subject;
 class SubjectController extends Controller
 {
     // Display a listing of subjects
-    public function index()
+    public function getAll()
     {
         $subjects = Subject::all();
         return response()->json($subjects);
