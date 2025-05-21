@@ -83,17 +83,39 @@ class StudentController extends Controller
         ], 201);
     }
 
-    public function acceptProfile(Request $request, $id)
-    {
-        $student = StudentModel::find($id);
+    // public function acceptProfile(Request $request, $id)
+    // {
+    //     $student = StudentModel::find($id);
 
-        if (!$student) {
-            return response()->json(['message' => 'Student not found.'], 404);
-        }
+    //     if (!$student) {
+    //         return response()->json(['message' => 'Student not found.'], 404);
+    //     }
 
-        $student->Status = 'accepted';
-        $student->save();
+    //     $student->Status = 'accepted';
+    //     $student->save();
 
-        return response()->json(['message' => 'Student profile accepted successfully.']);
-    }
+    //     return response()->json(['message' => 'Student profile accepted successfully.']);
+    // }
+
+   public function massAcceptFromDataHolder(Request $request)
+{
+    // Validate incoming data format
+    $validated = $request->validate([
+        'data' => 'required|array',
+        'data.*.Student_ID' => 'required|integer|exists:students,Student_ID',
+    ]);
+
+    // Extract all Student_IDs
+    $studentIds = collect($validated['data'])->pluck('Student_ID')->toArray();
+
+    // Mass update the Status field
+    $updated = StudentModel::whereIn('Student_ID', $studentIds)
+        ->update(['Status' => 'Accepted']);
+
+    return response()->json([
+        'message' => "$updated student profile(s) accepted successfully.",
+        'accepted_ids' => $studentIds
+    ]);
+}
+
 }
