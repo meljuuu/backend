@@ -122,6 +122,11 @@ public function createTeacherAccount(Request $request)
             'error' => 'Only Admins or SuperAdmins can create teacher accounts.',
         ], 403);
     }
+        if (!in_array($authenticatedTeacher->Position, ['Admin', 'SuperAdmin'])) {
+        return response()->json([
+            'error' => 'Only Admins or SuperAdmins can create teacher accounts.',
+        ], 403);
+    }
 
     $teacher = TeacherModel::create([
         'Email' => $request->Email,
