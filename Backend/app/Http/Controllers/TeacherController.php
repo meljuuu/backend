@@ -52,11 +52,11 @@ class TeacherController extends Controller
         ]);
 
         $authenticatedTeacher = Auth::user(); 
-        if ($authenticatedTeacher->Position !== 'Admin') {
-            return response()->json([
-                'error' => 'Only Admins can create teacher accounts.',
-            ], 403);
-        }
+        if (!in_array($authenticatedTeacher->Position, ['Admin', 'SuperAdmin'])) {
+        return response()->json([
+            'error' => 'Only Admins or SuperAdmins can create teacher accounts.',
+        ], 403);
+    }
 
         $teacher = TeacherModel::create([
             'Teacher_ID' => $request->Teacher_ID,

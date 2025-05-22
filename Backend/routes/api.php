@@ -45,12 +45,18 @@ Route::get('/student/getAll', [StudentController::class, 'getAll']);
 Route::get('/student/getAllPending', [StudentController::class, 'getPendingStudents']);
 Route::get('/student/getAllAccepted', [StudentController::class, 'getAcceptedStudents']);
 Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
+Route::post('/student/bulk-upload', [StudentController::class, 'bulkUpload']);
+
 
 //ADMIN API
 Route::post('/assign-students', [AdminStudentClassController::class, 'assignStudentsToClass']);
 Route::post('/get-all-classes', [AdminStudentClassController::class, 'indexClass']);
 Route::get('/get-super-classes', [AdminStudentClassController::class, 'indexExcludeIncomplete']);
 Route::get('/dashboard/students/count', [AdminDashboardController::class, 'getStudentCount']);
+Route::get('/dashboard/teachers/count', [AdminDashboardController::class, 'getTeacherCount']);
+Route::get('/dashboard/students/gender-distribution', [AdminDashboardController::class, 'getStudentGenderDistribution']);
+Route::get('/dashboard/students/grade-distribution', [AdminDashboardController::class, 'getStudentGradeDistribution']);
+
 
 //Teacher
 Route::get('/teacher/getTeachers', [TeacherController::class, 'getAllTeachers']);
