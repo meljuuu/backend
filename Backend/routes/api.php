@@ -11,8 +11,6 @@ use App\Http\Controllers\AdminStudentClassController;
 use Illuminate\Http\Exceptions\NotFoundHttpException;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\AdminDashboardController;
-
-
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherSubjectController;
 use App\Http\Controllers\StudentClassController;
@@ -59,16 +57,18 @@ Route::get('/dashboard/students/grade-distribution', [AdminDashboardController::
 
 
 //Teacher
-Route::get('/teacher/getTeachers', [TeacherController::class, 'getAllTeachers']);
+    Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
+
 
 //SUPER ADMIN API
 Route::get('/superadmin/classes-with-students', [SuperAdminController::class, 'getAllWithStudentCount']);
 Route::get('/superadmin/students', [SuperadminController::class, 'getAllStudentsData']);
 Route::get('/superadmin/student/{id}', [SuperadminController::class, 'getStudentById']);
 
-//SUBJECTS
-Route::get('/getSubjects', [SubjectController::class, 'getAllSubjects']);
 
+//SUBJECTS API
+Route::get('/subject/getSubjects', [SubjectController::class, 'getAll']);
+    
 //TEACHER SUBJECTS
 Route::get('/teacher-subjects/getAll', [TeacherSubjectController::class, 'getAllSubject']);
 
@@ -78,10 +78,19 @@ Route::get('/admin/get-classes', [StudentClassController::class, 'index']);
 
 
 
-
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/create-teacher', [TeacherController::class, 'createTeacherAccount']);
+
+    //PERSONNEL API
+    Route::post('/teacher/create-teacher', [TeacherController::class, 'createTeacherAccount']);
+    Route::put('/teachers/edit/{teacherId}', [TeacherController::class, 'updateTeacherAccount']);
+    Route::delete('/teachers/delete/{teacherId}', [TeacherController::class, 'deleteTeacherAccount']);
+
+    
+    Route::get('/teachers/getAll', [TeacherController::class, 'getAllPersonnel']);
+    // Route::put('/profile', [ProfileController::class, 'updateProfile']);
+
+
     // Route::put('/profile', [ProfileController::class, 'updateProfile']);
     // Route::post('/profile/research', [ProfileController::class, 'addResearch']);
     // Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
