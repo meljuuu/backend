@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Research;
-use App\Models\Subject;
+use App\Models\SubjectModel as Subject;
 use Illuminate\Support\Facades\DB;
 
 class TeacherController extends Controller
