@@ -13,11 +13,24 @@ class TeacherSubjectController extends Controller
 {
     public function getAllSubject()
     {
-        $teachersSubjects = TeachersSubject::with('subject')->get();
+        $teachersSubjects = TeachersSubject::with(['subject', 'teacher'])->get();
 
         return response()->json([
             'status' => 'success',
-            'teachersSubjects' => $teachersSubjects
+            'data' => $teachersSubjects->map(function($ts) {
+                return [
+                    'id' => $ts->id,
+                    'subject' => [
+                        'id' => $ts->subject->Subject_ID,
+                        'name' => $ts->subject->SubjectName,
+                        'code' => $ts->subject->SubjectCode
+                    ],
+                    'teacher' => [
+                        'id' => $ts->teacher->Teacher_ID,
+                        'name' => $ts->teacher->FirstName . ' ' . $ts->teacher->LastName
+                    ]
+                ];
+            })
         ]);
     }
 }

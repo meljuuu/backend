@@ -10,20 +10,34 @@ class ClassesController extends Controller
     public function index()
     {
         // Fetch classes with relationships and filter by status = 'accepted'
-        $classes = ClassesModel::with(['schoolYear', 'adviser', 'subject'])
-            ->where('status', 'accepted')
-            ->get()
-            ->map(function ($class) {
-                return [
-                    'class_id' => $class->Class_ID,
-                    'trackStand' => $class->Track, // Maps to 'Track' in the database
-                    'classType' => $class->Curriculum, // Maps to 'Curriculum' in the database
-                    'className' => $class->ClassName,
-                    'subjectName' => $class->subject ? $class->subject->SubjectName : null,
-                    'subject_id' => $class->subject ? $class->subject->Subject_ID : null,
-                    'gradeLevel' => $class->Grade_Level,
-                ];
-            });
+        $classes = ClassesModel::with([
+            'schoolYear',
+            'adviser',
+            'studentClasses.teacherSubjects.subject'
+        ])
+        ->where('status', 'accepted')
+        ->get()
+        ->map(function ($class) {
+            // Get the first subject from the relationship chain
+            $subject = null;
+            if ($class->studentClasses->isNotEmpty()) {
+                $firstStudentClass = $class->studentClasses->first();
+                if ($firstStudentClass->teacherSubjects->isNotEmpty()) {
+                    $firstTeacherSubject = $firstStudentClass->teacherSubjects->first();
+                    $subject = $firstTeacherSubject->subject;
+                }
+            }
+
+            return [
+                'class_id' => $class->Class_ID,
+                'trackStand' => $class->Track,
+                'classType' => $class->Curriculum,
+                'className' => $class->ClassName,
+                'subjectName' => $subject ? $subject->SubjectName : 'No Subject Assigned',
+                'subject_id' => $subject ? $subject->Subject_ID : null,
+                'gradeLevel' => $class->Grade_Level,
+            ];
+        });
 
         return response()->json([
             'status' => 'success',

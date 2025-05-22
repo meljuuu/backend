@@ -15,6 +15,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherSubjectController;
 use App\Http\Controllers\StudentClassController;
 use App\Http\Controllers\ClassesController;
+use App\Http\Controllers\StudentClassTeacherSubjectController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -118,8 +119,47 @@ Route::middleware('auth:sanctum')->group(function () {
 
     });
 
-Route::get('/classes', [\App\Http\Controllers\ClassesController::class, 'index']);
-Route::get('/classes/{id}/subjects', [ClassesController::class, 'showSubjectsForClass']);
+// Classes routes
+Route::prefix('classes')->group(function () {
+    Route::get('/', [ClassesController::class, 'index']);
+    Route::get('/{classId}/subjects', [ClassesController::class, 'showSubjectsForClass']);
+    Route::get('/{classId}/teachers', [ClassesController::class, 'getTeachersForClass']);
+});
+
+// Student Class Teacher Subject routes
+Route::prefix('student-class-teacher-subject')->group(function () {
+    Route::get('/', [StudentClassTeacherSubjectController::class, 'index']);
+    Route::get('/class/{classId}/subjects', [StudentClassTeacherSubjectController::class, 'getSubjectsForClass']);
+    Route::get('/class/{classId}/subjects-with-teachers', [StudentClassTeacherSubjectController::class, 'getClassSubjectsWithTeachers']);
+    Route::get('/class/{classId}/teachers', [StudentClassTeacherSubjectController::class, 'getTeachersForClass']);
+    Route::post('/assign', [StudentClassTeacherSubjectController::class, 'assignSubjectsToClass']);
+    Route::post('/remove', [StudentClassTeacherSubjectController::class, 'removeSubjectsFromClass']);
+    Route::get('/teacher/{teacherId}/classes', [StudentClassTeacherSubjectController::class, 'getClassesForTeacher']);
+    Route::get('/teacher/{teacherId}/class/{classId}/subjects', [StudentClassTeacherSubjectController::class, 'getTeacherSubjectsInClass']);
+});
+
+// Teacher Subject routes
+Route::prefix('teacher-subjects')->group(function () {
+    Route::get('/', [TeacherSubjectController::class, 'getAllSubject']);
+    Route::get('/teacher/{teacherId}', [TeacherSubjectController::class, 'getSubjectsByTeacher']);
+    Route::get('/subject/{subjectId}', [TeacherSubjectController::class, 'getTeachersBySubject']);
+});
+
+// Subject routes
+Route::prefix('subjects')->group(function () {
+    Route::get('/', [SubjectController::class, 'getAll']);
+    Route::get('/{subjectId}/teachers', [SubjectController::class, 'getTeachers']);
+    Route::get('/{subjectId}/classes', [SubjectController::class, 'getClasses']);
+});
+
+// Student Class routes
+Route::prefix('student-classes')->group(function () {
+    Route::get('/', [StudentClassController::class, 'index']);
+    Route::post('/', [StudentClassController::class, 'store']);
+    Route::post('/add-students', [StudentClassController::class, 'addStudentsToClass']);
+    Route::post('/remove-students', [StudentClassController::class, 'removeStudentsFromClass']);
+    Route::get('/{id}/subjects', [StudentClassController::class, 'show']);
+});
 
 
 

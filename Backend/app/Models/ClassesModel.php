@@ -49,9 +49,27 @@ class ClassesModel extends Model
         return $this->belongsTo(TeacherModel::class, 'Adviser_ID', 'Teacher_ID');
     }
 
-    public function subject()
+    public function subjects()
     {
-        return $this->belongsTo(SubjectModel::class, 'subject_id', 'Subject_ID');
+        return $this->hasManyThrough(
+            SubjectModel::class,
+            StudentClassModel::class,
+            'Class_ID',
+            'Subject_ID',
+            'Class_ID',
+            'Subject_ID'
+        )->distinct();
     }
 
+    public function teacherSubjects()
+    {
+        return $this->hasManyThrough(
+            TeachersSubject::class,
+            StudentClassModel::class,
+            'Class_ID',
+            'id',
+            'Class_ID',
+            'teacher_subject_id'
+        )->distinct();
+    }
 }

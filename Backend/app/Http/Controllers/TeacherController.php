@@ -21,19 +21,24 @@ class TeacherController extends Controller
 
     public function getAll()
     {
-        $teachers = TeacherModel::with('subjects')->get();
+        $teachers = TeacherModel::with(['subjects', 'teacherSubjects.subject'])->get();
 
-        // Optionally, format the response to include subject IDs for each teacher
         $data = $teachers->map(function ($teacher) {
             return [
                 'teacher' => $teacher,
-                'Subject_IDs' => $teacher->subjects->pluck('Subject_ID')->toArray(),
-                'subjects' => $teacher->subjects,
+                'subjects' => $teacher->teacherSubjects->map(function($ts) {
+                    return [
+                        'id' => $ts->subject->Subject_ID,
+                        'name' => $ts->subject->SubjectName,
+                        'code' => $ts->subject->SubjectCode
+                    ];
+                })->unique('id')->values()
             ];
         });
 
         return response()->json([
-            'teachers' => $data
+            'status' => 'success',
+            'data' => $data
         ]);
     }
     public function getAllTeachers()

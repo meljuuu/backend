@@ -10,10 +10,23 @@ class SubjectController extends Controller
     // Display a listing of subjects
     public function getAll()
     {
-        $subjects = SubjectModel::all();
+        $subjects = SubjectModel::with(['teacherSubjects.teacher'])->get();
+        
         return response()->json([
             'status' => 'success',
-            'data' => $subjects
+            'data' => $subjects->map(function($subject) {
+                return [
+                    'id' => $subject->Subject_ID,
+                    'name' => $subject->SubjectName,
+                    'code' => $subject->SubjectCode,
+                    'teachers' => $subject->teacherSubjects->map(function($ts) {
+                        return [
+                            'id' => $ts->teacher->Teacher_ID,
+                            'name' => $ts->teacher->FirstName . ' ' . $ts->teacher->LastName
+                        ];
+                    })->unique('id')->values()
+                ];
+            })
         ]);
     }
 

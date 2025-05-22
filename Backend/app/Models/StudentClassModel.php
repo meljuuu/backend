@@ -94,11 +94,19 @@ class StudentClassModel extends Model
 
     public function teacherSubjects()
     {
-        return $this->belongsToMany(TeachersSubject::class, 'student_class_teacher_subject', 'student_class_id', 'teacher_subject_id');
+        return $this->belongsToMany(TeachersSubject::class, 'student_class_teacher_subject', 'student_class_id', 'teacher_subject_id')
+            ->with(['subject', 'teacher']);
     }
 
-    public function subject()
+    public function subjects()
     {
-        return $this->belongsTo(Subject::class, 'subject_id');
+        return $this->hasManyThrough(
+            SubjectModel::class,
+            TeachersSubject::class,
+            'id',
+            'Subject_ID',
+            'teacher_subject_id',
+            'subject_id'
+        )->distinct();
     }
 }

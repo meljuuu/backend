@@ -8,6 +8,9 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Research;
 use App\Models\SubjectModel;
+use App\Models\TeachersSubject;
+use App\Models\ClassesModel;
+use App\Models\StudentClassModel;
 
 class TeacherModel extends Authenticatable
 {
@@ -49,6 +52,22 @@ class TeacherModel extends Authenticatable
                     ->withTimestamps();
     }
 
+    public function teacherSubjects()
+    {
+        return $this->hasMany(TeachersSubject::class, 'teacher_id', 'Teacher_ID');
+    }
+
+    public function teachingClasses()
+    {
+        return $this->hasManyThrough(
+            ClassesModel::class,
+            StudentClassModel::class,
+            'Teacher_ID',
+            'Class_ID',
+            'Teacher_ID',
+            'Class_ID'
+        )->distinct();
+    }
 
     public function classes()
     {
