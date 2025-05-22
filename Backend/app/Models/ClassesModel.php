@@ -34,11 +34,19 @@ class ClassesModel extends Model
      */
     public function schoolYear()
     {
-        return $this->belongsTo(SchoolYear::class, 'SY_ID', 'SY_ID');
+        return $this->belongsTo(SchoolYearModel::class, 'SY_ID', 'SY_ID');
     }
+
 
     public function studentClasses()
     {
         return $this->hasMany(StudentClassModel::class, 'Class_ID', 'Class_ID');
     }
+
+    
+    public function adviser()
+    {
+        return $this->belongsTo(TeacherModel::class, 'Adviser_ID', 'Teacher_ID');
+    }
+
 }

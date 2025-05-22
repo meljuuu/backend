@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Models\ClassesModel;
 use App\Models\User;
-use App\Models\Teacher;
+use App\Models\TeacherModel;
 use App\Models\SchoolYearModel;
 use App\Models\StudentModel;
 use App\Models\SubjectGradeModel;

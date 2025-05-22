@@ -22,10 +22,12 @@ return new class extends Migration
                   ->default('Incomplete');
                   
             $table->string('Track')->nullable(); // if applicable only to SHS
+            $table->unsignedBigInteger('Adviser_ID')->nullable();
             $table->enum('Curriculum', ['JHS', 'SHS'])->nullable();
             $table->text('comments')->nullable();
             $table->timestamps();
             $table->foreign('SY_ID')->references('SY_ID')->on('school_years')->onDelete('cascade');
+            $table->foreign('Adviser_ID')->references('Teacher_ID')->on('teachers')->onDelete('set null');
 
             $table->index(['SY_ID', 'Grade_Level']);
         });
