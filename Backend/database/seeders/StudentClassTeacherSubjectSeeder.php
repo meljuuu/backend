@@ -13,7 +13,7 @@ class StudentClassTeacherSubjectSeeder extends Seeder
         $relationships = [
             [
                 'student_class_id' => 1, // Replace with actual student_class_id
-                'teacher_subject_id' => 1, // Replace with actual teacher_subject_id
+                'teacher_subject_id' => 2, // Replace with actual teacher_subject_id
             ],
         ];
 
