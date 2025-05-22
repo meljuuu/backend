@@ -60,6 +60,35 @@ class SuperAdminController extends Controller
     }
 
 
+    // Accept Student Tab
+    public function acceptStudent($id)
+    {
+        $student = StudentModel::findOrFail($id);
+        $student->Status = 'Accepted';
+        $student->save();
+
+        return response()->json([
+            'message' => 'Student has been accepted.',
+            'student' => $student
+        ], 200);
+    }
+
+    // Decline Student Tab
+    public function declineStudent($id)
+    {
+        $student = StudentModel::findOrFail($id);
+        $student->Status = 'Declined';
+        $student->save();
+
+        return response()->json([
+            'message' => 'Student has been declined.',
+            'student' => $student
+        ], 200);
+    }
+
+
+
+
 
 
 

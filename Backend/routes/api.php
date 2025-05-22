@@ -61,10 +61,20 @@ Route::get('/get-accepted-classes', [AdminStudentClassController::class, 'indexA
     Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
 
 
+
+
+
+
+
 //SUPER ADMIN API
 Route::get('/superadmin/classes-with-students', [SuperAdminController::class, 'getAllWithStudentCount']);
 Route::get('/superadmin/students', [SuperadminController::class, 'getAllStudentsData']);
 Route::get('/superadmin/student/{id}', [SuperadminController::class, 'getStudentById']);
+Route::put('/superadmin/student/{id}/accept', [SuperadminController::class, 'acceptStudent']);
+Route::put('/superadmin/student/{id}/decline', [SuperadminController::class, 'declineStudent']);
+
+
+
 
 
 //SUBJECTS API
