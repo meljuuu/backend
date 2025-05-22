@@ -13,17 +13,11 @@ class TeacherSubjectController extends Controller
 {
     public function getAllSubject()
     {
-        try {
-            $teachersSubjects = TeachersSubject::with(['teacher', 'subject'])->get();
-    
-            return response()->json([
-                'teachersSubjects' => $teachersSubjects
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to retrieve teacher-subject records.',
-                'message' => $e->getMessage(),
-            ], 500);
-        }
+        $teachersSubjects = TeachersSubject::with('subject')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'teachersSubjects' => $teachersSubjects
+        ]);
     }
 }

@@ -14,6 +14,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherSubjectController;
 use App\Http\Controllers\StudentClassController;
+use App\Http\Controllers\ClassesController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -116,6 +117,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/teacher/lesson-plans', \App\Http\Controllers\LessonPlanController::class);
 
     });
+
+Route::get('/classes', [\App\Http\Controllers\ClassesController::class, 'index']);
+Route::get('/classes/{id}/subjects', [ClassesController::class, 'showSubjectsForClass']);
 
 
 

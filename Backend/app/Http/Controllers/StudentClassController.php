@@ -167,10 +167,16 @@ class StudentClassController extends Controller
     
     public function show($id)
     {
-        $item = StudentClass::with(['student', 'class', 'schoolYear', 'teacher', 'adviser', 'teacherSubject'])
-            ->findOrFail($id);
+        $studentClass = StudentClassModel::with(['teacherSubjects.subject'])->findOrFail($id);
 
-        return response()->json($item);
+        $subjects = $studentClass->teacherSubjects->map(function($ts) {
+            return $ts->subject;
+        })->unique('Subject_ID')->values();
+
+        return response()->json([
+            'status' => 'success',
+            'subjects' => $subjects
+        ]);
     }
 
     public function update(Request $request, $id)

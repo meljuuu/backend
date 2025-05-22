@@ -49,4 +49,9 @@ class ClassesModel extends Model
         return $this->belongsTo(TeacherModel::class, 'Adviser_ID', 'Teacher_ID');
     }
 
+    public function subject()
+    {
+        return $this->belongsTo(SubjectModel::class, 'subject_id', 'Subject_ID');
+    }
+
 }

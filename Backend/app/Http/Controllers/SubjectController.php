@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Subject;
+use App\Models\SubjectModel;
 
 class SubjectController extends Controller
 {
     // Display a listing of subjects
     public function getAll()
     {
-        $subjects = Subject::all();
-        return response()->json($subjects);
+        $subjects = SubjectModel::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => $subjects
+        ]);
     }
 
     // Store a newly created subject in storage
@@ -22,7 +25,7 @@ class SubjectController extends Controller
             'SubjectCode' => 'required|integer|unique:subjects,SubjectCode',
         ]);
 
-        $subject = Subject::create([
+        $subject = SubjectModel::create([
             'SubjectName' => $request->SubjectName,
             'SubjectCode' => $request->SubjectCode,
         ]);
@@ -33,7 +36,7 @@ class SubjectController extends Controller
     // Display the specified subject
     public function show($id)
     {
-        $subject = Subject::find($id);
+        $subject = SubjectModel::find($id);
 
         if (!$subject) {
             return response()->json(['message' => 'Subject not found'], 404);
@@ -45,7 +48,7 @@ class SubjectController extends Controller
     // Update the specified subject in storage
     public function update(Request $request, $id)
     {
-        $subject = Subject::find($id);
+        $subject = SubjectModel::find($id);
 
         if (!$subject) {
             return response()->json(['message' => 'Subject not found'], 404);
@@ -64,7 +67,7 @@ class SubjectController extends Controller
     // Remove the specified subject from storage
     public function destroy($id)
     {
-        $subject = Subject::find($id);
+        $subject = SubjectModel::find($id);
 
         if (!$subject) {
             return response()->json(['message' => 'Subject not found'], 404);

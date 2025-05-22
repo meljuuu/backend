@@ -92,14 +92,13 @@ class StudentClassModel extends Model
         return $this->belongsTo(TeacherModel::class, 'Adviser_ID', 'Teacher_ID');
     }
 
-   
     public function teacherSubjects()
     {
-        return $this->belongsToMany(
-            TeachersSubject::class,
-            'student_class_teacher_subject',
-            'student_class_id', 
-            'teacher_subject_id' 
-        );
+        return $this->belongsToMany(TeachersSubject::class, 'student_class_teacher_subject', 'student_class_id', 'teacher_subject_id');
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class, 'subject_id');
     }
 }

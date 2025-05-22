@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TeacherModel;
 use App\Models\SubjectModel;
+use App\Models\StudentClassModel;
 
 class TeachersSubject extends Model
 {
@@ -37,11 +38,6 @@ class TeachersSubject extends Model
     
     public function studentClasses()
     {
-        return $this->belongsToMany(
-            StudentClass::class,
-            'student_class_teacher_subject',
-            'teacher_subject_id',
-            'student_class_id'
-        );
+        return $this->belongsToMany(StudentClassModel::class, 'student_class_teacher_subject', 'teacher_subject_id', 'student_class_id');
     }
 }

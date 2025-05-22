@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Research;
+use App\Models\SubjectModel;
 
 class TeacherModel extends Authenticatable
 {
@@ -43,8 +44,8 @@ class TeacherModel extends Authenticatable
 
     public function subjects()
     {
-        return $this->belongsToMany(Subject::class, 'teachers_subject', 'teacher_id', 'subject_id')
-                    ->withPivot('subject_code') // optional, only if you want to access this in relationship
+        return $this->belongsToMany(SubjectModel::class, 'teachers_subject', 'teacher_id', 'subject_id')
+                    ->withPivot('subject_code')
                     ->withTimestamps();
     }
 

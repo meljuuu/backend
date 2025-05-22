@@ -28,4 +28,8 @@ class SubjectModel extends Model
                     ->withPivot('subject_code')
                     ->withTimestamps();
     }
+
+    public function teachersSubjects() {
+        return $this->hasMany(TeachersSubject::class, 'subject_id', 'Subject_ID');
+    }
 }
