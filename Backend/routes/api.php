@@ -54,6 +54,9 @@ Route::get('/dashboard/students/count', [AdminDashboardController::class, 'getSt
 Route::get('/dashboard/teachers/count', [AdminDashboardController::class, 'getTeacherCount']);
 Route::get('/dashboard/students/gender-distribution', [AdminDashboardController::class, 'getStudentGenderDistribution']);
 Route::get('/dashboard/students/grade-distribution', [AdminDashboardController::class, 'getStudentGradeDistribution']);
+Route::get('dashboard/accepted-classes/count', [AdminDashboardController::class, 'countAcceptedClasses']);
+Route::get('/dashboard/students/latest', [AdminDashboardController::class, 'getLatestUpdatedStudents']);
+Route::get('/dashboard/students/status-counts', [AdminDashboardController::class, 'getSubmissionStatusCounts']);
 
 
 Route::get('/get-accepted-classes', [AdminStudentClassController::class, 'indexAllAccepted']);

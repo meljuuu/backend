@@ -72,6 +72,25 @@ class TeacherSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Create keeper account
+        DB::table('teachers')->insert([
+            'EmployeeNo' => 'TEACHER002',
+            'Email' => 'keeper@example.com',
+            'Password' => Hash::make('keeper123'),
+            'FirstName' => 'Juan',
+            'LastName' => 'Dela Cruz',
+            'MiddleName' => 'Santos',
+            'BirthDate' => '1990-05-10',
+            'Sex' => 'F',
+            'Position' => 'Book-Keeping',
+            'ContactNumber' => '09172345678',
+            'Address' => 'Teacher Address',
+            'Educational_Attainment' => 'Master\'s Degree',
+            'Teaching_Position' => 'Teacher 1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }
     

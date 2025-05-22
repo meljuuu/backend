@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\StudentModel;
 use App\Models\TeacherModel;
+use App\Models\ClassesModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -51,25 +52,80 @@ class AdminDashboardController extends Controller
     }
 
     public function getStudentGradeDistribution(): JsonResponse
-{
-    // Grade levels stored as strings
-    $gradeLevels = ['7', '8', '9', '10', '11', '12'];
+    {
+        // Grade levels stored as strings
+        $gradeLevels = ['7', '8', '9', '10', '11', '12'];
 
-    // Fetch and group count
-    $counts = StudentModel::selectRaw('Grade_Level, COUNT(*) as total')
-        ->whereIn('Grade_Level', $gradeLevels)
-        ->groupBy('Grade_Level')
-        ->get()
-        ->keyBy('Grade_Level');
+        // Fetch and group count
+        $counts = StudentModel::selectRaw('Grade_Level, COUNT(*) as total')
+            ->whereIn('Grade_Level', $gradeLevels)
+            ->groupBy('Grade_Level')
+            ->get()
+            ->keyBy('Grade_Level');
 
-    // Format response
-    $data = [];
-    foreach ($gradeLevels as $grade) {
-        $data["Grade $grade"] = $counts[$grade]->total ?? 0;
+        // Format response
+        $data = [];
+        foreach ($gradeLevels as $grade) {
+            $data["Grade $grade"] = $counts[$grade]->total ?? 0;
+        }
+
+        return response()->json($data);
     }
 
-    return response()->json($data);
-}
+  public function countAcceptedClasses()
+    {
+        try {
+            $count = ClassesModel::where('Status', 'Accepted')->count();
+
+            return response()->json([
+                'accepted_classes_count' => $count
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to count accepted classes',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getLatestUpdatedStudents(): JsonResponse
+    {
+        try {
+            $latestStudents = StudentModel::orderBy('updated_at', 'desc')
+                ->limit(10)
+                ->get();
+
+            return response()->json($latestStudents);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch latest students.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+      public function getSubmissionStatusCounts()
+    {
+        $statuses = ['Accepted', 'Pending', 'Declined'];
+
+        $results = StudentModel::whereIn('Status', $statuses)
+            ->selectRaw('Status, Sex, COUNT(*) as count')
+            ->groupBy('Status', 'Sex')
+            ->get();
+
+        // Structure result like: { "Male": { Accepted: 10, Pending: 5, Declined: 2 }, "Female": { ... } }
+        $formatted = [
+            'Male' => ['Accepted' => 0, 'Pending' => 0, 'Declined' => 0],
+            'Female' => ['Accepted' => 0, 'Pending' => 0, 'Declined' => 0],
+        ];
+
+        foreach ($results as $row) {
+            $sex = $row->Sex === 'M' ? 'Male' : 'Female';
+            $formatted[$sex][$row->Status] = $row->count;
+        }
+
+        return response()->json($formatted);
+    }
 
 
 }
