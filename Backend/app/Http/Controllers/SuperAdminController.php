@@ -74,10 +74,15 @@ class SuperAdminController extends Controller
     }
 
     // Decline Student Tab
-    public function declineStudent($id)
+    public function declineStudent(Request $request, $id)
     {
+        $request->validate([
+            'comment' => 'required|string|max:255',
+        ]);
+
         $student = StudentModel::findOrFail($id);
         $student->Status = 'Declined';
+        $student->comments = $request->input('comment'); // ✅ Save the rejection comment
         $student->save();
 
         return response()->json([
@@ -85,6 +90,7 @@ class SuperAdminController extends Controller
             'student' => $student
         ], 200);
     }
+
 
 
 
