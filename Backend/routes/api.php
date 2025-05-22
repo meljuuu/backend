@@ -56,6 +56,7 @@ Route::get('/dashboard/students/gender-distribution', [AdminDashboardController:
 Route::get('/dashboard/students/grade-distribution', [AdminDashboardController::class, 'getStudentGradeDistribution']);
 
 
+Route::get('/get-accepted-classes', [AdminStudentClassController::class, 'indexAllAccepted']);
 //Teacher
     Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
 
@@ -75,8 +76,8 @@ Route::get('/teacher-subjects/getAll', [TeacherSubjectController::class, 'getAll
 //STUDENTCLASSES
 Route::post('/admin/create-class', [StudentClassController::class, 'store']);
 Route::get('/admin/get-classes', [StudentClassController::class, 'index']);
-
-
+Route::post('/admin/add-student-to-class',[StudentClassController::class, 'addStudentsToClass']);
+Route::post('/admin/remove-student-to-class',[StudentClassController::class, 'removeStudentsFromClass']);
 
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {

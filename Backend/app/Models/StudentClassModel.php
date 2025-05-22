@@ -69,7 +69,7 @@ class StudentClassModel extends Model
 
     public function student()
     {
-        return $this->belongsTo(SubjectModel::class, 'Student_ID', 'Student_ID');
+        return $this->belongsTo(StudentModel::class, 'Student_ID', 'Student_ID');
     }
 
     public function class()

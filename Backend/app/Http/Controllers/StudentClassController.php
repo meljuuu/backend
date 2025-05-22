@@ -12,7 +12,7 @@ class StudentClassController extends Controller
    
     public function index()
     {
-        $list = StudentClassModel::with(['student', 'class', 'schoolYear', 'teacher', 'adviser', 'teacherSubject'])
+        $list = StudentClassModel::with(['student', 'class', 'schoolYear', 'teacher', 'adviser', 'teacherSubjects'])
             ->get();
 
         return response()->json($list);
@@ -61,6 +61,108 @@ class StudentClassController extends Controller
             'data' => $studentClassRecords
         ]);
     }
+
+    public function addStudentsToClass(Request $request)
+    {
+        $request->validate([
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'integer|exists:students,Student_ID',
+            'class_id' => 'required|exists:classes,Class_ID',
+        ]);
+    
+        // Fetch existing class setup from any existing student_class row in that class
+        $existingStudentClass = StudentClassModel::where('Class_ID', $request->class_id)->first();
+    
+        if (!$existingStudentClass) {
+            return response()->json([
+                'message' => 'No existing class data found to copy from.'
+            ], 404);
+        }
+    
+        // Update class status to 'pending'
+        $class = \App\Models\ClassesModel::find($request->class_id);
+        if ($class) {
+            $class->status = 'pending';
+            $class->save();
+        }
+    
+        $teacherSubjectIds = $existingStudentClass->teacherSubjects()->pluck('teachers_subject.id')->toArray();
+        $newStudentClasses = [];
+    
+        foreach ($request->student_ids as $studentId) {
+            // Skip if student is already in the class
+            $alreadyExists = StudentClassModel::where('Class_ID', $request->class_id)
+                ->where('Student_ID', $studentId)
+                ->exists();
+    
+            if ($alreadyExists) {
+                continue; // Skip existing student
+            }
+    
+            $newStudentClass = StudentClassModel::create([
+                'Student_ID' => $studentId,
+                'Class_ID' => $existingStudentClass->Class_ID,
+                'ClassName' => $existingStudentClass->ClassName,
+                'SY_ID' => $existingStudentClass->SY_ID,
+                'Adviser_ID' => $existingStudentClass->Adviser_ID,
+                'isAdvisory' => $existingStudentClass->isAdvisory,
+            ]);
+    
+            $newStudentClass->teacherSubjects()->attach($teacherSubjectIds);
+            $newStudentClasses[] = $newStudentClass;
+        }
+    
+        return response()->json([
+            'message' => count($newStudentClasses) > 0 
+                ? 'Students successfully added to class and class status set to pending.'
+                : 'No new students were added (possibly already enrolled).',
+            'data' => $newStudentClasses
+        ]);
+    }
+
+    public function removeStudentsFromClass(Request $request)
+    {
+        $request->validate([
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'integer|exists:students,Student_ID',
+            'class_id' => 'required|exists:classes,Class_ID',
+        ]);
+
+        $removedStudents = [];
+
+        foreach ($request->student_ids as $studentId) {
+            $studentClass = StudentClassModel::where('Class_ID', $request->class_id)
+                ->where('Student_ID', $studentId)
+                ->first();
+
+            if ($studentClass) {
+                // Detach related teacher subjects if any
+                $studentClass->teacherSubjects()->detach();
+
+                // Delete the student from the class
+                $studentClass->delete();
+
+                $removedStudents[] = $studentId;
+            }
+        }
+
+        // If at least one student was removed, update class status to 'pending'
+        if (count($removedStudents) > 0) {
+            $class = \App\Models\ClassesModel::find($request->class_id);
+            if ($class) {
+                $class->status = 'pending';
+                $class->save();
+            }
+        }
+
+        return response()->json([
+            'message' => count($removedStudents) > 0 
+                ? 'Students successfully removed from class and class status set to pending.'
+                : 'No students were removed (possibly not enrolled).',
+            'removed_student_ids' => $removedStudents
+        ]);
+    }
+    
     
     
     public function show($id)

@@ -11,41 +11,51 @@ class AdminStudentClassController extends Controller
 
     public function indexClass()
     {
-        // Get all classes
         $classes = ClassesModel::where('Status', 'Incomplete')->get();
 
-        // Return as JSON (for API) or pass to a view
         return response()->json($classes);
     }
 
     public function indexExcludeIncomplete()
     {
-        $classes = ClassesModel::with(['studentClasses.adviser']) // Load adviser via studentClasses
+        $classes = ClassesModel::with(['studentClasses.adviser']) 
             ->withCount('studentClasses')
             ->where('Status', '!=', 'Incomplete')
             ->get()
             ->map(function ($class) {
-                // Get the first StudentClass and retrieve adviser name if available
                 $firstStudentClass = $class->studentClasses->first();
                 $class->adviser_id = $firstStudentClass ? $firstStudentClass->Adviser_ID : null;
                 $class->adviser_name = $firstStudentClass && $firstStudentClass->adviser
-                    ? $firstStudentClass->adviser->name // Adjust this to your teacher's name column
+                    ? $firstStudentClass->adviser->name 
                     : 'Not assigned';
                 return $class;
             });
     
         return response()->json($classes);
     }
+
+    public function indexAllAccepted()
+    {
+        $classes = ClassesModel::with(['studentClasses.adviser', 'studentClasses.student'])
+        ->withCount('studentClasses')
+        ->where('Status', 'Accepted')
+        ->get()
+        ->map(function ($class) {
+            $firstStudentClass = $class->studentClasses->first();
+            $class->adviser_id = $firstStudentClass ? $firstStudentClass->Adviser_ID : null;
+            $class->adviser_name = $firstStudentClass && $firstStudentClass->adviser
+                ? $firstStudentClass->adviser->name 
+                : 'Not assigned';
+            return $class;
+        });
     
+        return response()->json($classes);
+    }
     
 
-    /**
-     * Assign multiple students to a class.
-     */
     public function assignStudentsToClass(Request $request)
     {
         try {
-            // Validate request input
             $validated = $request->validate([
                 'class_id' => 'required|exists:classes,Class_ID',
                 'sy_id' => 'required|exists:school_years,SY_ID',
@@ -83,7 +93,7 @@ class AdminStudentClassController extends Controller
                     'SY_ID' => $syId,
                     'Teacher_ID' => $teacherId,
                     'ClassName' => $className,
-                    'isAdvisory' => false, // default to false; can be changed later
+                    'isAdvisory' => false,
                 ]);
 
                 $created[] = $studentClass;
