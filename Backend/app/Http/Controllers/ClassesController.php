@@ -7,37 +7,46 @@ use App\Models\ClassesModel;
 
 class ClassesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch classes with relationships and filter by status = 'accepted'
-        $classes = ClassesModel::with([
+        $teacherId = $request->query('teacher_id');
+        
+        \Log::info('Filtering classes for teacher ID: ' . $teacherId);
+        
+        $query = ClassesModel::with([
             'schoolYear',
             'adviser',
+            'studentClasses.teacherSubjects' => function($query) use ($teacherId) {
+                $query->where('teacher_id', $teacherId);
+            },
             'studentClasses.teacherSubjects.subject'
         ])
         ->where('status', 'accepted')
-        ->get()
-        ->map(function ($class) {
-            // Get the first subject from the relationship chain
-            $subject = null;
-            if ($class->studentClasses->isNotEmpty()) {
-                $firstStudentClass = $class->studentClasses->first();
-                if ($firstStudentClass->teacherSubjects->isNotEmpty()) {
-                    $firstTeacherSubject = $firstStudentClass->teacherSubjects->first();
-                    $subject = $firstTeacherSubject->subject;
+        ->where('Adviser_ID', $teacherId);
+        
+        $classes = $query->get()
+            ->map(function ($class) use ($teacherId) {
+                // Get the subject for this teacher in this class
+                $subject = null;
+                foreach ($class->studentClasses as $studentClass) {
+                    foreach ($studentClass->teacherSubjects as $teacherSubject) {
+                        if ($teacherSubject->teacher_id == $teacherId) {
+                            $subject = $teacherSubject->subject;
+                            break 2;
+                        }
+                    }
                 }
-            }
 
-            return [
-                'class_id' => $class->Class_ID,
-                'trackStand' => $class->Track,
-                'classType' => $class->Curriculum,
-                'className' => $class->ClassName,
-                'subjectName' => $subject ? $subject->SubjectName : 'No Subject Assigned',
-                'subject_id' => $subject ? $subject->Subject_ID : null,
-                'gradeLevel' => $class->Grade_Level,
-            ];
-        });
+                return [
+                    'class_id' => (string)$class->Class_ID,
+                    'trackStand' => $class->Track,
+                    'classType' => $class->Curriculum,
+                    'className' => $class->ClassName,
+                    'subjectName' => $subject ? $subject->SubjectName : 'No Subject Assigned', // Show actual subject name
+                    'subject_id' => $subject ? $subject->Subject_ID : null,
+                    'gradeLevel' => $class->Grade_Level,
+                ];
+            });
 
         return response()->json([
             'status' => 'success',
