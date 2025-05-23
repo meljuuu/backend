@@ -45,11 +45,9 @@ class StudentClassModel extends Model
         'Class_ID',
         'ClassName',
         'SY_ID',
-        'Teacher_ID',
         'Adviser_ID',
-        'TeacherSubject_ID',
         'isAdvisory',
-        'Status',
+        'Status'
     ];
 
     /**
@@ -94,8 +92,12 @@ class StudentClassModel extends Model
 
     public function teacherSubjects()
     {
-        return $this->belongsToMany(TeachersSubject::class, 'student_class_teacher_subject', 'student_class_id', 'teacher_subject_id')
-            ->with(['subject', 'teacher']);
+        return $this->belongsToMany(
+            TeachersSubject::class,
+            'student_class_teacher_subject',
+            'student_class_id',
+            'teacher_subject_id'
+        )->with(['subject', 'teacher']);
     }
 
     public function subjects()

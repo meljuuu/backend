@@ -18,6 +18,7 @@ use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\StudentClassTeacherSubjectController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\GradingController;
+use App\Http\Controllers\AdvisoryController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -131,6 +132,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{gradeId}', [GradingController::class, 'updateGrade']);
     });
 
+    Route::get('/teacher/advisory-students', [AdvisoryController::class, 'getAdvisoryStudents']);
+    Route::get('/student/{studentId}/subjects', [AdvisoryController::class, 'getStudentSubjects']);
+    Route::get('/student/{studentId}/subject/{subjectId}/grades', [AdvisoryController::class, 'getStudentGrades']);
+
     });
 
 // Classes routes
@@ -180,6 +185,11 @@ Route::prefix('student-classes')->group(function () {
 
 Route::get('/classes/{classId}', [ClassController::class, 'getClassDetails'])
     ->middleware('auth:sanctum');
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/teacher/advisory-students', [AdvisoryController::class, 'getAdvisoryStudents']);
+    Route::get('/student/{studentId}/subjects', [AdvisoryController::class, 'getStudentSubjects']);
+});
 
 
 

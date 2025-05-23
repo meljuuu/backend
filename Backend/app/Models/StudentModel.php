@@ -50,6 +50,6 @@ class StudentModel extends Model
 
     public function studentClasses()
     {
-        return $this->hasMany(StudentClass::class, 'Student_ID');
+        return $this->hasMany(StudentClassModel::class, 'Student_ID');
     }
 }
