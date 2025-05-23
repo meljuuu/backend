@@ -12,7 +12,9 @@ class StudentClassController extends Controller
    
     public function index()
     {
-        $list = StudentClassModel::with(['student', 'class', 'schoolYear', 'teacher', 'adviser', 'teacherSubjects'])
+        $list = StudentClassModel::with(['student' => function($query) {
+            $query->select('Student_ID', 'firstName', 'middleName', 'lastName', 'lrn', 'sex', 'birthDate', 'curriculum');
+        }, 'class', 'schoolYear', 'teacher', 'adviser', 'teacherSubjects'])
             ->get();
 
         return response()->json($list);

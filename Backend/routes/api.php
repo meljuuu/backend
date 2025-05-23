@@ -17,6 +17,7 @@ use App\Http\Controllers\StudentClassController;
 use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\StudentClassTeacherSubjectController;
 use App\Http\Controllers\ClassController;
+use App\Http\Controllers\GradingController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -117,6 +118,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/teacher/research', [ResearchController::class, 'store']);
     Route::delete('/teacher/research/{research}', [ResearchController::class, 'destroy']);
     Route::apiResource('/teacher/lesson-plans', \App\Http\Controllers\LessonPlanController::class);
+
+    Route::get('/grades/subject/{subjectId}', [GradingController::class, 'getSubjectGrades']);
+    Route::get('/grades/student/{studentId}/subject/{subjectId}', [GradingController::class, 'getStudentGrades']);
+    Route::post('/grades/bulk', [GradingController::class, 'submitGrades']);
+
+    // Grading routes
+    Route::prefix('grades')->group(function () {
+        Route::get('/subject/{subjectId}', [GradingController::class, 'getSubjectGrades']);
+        Route::get('/student/{studentId}/subject/{subjectId}', [GradingController::class, 'getStudentGrades']);
+        Route::post('/bulk', [GradingController::class, 'submitGrades']);
+        Route::put('/{gradeId}', [GradingController::class, 'updateGrade']);
+    });
 
     });
 
