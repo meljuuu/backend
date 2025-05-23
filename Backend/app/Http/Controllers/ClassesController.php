@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ClassesModel;
+use App\Models\StudentClassTeacherSubject;
 
 class ClassesController extends Controller
 {
@@ -91,5 +92,60 @@ class ClassesController extends Controller
             'status' => 'success',
             'subjects' => $uniqueSubjects
         ]);
+    }
+
+    public function getStudentsForSubject($subjectId)
+    {
+        try {
+            $students = StudentClassTeacherSubject::with([
+                'studentClass.student' => function($query) {
+                    $query->select([
+                        'Student_ID',
+                        'LRN',
+                        'FirstName',
+                        'LastName',
+                        'Sex',
+                        'BirthDate',
+                        'ContactNumber',
+                        'HouseNo',
+                        'Barangay',
+                        'Municipality',
+                        'Province'
+                    ]);
+                }
+            ])
+            ->whereHas('teacherSubject', function($query) use ($subjectId) {
+                $query->where('subject_id', $subjectId);
+            })
+            ->get()
+            ->map(function($item) {
+                $student = $item->studentClass->student;
+                return [
+                    'student_id' => $student->Student_ID,
+                    'lrn' => $student->LRN,
+                    'firstName' => $student->FirstName,
+                    'lastName' => $student->LastName,
+                    'sex' => $student->Sex,
+                    'birthDate' => $student->BirthDate,
+                    'contactNumber' => $student->ContactNumber,
+                    'address' => $student->HouseNo . ', ' . 
+                                $student->Barangay . ', ' . 
+                                $student->Municipality . ', ' . 
+                                $student->Province
+                ];
+            })
+            ->unique('student_id')
+            ->values();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $students
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch students: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

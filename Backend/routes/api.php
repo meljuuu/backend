@@ -124,6 +124,7 @@ Route::prefix('classes')->group(function () {
     Route::get('/', [ClassesController::class, 'index']);
     Route::get('/{classId}/subjects', [ClassesController::class, 'showSubjectsForClass']);
     Route::get('/{classId}/teachers', [ClassesController::class, 'getTeachersForClass']);
+    Route::get('/{subjectId}/students', [ClassesController::class, 'getStudentsForSubject']);
 });
 
 // Student Class Teacher Subject routes
