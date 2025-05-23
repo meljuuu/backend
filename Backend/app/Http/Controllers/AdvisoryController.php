@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\StudentClassTeacherSubject;
 use App\Models\SubjectGradeModel;
+use Illuminate\Support\Facades\DB;
 
 class AdvisoryController extends Controller
 {
@@ -133,77 +134,58 @@ class AdvisoryController extends Controller
                 ], 401);
             }
 
-            // Get the student's class
-            $studentClass = StudentClassModel::where('Student_ID', $studentId)
-                ->where('isAdvisory', true)
-                ->first();
-
-            if (!$studentClass) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Student not found in any advisory class'
-                ], 404);
-            }
-
-            // Get ALL subjects without removing duplicates
-            $subjects = StudentClassTeacherSubject::with(['teacherSubject.subject', 'teacherSubject.teacher'])
-                ->where('student_class_id', $studentClass->StudentClass_ID)
+            // Get all subjects and grades for the student
+            $subjects = DB::table('subject_grades')
+                ->join('subjects', 'subject_grades.Subject_ID', '=', 'subjects.Subject_ID')
+                ->join('students', 'subject_grades.Student_ID', '=', 'students.Student_ID')
+                ->join('teachers', 'subject_grades.Teacher_ID', '=', 'teachers.Teacher_ID')
+                ->where('subject_grades.Student_ID', $studentId)
+                ->select([
+                    'subjects.Subject_ID',
+                    'subjects.SubjectName',
+                    'subjects.SubjectCode',
+                    'subject_grades.Q1',
+                    'subject_grades.Q2',
+                    'subject_grades.Q3',
+                    'subject_grades.Q4',
+                    'subject_grades.FinalGrade',
+                    'subject_grades.Remarks',
+                    'teachers.FirstName as TeacherFirstName',
+                    'teachers.LastName as TeacherLastName'
+                ])
                 ->get()
-                ->map(function ($item) use ($studentId) {
+                ->map(function ($subject) {
                     return [
-                        'student_id' => $studentId,
-                        'subject_id' => $item->teacherSubject->subject->Subject_ID,
-                        'subjectName' => $item->teacherSubject->subject->SubjectName,
-                        'subjectCode' => $item->teacherSubject->subject->SubjectCode,
-                        'teacher_id' => $item->teacherSubject->teacher->Teacher_ID,
-                        'teacher_name' => $item->teacherSubject->teacher->FirstName . ' ' . 
-                                        $item->teacherSubject->teacher->LastName,
-                        'class_id' => $item->studentClass->Class_ID,
-                        'student_class_id' => $item->student_class_id,
+                        'subject_id' => $subject->Subject_ID,
+                        'subjectName' => $subject->SubjectName,
+                        'subjectCode' => $subject->SubjectCode,
+                        'teacher_name' => $subject->TeacherFirstName . ' ' . $subject->TeacherLastName,
                         'grades' => [
-                            'Q1' => $item->Q1,
-                            'Q2' => $item->Q2,
-                            'Q3' => $item->Q3,
-                            'Q4' => $item->Q4,
-                            'FinalGrade' => $item->FinalGrade,
-                            'Remarks' => $item->Remarks
+                            'Q1' => $subject->Q1,
+                            'Q2' => $subject->Q2,
+                            'Q3' => $subject->Q3,
+                            'Q4' => $subject->Q4,
+                            'FinalGrade' => $subject->FinalGrade,
+                            'Remarks' => $subject->Remarks
                         ]
                     ];
                 });
 
-            // Group by student_id and include ALL subjects
-            $groupedSubjects = $subjects->groupBy('student_id')
-                ->map(function ($studentSubjects) {
-                    return [
-                        'student_id' => $studentSubjects->first()['student_id'],
-                        'subjects' => $studentSubjects->map(function ($subject) {
-                            return [
-                                'subject_id' => $subject['subject_id'],
-                                'subjectName' => $subject['subjectName'],
-                                'subjectCode' => $subject['subjectCode'],
-                                'teacher_id' => $subject['teacher_id'],
-                                'teacher_name' => $subject['teacher_name'],
-                                'class_id' => $subject['class_id'],
-                                'student_class_id' => $subject['student_class_id'],
-                                'grades' => $subject['grades']
-                            ];
-                        })->values()
-                    ];
-                })->values();
-
-            Log::info('Found all subjects count:', ['count' => $subjects->count()]);
-
             return response()->json([
                 'status' => 'success',
-                'student_subjects' => $groupedSubjects
+                'student_subjects' => [
+                    [
+                        'student_id' => $studentId,
+                        'subjects' => $subjects
+                    ]
+                ]
             ]);
 
         } catch (\Exception $e) {
             Log::error('Student subjects fetch error', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
+                'line' => $e->getLine()
             ]);
             
             return response()->json([
