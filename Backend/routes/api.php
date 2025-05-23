@@ -152,6 +152,8 @@ Route::prefix('subjects')->group(function () {
     Route::get('/', [SubjectController::class, 'getAll']);
     Route::get('/{subjectId}/teachers', [SubjectController::class, 'getTeachers']);
     Route::get('/{subjectId}/classes', [SubjectController::class, 'getClasses']);
+    Route::post('/grades', [SubjectController::class, 'submitGrades']);
+    Route::get('/{subjectId}/grades', [SubjectController::class, 'getGrades']);
 });
 
 // Student Class routes

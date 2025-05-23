@@ -114,7 +114,7 @@ class ClassesController extends Controller
                         'Province'
                     ]);
                 },
-                'grades'
+                'teacherSubject.subject'
             ])
             ->whereHas('teacherSubject', function($query) use ($subjectId) {
                 $query->where('subject_id', $subjectId);
@@ -122,6 +122,14 @@ class ClassesController extends Controller
             ->get()
             ->map(function($item) {
                 $student = $item->studentClass->student;
+                
+                // Get grades from SubjectGradeModel
+                $grades = \App\Models\SubjectGradeModel::where([
+                    'Student_ID' => $student->Student_ID,
+                    'Subject_ID' => $item->teacherSubject->subject_id,
+                    'Teacher_ID' => $item->teacherSubject->teacher_id
+                ])->first();
+
                 return [
                     'student_id' => $student->Student_ID,
                     'lrn' => $student->LRN,
@@ -135,10 +143,10 @@ class ClassesController extends Controller
                                 $student->Municipality . ', ' . 
                                 $student->Province,
                     'grades' => [
-                        'first' => $item->grades->first_quarter ?? null,
-                        'second' => $item->grades->second_quarter ?? null,
-                        'third' => $item->grades->third_quarter ?? null,
-                        'fourth' => $item->grades->fourth_quarter ?? null
+                        'first' => $grades ? $grades->Q1 : null,
+                        'second' => $grades ? $grades->Q2 : null,
+                        'third' => $grades ? $grades->Q3 : null,
+                        'fourth' => $grades ? $grades->Q4 : null
                     ]
                 ];
             })

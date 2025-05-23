@@ -48,4 +48,13 @@ class StudentClassTeacherSubject extends Model
             'teacher_id'
         );
     }
+
+    // Add this relationship to get grades
+    public function grades()
+    {
+        return $this->hasOne(SubjectGradeModel::class, 'Student_ID', 'student_class_id')
+            ->whereHas('teacherSubject', function($query) {
+                $query->where('teacher_subject_id', $this->teacher_subject_id);
+            });
+    }
 }
