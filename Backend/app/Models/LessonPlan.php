@@ -30,4 +30,15 @@ class LessonPlan extends Model
     {
         return $this->belongsTo(TeacherModel::class, 'Teacher_ID');
     }
+
+    // Lesson Plan Don't Delete!
+    public function getTeacherNameAttribute()
+    {
+        $teacher = $this->teacher;
+        if (!$teacher) return null;
+
+        $middle = $teacher->MiddleName ? ' ' . $teacher->MiddleName . ' ' : ' ';
+        return $teacher->FirstName . $middle . $teacher->LastName;
+    }
+
 }
