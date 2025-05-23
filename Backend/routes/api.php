@@ -135,6 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/teacher/advisory-students', [AdvisoryController::class, 'getAdvisoryStudents']);
     Route::get('/student/{studentId}/subjects', [AdvisoryController::class, 'getStudentSubjects']);
     Route::get('/student/{studentId}/subject/{subjectId}/grades', [AdvisoryController::class, 'getStudentGrades']);
+    Route::get('/teacher/student/{studentId}/grades', [AdvisoryController::class, 'getStudentGrades']);
 
     });
 
