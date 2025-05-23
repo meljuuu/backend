@@ -43,13 +43,11 @@ class ClassesController extends Controller
                         $isAdvisory = true;
                     }
                     
-                    // Get subject information if not advisory
-                    if (!$isAdvisory) {
-                        foreach ($studentClass->teacherSubjects as $teacherSubject) {
-                            if ($teacherSubject->teacher_id == $teacherId) {
-                                $subject = $teacherSubject->subject;
-                                break 2;
-                            }
+                    // Get subject information regardless of advisory status
+                    foreach ($studentClass->teacherSubjects as $teacherSubject) {
+                        if ($teacherSubject->teacher_id == $teacherId) {
+                            $subject = $teacherSubject->subject;
+                            break 2;
                         }
                     }
                 }
@@ -59,8 +57,8 @@ class ClassesController extends Controller
                     'trackStand' => $class->Track,
                     'classType' => $isAdvisory ? 'Advisory' : $class->Curriculum,
                     'className' => $class->ClassName,
-                    'subjectName' => $isAdvisory ? 'Advisory Class' : ($subject ? $subject->SubjectName : 'No Subject Assigned'),
-                    'subject_id' => $isAdvisory ? null : ($subject ? $subject->Subject_ID : null),
+                    'subjectName' => $subject ? $subject->SubjectName : 'No Subject Assigned',
+                    'subject_id' => $subject ? $subject->Subject_ID : null,
                     'gradeLevel' => $class->Grade_Level,
                     'isAdvisory' => $isAdvisory
                 ];
