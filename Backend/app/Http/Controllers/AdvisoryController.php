@@ -125,25 +125,18 @@ class AdvisoryController extends Controller
             Log::info('Getting subjects for student:', ['studentId' => $studentId]);
             
             $teacherId = Auth::id();
-            Log::info('Teacher ID from Auth:', ['teacherId' => $teacherId]);
             
             if (!$teacherId) {
-                Log::warning('No teacher ID found in Auth');
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Teacher not authenticated'
                 ], 401);
             }
 
-            // First, get the student's class
+            // Get the student's class
             $studentClass = StudentClassModel::where('Student_ID', $studentId)
                 ->where('isAdvisory', true)
                 ->first();
-
-            Log::info('Student class query result:', [
-                'found' => !is_null($studentClass),
-                'student_id' => $studentId
-            ]);
 
             if (!$studentClass) {
                 return response()->json([
@@ -152,29 +145,57 @@ class AdvisoryController extends Controller
                 ], 404);
             }
 
-            // Get the subjects through the student_class_teacher_subject pivot table
+            // Get ALL subjects without removing duplicates
             $subjects = StudentClassTeacherSubject::with(['teacherSubject.subject', 'teacherSubject.teacher'])
                 ->where('student_class_id', $studentClass->StudentClass_ID)
                 ->get()
-                ->map(function ($item) {
+                ->map(function ($item) use ($studentId) {
                     return [
+                        'student_id' => $studentId,
                         'subject_id' => $item->teacherSubject->subject->Subject_ID,
                         'subjectName' => $item->teacherSubject->subject->SubjectName,
                         'subjectCode' => $item->teacherSubject->subject->SubjectCode,
                         'teacher_id' => $item->teacherSubject->teacher->Teacher_ID,
                         'teacher_name' => $item->teacherSubject->teacher->FirstName . ' ' . 
                                         $item->teacherSubject->teacher->LastName,
-                        'class_id' => $item->studentClass->Class_ID
+                        'class_id' => $item->studentClass->Class_ID,
+                        'student_class_id' => $item->student_class_id,
+                        'grades' => [
+                            'Q1' => $item->Q1,
+                            'Q2' => $item->Q2,
+                            'Q3' => $item->Q3,
+                            'Q4' => $item->Q4,
+                            'FinalGrade' => $item->FinalGrade,
+                            'Remarks' => $item->Remarks
+                        ]
                     ];
-                })
-                ->unique('subject_id')
-                ->values();
+                });
 
-            Log::info('Found subjects count:', ['count' => $subjects->count()]);
+            // Group by student_id and include ALL subjects
+            $groupedSubjects = $subjects->groupBy('student_id')
+                ->map(function ($studentSubjects) {
+                    return [
+                        'student_id' => $studentSubjects->first()['student_id'],
+                        'subjects' => $studentSubjects->map(function ($subject) {
+                            return [
+                                'subject_id' => $subject['subject_id'],
+                                'subjectName' => $subject['subjectName'],
+                                'subjectCode' => $subject['subjectCode'],
+                                'teacher_id' => $subject['teacher_id'],
+                                'teacher_name' => $subject['teacher_name'],
+                                'class_id' => $subject['class_id'],
+                                'student_class_id' => $subject['student_class_id'],
+                                'grades' => $subject['grades']
+                            ];
+                        })->values()
+                    ];
+                })->values();
+
+            Log::info('Found all subjects count:', ['count' => $subjects->count()]);
 
             return response()->json([
                 'status' => 'success',
-                'subjects' => $subjects
+                'student_subjects' => $groupedSubjects
             ]);
 
         } catch (\Exception $e) {
