@@ -15,8 +15,11 @@ class SubjectModel extends Model
     // Set the primary key
     protected $primaryKey = 'Subject_ID';
 
-
-    protected $fillable = ['SubjectName', 'SubjectCode'];
+    protected $fillable = [
+        'SubjectName', 
+        'SubjectCode', 
+        'GradeLevel', 
+    ];
 
     public function grades()
     {

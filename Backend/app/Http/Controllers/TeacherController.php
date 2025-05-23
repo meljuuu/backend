@@ -36,6 +36,7 @@ class TeacherController extends Controller
             'teachers' => $data
         ]);
     }
+    
     public function getAllTeachers()
     {
         try {

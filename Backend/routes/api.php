@@ -46,14 +46,17 @@ Route::post('/student/add', [StudentController::class, 'store']);
 Route::get('/student/getAll', [StudentController::class, 'getAll']);
 Route::get('/student/getAllPending', [StudentController::class, 'getPendingStudents']);
 Route::get('/student/getAllAccepted', [StudentController::class, 'getAcceptedStudents']);
+Route::get('/student/get-students-no-class', [StudentController::class, 'getNoClassStudents']);
 Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
 Route::post('/student/bulk-upload', [StudentController::class, 'bulkUpload']);
-
+Route::put('/students/update/{id}', [StudentController::class, 'update']);
 
 //ADMIN API
 Route::post('/assign-students', [AdminStudentClassController::class, 'assignStudentsToClass']);
 Route::post('/get-all-classes', [AdminStudentClassController::class, 'indexClass']);
 Route::get('/get-super-classes', [AdminStudentClassController::class, 'indexExcludeIncomplete']);
+Route::get('/get-accepted-classes', [AdminStudentClassController::class, 'indexAllAccepted']);
+Route::get('/get-classes', [AdminStudentClassController::class, 'indexAllAClasses']);
 Route::get('/dashboard/students/count', [AdminDashboardController::class, 'getStudentCount']);
 Route::get('/dashboard/teachers/count', [AdminDashboardController::class, 'getTeacherCount']);
 Route::get('/dashboard/students/gender-distribution', [AdminDashboardController::class, 'getStudentGenderDistribution']);
@@ -61,7 +64,7 @@ Route::get('/dashboard/students/grade-distribution', [AdminDashboardController::
 
 
 //Teacher
-    Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
+Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
 
 
 //SUPER ADMIN API
@@ -79,7 +82,8 @@ Route::get('/teacher-subjects/getAll', [TeacherSubjectController::class, 'getAll
 //STUDENTCLASSES
 Route::post('/admin/create-class', [StudentClassController::class, 'store']);
 Route::get('/admin/get-classes', [StudentClassController::class, 'index']);
-
+Route::post('/admin/add-student-to-class',[StudentClassController::class, 'addStudentsToClass']);
+Route::post('/admin/remove-student-to-class',[StudentClassController::class, 'removeStudentsFromClass']);
 
 
 // Protected Routes Here
