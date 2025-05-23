@@ -16,10 +16,6 @@ class ClassesController extends Controller
         $query = ClassesModel::with([
             'schoolYear',
             'adviser',
-            'studentClasses' => function($query) use ($teacherId) {
-                $query->where('Adviser_ID', $teacherId)
-                      ->where('isAdvisory', true);
-            },
             'studentClasses.teacherSubjects' => function($query) use ($teacherId) {
                 $query->where('teacher_id', $teacherId);
             },
@@ -29,34 +25,13 @@ class ClassesController extends Controller
         
         $classes = $query->get()
             ->map(function ($class) use ($teacherId) {
-                $isAdvisory = $class->studentClasses->contains(function($studentClass) use ($teacherId) {
-                    return $studentClass->Adviser_ID == $teacherId && $studentClass->isAdvisory;
-                });
-
                 // Get the subject for this teacher in this class
                 $subject = null;
-                if (!$isAdvisory) {
-                    // For non-advisory classes, get the subject directly from teacherSubjects
-                    foreach ($class->studentClasses as $studentClass) {
-                        foreach ($studentClass->teacherSubjects as $teacherSubject) {
-                            if ($teacherSubject->teacher_id == $teacherId) {
-                                $subject = $teacherSubject->subject;
-                                break 2;
-                            }
-                        }
-                    }
-                } else {
-                    // For advisory classes, get the subject from the adviser's teacherSubjects
-                    $advisoryClass = $class->studentClasses->first(function($studentClass) use ($teacherId) {
-                        return $studentClass->Adviser_ID == $teacherId && $studentClass->isAdvisory;
-                    });
-                    
-                    if ($advisoryClass) {
-                        foreach ($advisoryClass->teacherSubjects as $teacherSubject) {
-                            if ($teacherSubject->teacher_id == $teacherId) {
-                                $subject = $teacherSubject->subject;
-                                break;
-                            }
+                foreach ($class->studentClasses as $studentClass) {
+                    foreach ($studentClass->teacherSubjects as $teacherSubject) {
+                        if ($teacherSubject->teacher_id == $teacherId) {
+                            $subject = $teacherSubject->subject;
+                            break 2;
                         }
                     }
                 }
@@ -68,8 +43,7 @@ class ClassesController extends Controller
                     'className' => $class->ClassName,
                     'subjectName' => $subject ? $subject->SubjectName : 'No Subject Assigned',
                     'subject_id' => $subject ? $subject->Subject_ID : null,
-                    'gradeLevel' => $class->Grade_Level,
-                    'isAdvisory' => $isAdvisory
+                    'gradeLevel' => $class->Grade_Level
                 ];
             });
 
