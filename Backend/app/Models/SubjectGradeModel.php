@@ -12,6 +12,9 @@ class SubjectGradeModel extends Model
 
     protected $table = 'subject_grades';
 
+    protected $table = 'subject_grades';
+
+    protected $table = 'subject_grades';
     protected $primaryKey = 'Grade_ID';
 
     protected $fillable = [

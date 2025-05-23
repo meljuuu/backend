@@ -18,7 +18,7 @@ class AdminStudentClassController extends Controller
 
     public function indexExcludeIncomplete()
     {
-        $classes = ClassesModel::with(['studentClasses.adviser']) 
+        $classes = ClassesModel::with(['studentClasses.adviser', 'studentClasses.student']) 
             ->withCount('studentClasses')
             ->where('Status', '!=', 'Incomplete')
             ->get()
@@ -51,6 +51,24 @@ class AdminStudentClassController extends Controller
     
         return response()->json($classes);
     }
+
+    public function indexAllAClasses()
+    {
+        $classes = ClassesModel::with(['studentClasses.adviser', 'studentClasses.student'])
+        ->withCount('studentClasses')
+        ->get()
+        ->map(function ($class) {
+            $firstStudentClass = $class->studentClasses->first();
+            $class->adviser_id = $firstStudentClass ? $firstStudentClass->Adviser_ID : null;
+            $class->adviser_name = $firstStudentClass && $firstStudentClass->adviser
+                ? $firstStudentClass->adviser->name 
+                : 'Not assigned';
+            return $class;
+        });
+    
+        return response()->json($classes);
+    }
+    
     
 
     public function assignStudentsToClass(Request $request)

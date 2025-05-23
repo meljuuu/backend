@@ -14,17 +14,17 @@ class ClassSubjectModel extends Model
 
     public function subject()
     {
-        return $this->belongsTo(Subject::class, 'Subject_ID');
+        return $this->belongsTo(SubjectModel::class, 'Subject_ID');
     }
 
     public function class()
     {
-        return $this->belongsTo(Classes::class, 'Class_ID');
+        return $this->belongsTo(ClassesModel::class, 'Class_ID');
     }
 
     public function teacher()
     {
-        return $this->belongsTo(Teacher::class, 'Teacher_ID');
+        return $this->belongsTo(TeacherModel::class, 'Teacher_ID');
     }
     
 }
