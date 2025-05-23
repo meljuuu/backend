@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Research;
-use App\Models\Subject;
+use App\Models\SubjectModel as Subject;
 use Illuminate\Support\Facades\DB;
 
 class TeacherController extends Controller
@@ -169,9 +169,15 @@ public function createTeacherAccount(Request $request)
     ], 201);
 }
 
-  public function updateTeacherAccount(Request $request, $teacherId)
+public function updateTeacherAccount(Request $request, $teacherId)
 {
-    $teacher = TeacherModel::findOrFail($teacherId);
+    try {
+        $teacher = TeacherModel::findOrFail($teacherId);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'error' => 'Teacher not found.'
+        ], 404);
+    }
 
     $request->validate([
         'Email' => 'required|email|unique:teachers,Email,' . $teacherId . ',Teacher_ID',
@@ -182,19 +188,20 @@ public function createTeacherAccount(Request $request)
         'FirstName' => 'required|string|max:255',
         'LastName' => 'required|string|max:255',
         'MiddleName' => 'nullable|string|max:255',
+        'Suffix' => 'nullable|string|max:255',
         'BirthDate' => 'required|date',
         'Sex' => 'required|in:M,F',
         'Position' => 'required|in:Admin,Book-Keeping,Teacher,SuperAdmin',
         'ContactNumber' => 'required|string|max:15',
         'Address' => 'required|string|max:255',
-        'Subject_IDs' => 'required|array|min:1|max:2',
+        'Subject_IDs' => 'required_if:Position,Teacher|array|min:1|max:2',
         'Subject_IDs.*' => 'exists:subjects,Subject_ID',
     ]);
 
     $authenticatedTeacher = Auth::user();
     if (!in_array($authenticatedTeacher->Position, ['Admin', 'SuperAdmin'])) {
         return response()->json([
-            'error' => 'Only Admins can update teacher accounts.',
+            'error' => 'Only Admins or SuperAdmins can update teacher accounts.',
         ], 403);
     }
 
@@ -215,29 +222,44 @@ public function createTeacherAccount(Request $request)
         'Address' => $request->Address,
     ]);
 
-    // Sync subjects
-    $subjects = Subject::whereIn('Subject_ID', $request->Subject_IDs)->get();
+    // Handle subject assignments
+    if ($request->Position === 'Teacher') {
+        $subjectIds = $request->Subject_IDs ?? [];
+        if (!is_array($subjectIds)) {
+            $subjectIds = [];
+        }
+        $subjects = count($subjectIds) > 0
+            ? Subject::whereIn('Subject_ID', $subjectIds)->get()
+            : collect();
 
-    DB::table('teachers_subject')->where('teacher_id', $teacher->Teacher_ID)->delete();
+        // Remove old assignments
+        DB::table('teachers_subject')->where('teacher_id', $teacher->Teacher_ID)->delete();
 
-    $now = now();
-    $insertData = [];
-    foreach ($subjects as $subject) {
-        $insertData[] = [
-            'teacher_id' => $teacher->Teacher_ID,
-            'subject_id' => $subject->Subject_ID,
-            'subject_code' => $subject->SubjectCode,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ];
+        // Insert new assignments
+        $now = now();
+        $insertData = [];
+        foreach ($subjects as $subject) {
+            $insertData[] = [
+                'teacher_id' => $teacher->Teacher_ID,
+                'subject_id' => $subject->Subject_ID,
+                'subject_code' => $subject->SubjectCode,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
+        if (!empty($insertData)) {
+            DB::table('teachers_subject')->insert($insertData);
+        }
+    } else {
+        // Remove all subject assignments if not Teacher
+        DB::table('teachers_subject')->where('teacher_id', $teacher->Teacher_ID)->delete();
+        $subjects = [];
     }
-
-    DB::table('teachers_subject')->insert($insertData);
 
     return response()->json([
         'message' => 'Teacher account updated successfully.',
         'teacher' => $teacher,
-        'assigned_subjects' => $subjects,
+        'assigned_subjects' => $request->Position === 'Teacher' ? ($subjects ?? []) : [],
     ], 200);
 }
 

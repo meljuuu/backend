@@ -43,7 +43,7 @@ class TeacherModel extends Authenticatable
 
     public function subjects()
     {
-        return $this->belongsToMany(SubjectModel::class, 'teachers_subject', 'teacher_id', 'subject_id')
+        return $this->belongsToMany(\App\Models\SubjectModel::class, 'teachers_subject', 'teacher_id', 'subject_id')
                     ->withPivot('subject_code') // optional, only if you want to access this in relationship
                     ->withTimestamps();
     }
