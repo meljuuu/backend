@@ -84,6 +84,7 @@ Route::post('/admin/create-class', [StudentClassController::class, 'store']);
 Route::get('/admin/get-classes', [StudentClassController::class, 'index']);
 Route::post('/admin/add-student-to-class',[StudentClassController::class, 'addStudentsToClass']);
 Route::post('/admin/remove-student-to-class',[StudentClassController::class, 'removeStudentsFromClass']);
+Route::delete('/admin/remove-class',[StudentClassController::class, 'destroy']);
 
 
 // Protected Routes Here

@@ -19,7 +19,7 @@ class SubjectModel extends Model
         'SubjectName', 
         'SubjectCode', 
         'GradeLevel', 
-    ];
+        ];
 
     public function grades()
     {

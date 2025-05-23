@@ -196,11 +196,37 @@ class StudentClassController extends Controller
         ]);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $item = StudentClass::findOrFail($id);
-        $item->delete();
-
-        return response()->json(['message' => 'StudentClass deleted']);
+        $request->validate([
+            'class_id' => 'required|exists:classes,Class_ID',
+        ]);
+    
+        // Fetch all student_class records for this class
+        $studentClasses = StudentClassModel::where('Class_ID', $request->class_id)->get();
+    
+        if ($studentClasses->isEmpty()) {
+            return response()->json([
+                'message' => 'No student class records found for the given class.',
+            ], 404);
+        }
+    
+        foreach ($studentClasses as $studentClass) {
+            // ✅ Detach teacher_subjects (pivot table)
+            $studentClass->teacherSubjects()->detach();
+    
+            // ✅ Delete the student_class record
+            $studentClass->delete();
+        }
+    
+        // ✅ Optionally reset class status back to 'incomplete'
+        DB::table('classes')
+            ->where('Class_ID', $request->class_id)
+            ->update(['Status' => 'incomplete']);
+    
+        return response()->json([
+            'message' => 'Student class assignments and teacher subjects removed successfully.'
+        ]);
     }
+    
 }
