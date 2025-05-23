@@ -19,7 +19,6 @@ use App\Http\Controllers\TeacherSubjectController;
 use App\Http\Controllers\StudentClassController;
 use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\StudentClassTeacherSubjectController;
-use App\Http\Controllers\ClassController;
 use App\Http\Controllers\GradingController;
 /*
 |--------------------------------------------------------------------------
