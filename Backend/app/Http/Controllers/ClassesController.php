@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\ClassesModel;
 use App\Models\StudentClassTeacherSubject;
 use App\Models\GradesModel;
+use Illuminate\Support\Facades\DB;
 
 class ClassesController extends Controller
 {
@@ -98,60 +99,81 @@ class ClassesController extends Controller
     public function getStudentsForSubject($subjectId)
     {
         try {
-            $students = StudentClassTeacherSubject::with([
-                'studentClass.student' => function($query) {
-                    $query->select([
-                        'Student_ID',
-                        'LRN',
-                        'FirstName',
-                        'LastName',
-                        'Sex',
-                        'BirthDate',
-                        'ContactNumber',
-                        'HouseNo',
-                        'Barangay',
-                        'Municipality',
-                        'Province'
-                    ]);
-                },
-                'teacherSubject.subject'
-            ])
-            ->whereHas('teacherSubject', function($query) use ($subjectId) {
-                $query->where('subject_id', $subjectId);
-            })
-            ->get()
-            ->map(function($item) {
-                $student = $item->studentClass->student;
-                
-                // Get grades from SubjectGradeModel
-                $grades = \App\Models\SubjectGradeModel::where([
-                    'Student_ID' => $student->Student_ID,
-                    'Subject_ID' => $item->teacherSubject->subject_id,
-                    'Teacher_ID' => $item->teacherSubject->teacher_id
-                ])->first();
+            // First get the class ID for this subject
+            $classId = DB::table('student_class_teacher_subject as scts')
+                ->join('teachers_subject as ts', 'scts.teacher_subject_id', '=', 'ts.id')
+                ->where('ts.subject_id', $subjectId)
+                ->value('scts.student_class_id');
 
-                return [
-                    'student_id' => $student->Student_ID,
-                    'lrn' => $student->LRN,
-                    'firstName' => $student->FirstName,
-                    'lastName' => $student->LastName,
-                    'sex' => $student->Sex,
-                    'birthDate' => $student->BirthDate,
-                    'contactNumber' => $student->ContactNumber,
-                    'address' => $student->HouseNo . ', ' . 
-                                $student->Barangay . ', ' . 
-                                $student->Municipality . ', ' . 
-                                $student->Province,
-                    'grades' => [
-                        'first' => $grades ? $grades->Q1 : null,
-                        'second' => $grades ? $grades->Q2 : null,
-                        'third' => $grades ? $grades->Q3 : null,
-                        'fourth' => $grades ? $grades->Q4 : null
-                    ]
-                ];
-            })
-            ->unique('student_id')
-            ->values();
+            if (!$classId) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No class found for this subject'
+                ], 404);
+            }
+
+            $students = DB::table('student_class as sc')
+                ->join('students as s', 'sc.Student_ID', '=', 's.Student_ID')
+                ->leftJoin('student_class_teacher_subject as scts', function($join) use ($subjectId) {
+                    $join->on('sc.StudentClass_ID', '=', 'scts.student_class_id')
+                        ->where('scts.teacher_subject_id', '=', function($query) use ($subjectId) {
+                            $query->select('id')
+                                ->from('teachers_subject')
+                                ->where('subject_id', $subjectId)
+                                ->limit(1);
+                        });
+                })
+                ->leftJoin('teachers_subject as ts', 'scts.teacher_subject_id', '=', 'ts.id')
+                ->leftJoin('subject_grades as sg', function($join) use ($subjectId) {
+                    $join->on('s.Student_ID', '=', 'sg.Student_ID')
+                        ->where('sg.Subject_ID', '=', $subjectId);
+                })
+                ->where('sc.Class_ID', $classId)
+                ->select(
+                    's.Student_ID as student_id',
+                    's.LRN as lrn',
+                    's.FirstName as firstName',
+                    's.MiddleName as middleName',
+                    's.LastName as lastName',
+                    's.Sex as sex',
+                    's.BirthDate as birthDate',
+                    's.ContactNumber as contactNumber',
+                    's.HouseNo',
+                    's.Barangay',
+                    's.Municipality',
+                    's.Province',
+                    'sc.Class_ID as class_id',
+                    'sc.ClassName as class_name',
+                    'sg.Q1 as first_quarter',
+                    'sg.Q2 as second_quarter',
+                    'sg.Q3 as third_quarter',
+                    'sg.Q4 as fourth_quarter'
+                )
+                ->get()
+                ->map(function($student) {
+                    return [
+                        'student_id' => $student->student_id,
+                        'lrn' => $student->lrn,
+                        'firstName' => $student->firstName,
+                        'middleName' => $student->middleName ?? '',
+                        'lastName' => $student->lastName,
+                        'sex' => $student->sex,
+                        'birthDate' => $student->birthDate,
+                        'contactNumber' => $student->contactNumber,
+                        'address' => $student->HouseNo . ', ' . 
+                                    $student->Barangay . ', ' . 
+                                    $student->Municipality . ', ' . 
+                                    $student->Province,
+                        'class_id' => $student->class_id,
+                        'class_name' => $student->class_name,
+                        'grades' => [
+                            'first' => $student->first_quarter,
+                            'second' => $student->second_quarter,
+                            'third' => $student->third_quarter,
+                            'fourth' => $student->fourth_quarter
+                        ]
+                    ];
+                });
 
             return response()->json([
                 'status' => 'success',

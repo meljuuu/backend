@@ -20,28 +20,31 @@ class GradingController extends Controller
                     $query->select('Student_ID', 'FirstName', 'MiddleName', 'LastName', 'LRN', 'Sex', 'BirthDate', 'Curriculum');
                 }, 'teacher', 'subject'])
                 ->where('Subject_ID', $subjectId)
-                ->get();
-
-            // Transform the data to match frontend expectations
-            $grades = $grades->map(function($grade) {
-                return [
-                    'student_id' => $grade->student->Student_ID,
-                    'firstName' => $grade->student->FirstName,
-                    'middleName' => $grade->student->MiddleName ?? '',
-                    'lastName' => $grade->student->LastName,
-                    'lrn' => $grade->student->LRN,
-                    'sex' => $grade->student->Sex,
-                    'birthDate' => $grade->student->BirthDate,
-                    'curriculum' => $grade->student->Curriculum,
-                    'grades' => [
-                        'first' => $grade->Q1,
-                        'second' => $grade->Q2,
-                        'third' => $grade->Q3,
-                        'fourth' => $grade->Q4,
-                    ],
-                    'status' => $grade->Status ?? 'pending'
-                ];
-            });
+                ->get()
+                ->groupBy('Student_ID')  // Group by Student_ID to handle duplicates
+                ->map(function($studentGrades) {
+                    // Get the most recent grade entry for each student
+                    $latestGrade = $studentGrades->sortByDesc('created_at')->first();
+                    return [
+                        'student_id' => $latestGrade->student->Student_ID,
+                        'firstName' => $latestGrade->student->FirstName,
+                        'middleName' => $latestGrade->student->MiddleName ?? '',
+                        'lastName' => $latestGrade->student->LastName,
+                        'lrn' => $latestGrade->student->LRN,
+                        'sex' => $latestGrade->student->Sex,
+                        'birthDate' => $latestGrade->student->BirthDate,
+                        'curriculum' => $latestGrade->student->Curriculum,
+                        'grades' => [
+                            'first' => $latestGrade->Q1,
+                            'second' => $latestGrade->Q2,
+                            'third' => $latestGrade->Q3,
+                            'fourth' => $latestGrade->Q4,
+                        ],
+                        'status' => $latestGrade->Status ?? 'pending',
+                        'class_id' => $latestGrade->Class_ID ?? null  // Include Class_ID in response
+                    ];
+                })
+                ->values();  // Convert to array
 
             return response()->json([
                 'status' => 'success',
