@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ClassesModel;
 use App\Models\StudentClassTeacherSubject;
+use App\Models\GradesModel;
 
 class ClassesController extends Controller
 {
@@ -112,7 +113,8 @@ class ClassesController extends Controller
                         'Municipality',
                         'Province'
                     ]);
-                }
+                },
+                'grades'
             ])
             ->whereHas('teacherSubject', function($query) use ($subjectId) {
                 $query->where('subject_id', $subjectId);
@@ -131,7 +133,13 @@ class ClassesController extends Controller
                     'address' => $student->HouseNo . ', ' . 
                                 $student->Barangay . ', ' . 
                                 $student->Municipality . ', ' . 
-                                $student->Province
+                                $student->Province,
+                    'grades' => [
+                        'first' => $item->grades->first_quarter ?? null,
+                        'second' => $item->grades->second_quarter ?? null,
+                        'third' => $item->grades->third_quarter ?? null,
+                        'fourth' => $item->grades->fourth_quarter ?? null
+                    ]
                 ];
             })
             ->unique('student_id')
