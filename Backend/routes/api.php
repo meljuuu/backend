@@ -71,6 +71,13 @@ Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
 Route::get('/superadmin/classes-with-students', [SuperAdminController::class, 'getAllWithStudentCount']);
 Route::get('/superadmin/students', [SuperadminController::class, 'getAllStudentsData']);
 Route::get('/superadmin/student/{id}', [SuperadminController::class, 'getStudentById']);
+Route::put('/superadmin/student/{id}/accept', [SuperadminController::class, 'acceptStudent']);
+Route::put('/superadmin/student/{id}/decline', [SuperadminController::class, 'declineStudent']);
+Route::get('/superadmin/lesson-plans', [SuperadminController::class, 'getAllLessonPlans']);
+Route::get('/superadmin/lesson-plans/{id}', [SuperadminController::class, 'getLessonPlanById']);
+Route::put('/superadmin/lesson-plans/{id}/approve', [SuperadminController::class, 'approveLessonPlan']);
+Route::put('/superadmin/lesson-plans/{id}/decline', [SuperadminController::class, 'rejectLessonPlan']);
+
 
 
 //SUBJECTS API
