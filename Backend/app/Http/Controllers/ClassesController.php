@@ -16,6 +16,15 @@ class ClassesController extends Controller
         $query = ClassesModel::with([
             'schoolYear',
             'adviser',
+            'studentClasses' => function($query) use ($teacherId) {
+                $query->where(function($q) use ($teacherId) {
+                    $q->where('Adviser_ID', $teacherId)
+                      ->where('isAdvisory', true)
+                      ->orWhereHas('teacherSubjects', function($q) use ($teacherId) {
+                          $q->where('teacher_id', $teacherId);
+                      });
+                });
+            },
             'studentClasses.teacherSubjects' => function($query) use ($teacherId) {
                 $query->where('teacher_id', $teacherId);
             },
@@ -25,13 +34,22 @@ class ClassesController extends Controller
         
         $classes = $query->get()
             ->map(function ($class) use ($teacherId) {
-                // Get the subject for this teacher in this class
                 $subject = null;
+                $isAdvisory = false;
+                
                 foreach ($class->studentClasses as $studentClass) {
-                    foreach ($studentClass->teacherSubjects as $teacherSubject) {
-                        if ($teacherSubject->teacher_id == $teacherId) {
-                            $subject = $teacherSubject->subject;
-                            break 2;
+                    // Check if this is an advisory class
+                    if ($studentClass->Adviser_ID == $teacherId && $studentClass->isAdvisory) {
+                        $isAdvisory = true;
+                    }
+                    
+                    // Get subject information if not advisory
+                    if (!$isAdvisory) {
+                        foreach ($studentClass->teacherSubjects as $teacherSubject) {
+                            if ($teacherSubject->teacher_id == $teacherId) {
+                                $subject = $teacherSubject->subject;
+                                break 2;
+                            }
                         }
                     }
                 }
@@ -39,11 +57,12 @@ class ClassesController extends Controller
                 return [
                     'class_id' => (string)$class->Class_ID,
                     'trackStand' => $class->Track,
-                    'classType' => $class->Curriculum,
+                    'classType' => $isAdvisory ? 'Advisory' : $class->Curriculum,
                     'className' => $class->ClassName,
-                    'subjectName' => $subject ? $subject->SubjectName : 'No Subject Assigned',
-                    'subject_id' => $subject ? $subject->Subject_ID : null,
-                    'gradeLevel' => $class->Grade_Level
+                    'subjectName' => $isAdvisory ? 'Advisory Class' : ($subject ? $subject->SubjectName : 'No Subject Assigned'),
+                    'subject_id' => $isAdvisory ? null : ($subject ? $subject->Subject_ID : null),
+                    'gradeLevel' => $class->Grade_Level,
+                    'isAdvisory' => $isAdvisory
                 ];
             });
 

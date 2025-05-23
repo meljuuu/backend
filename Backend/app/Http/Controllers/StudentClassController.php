@@ -217,4 +217,17 @@ class StudentClassController extends Controller
 
         return response()->json(['message' => 'StudentClass deleted']);
     }
+
+    public function checkAdvisoryStatus($classId, $teacherId)
+    {
+        $isAdvisory = StudentClassModel::where('Class_ID', $classId)
+            ->where('Adviser_ID', $teacherId)
+            ->where('isAdvisory', true)
+            ->exists();
+
+        return response()->json([
+            'status' => 'success',
+            'isAdvisory' => $isAdvisory
+        ]);
+    }
 }

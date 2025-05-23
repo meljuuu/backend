@@ -219,4 +219,24 @@ class StudentClassTeacherSubjectController extends Controller
             'data' => $subjects
         ]);
     }
+
+    /**
+     * Get advisory information for a class
+     */
+    public function getAdvisoryInfo($classId)
+    {
+        $advisoryInfo = StudentClassModel::with(['adviser'])
+            ->where('Class_ID', $classId)
+            ->where('isAdvisory', true)
+            ->first();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $advisoryInfo ? [
+                'adviser_id' => $advisoryInfo->Adviser_ID,
+                'adviser_name' => $advisoryInfo->adviser ? 
+                    $advisoryInfo->adviser->FirstName . ' ' . $advisoryInfo->adviser->LastName : null
+            ] : null
+        ]);
+    }
 }
