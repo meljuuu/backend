@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Research;
 use App\Models\Subject;
 use Illuminate\Support\Facades\DB;
+use App\Models\StudentClassModel;
 
 class TeacherController extends Controller
 {
@@ -24,6 +25,18 @@ class TeacherController extends Controller
         $teachers = TeacherModel::with(['subjects', 'teacherSubjects.subject'])->get();
 
         $data = $teachers->map(function ($teacher) {
+            // Get advisory classes for this teacher
+            $advisoryClasses = StudentClassModel::where('Adviser_ID', $teacher->Teacher_ID)
+                ->where('isAdvisory', true)
+                ->with('class')
+                ->get()
+                ->map(function($studentClass) {
+                    return [
+                        'class_id' => $studentClass->class->Class_ID,
+                        'class_name' => $studentClass->class->ClassName
+                    ];
+                });
+
             return [
                 'teacher' => $teacher,
                 'subjects' => $teacher->teacherSubjects->map(function($ts) {
@@ -32,7 +45,8 @@ class TeacherController extends Controller
                         'name' => $ts->subject->SubjectName,
                         'code' => $ts->subject->SubjectCode
                     ];
-                })->unique('id')->values()
+                })->unique('id')->values(),
+                'advisory_classes' => $advisoryClasses
             ];
         });
 

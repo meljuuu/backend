@@ -32,6 +32,14 @@ class StudentClassController extends Controller
             'is_advisory' => 'boolean',
         ]);
     
+        // If this is an advisory class, ensure only one teacher is marked as advisory
+        if ($request->is_advisory) {
+            // Remove advisory status from other teachers in this class
+            StudentClassModel::where('Class_ID', $request->class_id)
+                ->where('isAdvisory', true)
+                ->update(['isAdvisory' => false]);
+        }
+    
         $studentClassRecords = [];
     
         foreach ($request->student_ids as $studentId) {

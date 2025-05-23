@@ -75,7 +75,9 @@ class StudentClassTeacherSubjectController extends Controller
         $request->validate([
             'class_id' => 'required|exists:classes,Class_ID',
             'teacher_subject_ids' => 'required|array',
-            'teacher_subject_ids.*' => 'exists:teachers_subject,id'
+            'teacher_subject_ids.*' => 'exists:teachers_subject,id',
+            'adviser_id' => 'nullable|exists:teachers,Teacher_ID',
+            'is_advisory' => 'boolean'
         ]);
 
         $studentClass = StudentClassModel::where('Class_ID', $request->class_id)->first();
@@ -87,12 +89,26 @@ class StudentClassTeacherSubjectController extends Controller
             ], 404);
         }
 
+        // If this is an advisory assignment
+        if ($request->is_advisory && $request->adviser_id) {
+            // Remove advisory status from other teachers in this class
+            StudentClassModel::where('Class_ID', $request->class_id)
+                ->where('isAdvisory', true)
+                ->update(['isAdvisory' => false]);
+
+            // Set the new adviser
+            $studentClass->update([
+                'Adviser_ID' => $request->adviser_id,
+                'isAdvisory' => true
+            ]);
+        }
+
         // Attach teacher subjects to the student class
         $studentClass->teacherSubjects()->attach($request->teacher_subject_ids);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Subjects assigned to class successfully'
+            'message' => 'Subjects and advisory status assigned to class successfully'
         ]);
     }
 

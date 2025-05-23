@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Research;
+use App\Models\StudentClassModel;
 
 class TeacherSubjectController extends Controller
 {
@@ -18,6 +19,11 @@ class TeacherSubjectController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $teachersSubjects->map(function($ts) {
+                // Get advisory status for this teacher-subject combination
+                $isAdvisory = StudentClassModel::where('Adviser_ID', $ts->teacher->Teacher_ID)
+                    ->where('isAdvisory', true)
+                    ->exists();
+
                 return [
                     'id' => $ts->id,
                     'subject' => [
@@ -27,7 +33,8 @@ class TeacherSubjectController extends Controller
                     ],
                     'teacher' => [
                         'id' => $ts->teacher->Teacher_ID,
-                        'name' => $ts->teacher->FirstName . ' ' . $ts->teacher->LastName
+                        'name' => $ts->teacher->FirstName . ' ' . $ts->teacher->LastName,
+                        'isAdvisory' => $isAdvisory
                     ]
                 ];
             })
