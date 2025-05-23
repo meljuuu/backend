@@ -12,6 +12,8 @@ class TeacherModel extends Authenticatable
 {
     use HasApiTokens, Notifiable;
 
+    
+
     protected $table = 'teachers';
     protected $primaryKey = 'Teacher_ID';
 
@@ -24,6 +26,9 @@ class TeacherModel extends Authenticatable
         'LastName',
         'MiddleName',
         'BirthDate',
+        'Suffix',
+        'Educational_Attainment',
+        'Teaching_Position',
         'Sex',
         'Position',
         'ContactNumber',
@@ -38,7 +43,9 @@ class TeacherModel extends Authenticatable
 
     public function subjects()
     {
-        return $this->belongsToMany(SubjectModel::class, 'teachers_subject', 'teacher_id', 'subject_id');
+        return $this->belongsToMany(SubjectModel::class, 'teachers_subject', 'teacher_id', 'subject_id')
+                    ->withPivot('subject_code') // optional, only if you want to access this in relationship
+                    ->withTimestamps();
     }
 
 

@@ -14,7 +14,7 @@ class StudentClassesSeeder extends Seeder
                 'Student_ID' => 1, // Alice
                 'Class_ID' => 1,   // Grade 10 - A
                 'SY_ID' => 1,      // School Year ID
-                'Teacher_ID' => 1, // Teacher ID
+                'Adviser_ID' => 3, // Changed from Advisory_ID to Adviser_ID
                 'isAdvisory' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -23,7 +23,7 @@ class StudentClassesSeeder extends Seeder
                 'Student_ID' => 2, // Bob
                 'Class_ID' => 1,   // Grade 10 - A
                 'SY_ID' => 1,      // School Year ID
-                'Teacher_ID' => 1, // Teacher ID
+                'Adviser_ID' => 1, // Changed from Advisory_ID to Adviser_ID
                 'isAdvisory' => false,
                 'created_at' => now(),
                 'updated_at' => now(),

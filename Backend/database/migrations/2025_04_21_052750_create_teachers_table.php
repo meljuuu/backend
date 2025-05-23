@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('Teaching_Position');
             $table->date('BirthDate');
             $table->enum('Sex', ['M', 'F']);
-            $table->enum('Position', ['Admin', 'Teacher', 'SuperAdmin']);
+            $table->enum('Position', ['Admin', 'Teacher', 'SuperAdmin', 'Book-Keeping']);
             $table->string('ContactNumber');
             $table->string('Address');
             $table->timestamps();

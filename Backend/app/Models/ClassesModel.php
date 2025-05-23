@@ -12,15 +12,20 @@ class ClassesModel extends Model
     protected $table = 'classes';
     protected $primaryKey = 'Class_ID';
 
+    public $incrementing = true;
+
+    protected $keyType = 'int';
+
+    // Which columns are mass assignable
     protected $fillable = [
         'ClassName',
         'Section',
         'SY_ID',
         'Grade_Level',
+        'Status',
         'Track',
-        'Teacher_ID',
-        'created_at',
-        'updated_at'
+        'Curriculum',
+        'comments',
     ];
 
     protected $casts = [
@@ -30,7 +35,7 @@ class ClassesModel extends Model
     public function students()
     {
         return $this->belongsToMany(StudentModel::class, 'student_class', 'Class_ID', 'Student_ID')
-            ->withPivot(['SY_ID', 'Teacher_ID', 'isAdvisory'])
+            ->withPivot(['SY_ID', 'Adviser_ID', 'isAdvisory'])
             ->withTimestamps();
     }
 
@@ -50,4 +55,17 @@ class ClassesModel extends Model
     {
         return $this->belongsTo(SchoolYearModel::class, 'SY_ID', 'SY_ID');
     }
+
+
+    public function studentClasses()
+    {
+        return $this->hasMany(StudentClassModel::class, 'Class_ID', 'Class_ID');
+    }
+
+    
+    public function adviser()
+    {
+        return $this->belongsTo(TeacherModel::class, 'Adviser_ID', 'Teacher_ID');
+    }
+
 }
