@@ -47,7 +47,7 @@ class SubjectGradeModel extends Model
      */
     public function student(): BelongsTo
     {
-        return $this->belongsTo(Student::class, 'Student_ID', 'Student_ID');
+        return $this->belongsTo(StudentModel::class, 'Student_ID', 'Student_ID');
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SubjectGradeModel;
-use App\Models\Student;
+use App\Models\StudentModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -17,7 +17,7 @@ class GradingController extends Controller
     {
         try {
             $grades = SubjectGradeModel::with(['student' => function($query) {
-                    $query->select('Student_ID', 'firstName', 'middleName', 'lastName', 'lrn', 'sex', 'birthDate', 'curriculum');
+                    $query->select('Student_ID', 'FirstName', 'MiddleName', 'LastName', 'LRN', 'Sex', 'BirthDate', 'Curriculum');
                 }, 'teacher', 'subject'])
                 ->where('Subject_ID', $subjectId)
                 ->get();
@@ -26,13 +26,13 @@ class GradingController extends Controller
             $grades = $grades->map(function($grade) {
                 return [
                     'student_id' => $grade->student->Student_ID,
-                    'firstName' => $grade->student->firstName,
-                    'middleName' => $grade->student->middleName ?? '',
-                    'lastName' => $grade->student->lastName,
-                    'lrn' => $grade->student->lrn,
-                    'sex' => $grade->student->sex,
-                    'birthDate' => $grade->student->birthDate,
-                    'curriculum' => $grade->student->curriculum,
+                    'firstName' => $grade->student->FirstName,
+                    'middleName' => $grade->student->MiddleName ?? '',
+                    'lastName' => $grade->student->LastName,
+                    'lrn' => $grade->student->LRN,
+                    'sex' => $grade->student->Sex,
+                    'birthDate' => $grade->student->BirthDate,
+                    'curriculum' => $grade->student->Curriculum,
                     'grades' => [
                         'first' => $grade->Q1,
                         'second' => $grade->Q2,
