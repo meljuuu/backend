@@ -16,7 +16,7 @@ class SubjectGradeModel extends Model
 
     protected $fillable = [
         'Q1', 'Q2', 'Q3', 'Q4', 'FinalGrade', 'Remarks',
-        'Student_ID', 'Teacher_ID', 'Subject_ID'
+        'Student_ID', 'Teacher_ID', 'Subject_ID', 'Status'
     ];
 
     /**

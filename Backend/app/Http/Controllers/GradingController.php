@@ -38,7 +38,8 @@ class GradingController extends Controller
                         'second' => $grade->Q2,
                         'third' => $grade->Q3,
                         'fourth' => $grade->Q4,
-                    ]
+                    ],
+                    'status' => $grade->Status ?? 'pending'
                 ];
             });
 
@@ -211,6 +212,41 @@ class GradingController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to update grade: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update grade status
+     */
+    public function updateGradeStatus($gradeId, Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|in:pending,accepted,declined'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $grade = SubjectGradeModel::findOrFail($gradeId);
+            $grade->Status = $request->status;
+            $grade->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Grade status updated successfully',
+                'data' => $grade
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update grade status: ' . $e->getMessage()
             ], 500);
         }
     }
