@@ -16,6 +16,7 @@ use App\Http\Controllers\TeacherSubjectController;
 use App\Http\Controllers\StudentClassController;
 use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\StudentClassTeacherSubjectController;
+use App\Http\Controllers\ClassController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -161,6 +162,9 @@ Route::prefix('student-classes')->group(function () {
     Route::post('/remove-students', [StudentClassController::class, 'removeStudentsFromClass']);
     Route::get('/{id}/subjects', [StudentClassController::class, 'show']);
 });
+
+Route::get('/classes/{classId}', [ClassController::class, 'getClassDetails'])
+    ->middleware('auth:sanctum');
 
 
 
