@@ -19,6 +19,7 @@ use App\Http\Controllers\StudentClassTeacherSubjectController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\GradingController;
 use App\Http\Controllers\AdvisoryController;
+use App\Http\Controllers\DashboardController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -136,6 +137,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/student/{studentId}/subjects', [AdvisoryController::class, 'getStudentSubjects']);
     Route::get('/student/{studentId}/subject/{subjectId}/grades', [AdvisoryController::class, 'getStudentGrades']);
     Route::get('/teacher/student/{studentId}/grades', [AdvisoryController::class, 'getStudentGrades']);
+
+    // Dashboard Routes
+    Route::prefix('teacher')->group(function () {
+        Route::get('/advisory-stats', [DashboardController::class, 'getAdvisoryStats']);
+        Route::get('/subject-classes', [DashboardController::class, 'getSubjectClasses']);
+        Route::get('/grade-summary', [DashboardController::class, 'getGradeSummary']);
+        Route::get('/recent-grades', [DashboardController::class, 'getRecentGrades']);
+    });
 
     });
 
