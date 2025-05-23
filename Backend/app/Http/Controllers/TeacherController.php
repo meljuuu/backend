@@ -107,22 +107,18 @@ public function createTeacherAccount(Request $request)
         'FirstName' => 'required|string|max:255',
         'LastName' => 'required|string|max:255',
         'MiddleName' => 'nullable|string|max:255',
+        'Suffix' => 'nullable|string|max:255',
         'BirthDate' => 'required|date',
         'Sex' => 'required|in:M,F',
         'Position' => 'required|in:Admin,Book-Keeping,Teacher,SuperAdmin',
         'ContactNumber' => 'required|string|max:15',
         'Address' => 'required|string|max:255',
-        'Subject_IDs' => 'required|array|min:1|max:2',
+        'Subject_IDs' => 'required_if:Position,Teacher|array|min:1|max:2',
         'Subject_IDs.*' => 'exists:subjects,Subject_ID',
     ]);
 
-        $authenticatedTeacher = Auth::user(); 
-        if (!in_array($authenticatedTeacher->Position, ['Admin', 'SuperAdmin'])) {
-        return response()->json([
-            'error' => 'Only Admins or SuperAdmins can create teacher accounts.',
-        ], 403);
-    }
-        if (!in_array($authenticatedTeacher->Position, ['Admin', 'SuperAdmin'])) {
+    $authenticatedTeacher = Auth::user(); 
+    if (!in_array($authenticatedTeacher->Position, ['Admin', 'SuperAdmin'])) {
         return response()->json([
             'error' => 'Only Admins or SuperAdmins can create teacher accounts.',
         ], 403);
@@ -145,22 +141,32 @@ public function createTeacherAccount(Request $request)
         'Address' => $request->Address,
     ]);
 
-    $subjects = Subject::whereIn('Subject_ID', $request->Subject_IDs)->get();
+    $subjects = [];
+    if ($request->Position === 'Teacher') {
+        $subjectIds = $request->Subject_IDs ?? [];
+        if (!is_array($subjectIds)) {
+            $subjectIds = [];
+        }
+        $subjects = count($subjectIds) > 0
+            ? Subject::whereIn('Subject_ID', $subjectIds)->get()
+            : collect();
 
-    // Prepare and insert into teachers_subject table directly
-    $now = now();
-    $insertData = [];
-    foreach ($subjects as $subject) {
-        $insertData[] = [
-            'teacher_id' => $teacher->Teacher_ID,
-            'subject_id' => $subject->Subject_ID,
-            'subject_code' => $subject->SubjectCode,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ];
+        // Prepare and insert into teachers_subject table directly
+        $now = now();
+        $insertData = [];
+        foreach ($subjects as $subject) {
+            $insertData[] = [
+                'teacher_id' => $teacher->Teacher_ID,
+                'subject_id' => $subject->Subject_ID,
+                'subject_code' => $subject->SubjectCode,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
+        if (!empty($insertData)) {
+            DB::table('teachers_subject')->insert($insertData);
+        }
     }
-
-    DB::table('teachers_subject')->insert($insertData);
 
     return response()->json([
         'message' => 'Teacher account created and subjects assigned successfully.',
