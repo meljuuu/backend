@@ -12,7 +12,9 @@ class StudentClassController extends Controller
    
     public function index()
     {
-        $list = StudentClassModel::with(['student', 'class', 'schoolYear', 'teacher', 'adviser', 'teacherSubjects'])
+        $list = StudentClassModel::with(['student' => function($query) {
+            $query->select('Student_ID', 'firstName', 'middleName', 'lastName', 'lrn', 'sex', 'birthDate', 'curriculum');
+        }, 'class', 'schoolYear', 'teacher', 'adviser', 'teacherSubjects'])
             ->get();
 
         return response()->json($list);
@@ -31,6 +33,14 @@ class StudentClassController extends Controller
             'teacher_subject_ids.*' => 'integer|exists:teachers_subject,id',
             'is_advisory' => 'boolean',
         ]);
+    
+        // If this is an advisory class, ensure only one teacher is marked as advisory
+        if ($request->is_advisory) {
+            // Remove advisory status from other teachers in this class
+            StudentClassModel::where('Class_ID', $request->class_id)
+                ->where('isAdvisory', true)
+                ->update(['isAdvisory' => false]);
+        }
     
         $studentClassRecords = [];
     
@@ -167,10 +177,16 @@ class StudentClassController extends Controller
     
     public function show($id)
     {
-        $item = StudentClass::with(['student', 'class', 'schoolYear', 'teacher', 'adviser', 'teacherSubject'])
-            ->findOrFail($id);
+        $studentClass = StudentClassModel::with(['teacherSubjects.subject'])->findOrFail($id);
 
-        return response()->json($item);
+        $subjects = $studentClass->teacherSubjects->map(function($ts) {
+            return $ts->subject;
+        })->unique('Subject_ID')->values();
+
+        return response()->json([
+            'status' => 'success',
+            'subjects' => $subjects
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -228,5 +244,56 @@ class StudentClassController extends Controller
             'message' => 'Student class assignments and teacher subjects removed successfully.'
         ]);
     }
+
+    public function checkAdvisoryStatus($classId, $teacherId)
+    {
+        $isAdvisory = StudentClassModel::where('Class_ID', $classId)
+            ->where('Adviser_ID', $teacherId)
+            ->where('isAdvisory', true)
+            ->exists();
+
+        return response()->json([
+            'status' => 'success',
+            'isAdvisory' => $isAdvisory
+        ]);
+    }
+<<<<<<< HEAD
+
+    public function getStudentsByClass($classId)
+    {
+        try {
+            $students = StudentClassModel::with(['student' => function($query) {
+                $query->select('Student_ID', 'FirstName', 'MiddleName', 'LastName', 'LRN', 'Sex', 'BirthDate', 'ContactNumber', 'Barangay', 'Municipality', 'Province');
+            }])
+            ->where('Class_ID', $classId)
+            ->get()
+            ->map(function($studentClass) {
+                $student = $studentClass->student;
+                return [
+                    'Student_ID' => $student->Student_ID,
+                    'FirstName' => $student->FirstName,
+                    'MiddleName' => $student->MiddleName,
+                    'LastName' => $student->LastName,
+                    'LRN' => $student->LRN,
+                    'Sex' => $student->Sex,
+                    'BirthDate' => $student->BirthDate,
+                    'ContactNumber' => $student->ContactNumber,
+                    'Barangay' => $student->Barangay,
+                    'Municipality' => $student->Municipality,
+                    'Province' => $student->Province,
+                    'isAdvisory' => $studentClass->isAdvisory
+                ];
+            });
+
+            return response()->json($students);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch students: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+=======
     
+>>>>>>> 08dcd437cc9705d665006fbc55ff1ee00eac979c
 }

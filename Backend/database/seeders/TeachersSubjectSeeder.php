@@ -12,16 +12,16 @@ class TeachersSubjectSeeder extends Seeder
      */
     public function run(): void
     {
-        $teacher = DB::table('teachers')->first();
-        $subjects = DB::table('subjects')->get();
-        if ($teacher) {
-            foreach ($subjects as $subject) {
-                DB::table('teachers_subject')->insert([
-                    'teacher_id' => $teacher->Teacher_ID,
-                    'subject_id' => $subject->Subject_ID,
-                    'subject_code' => $subject->SubjectCode,
-                ]);
-            }
-        }
+        // Sample data for the teachers_subject table
+        $teachersSubjects = [
+            [
+                'teacher_id' => 1, // Ensure this teacher_id exists in the teachers table
+                'subject_id' => 1, // Ensure this subject_id exists in the subjects table
+                'subject_code' => 'MATH101',
+            ],
+        ];
+
+        // Insert the data into the teachers_subject table
+        DB::table('teachers_subject')->insert($teachersSubjects);
     }
-} 
+}

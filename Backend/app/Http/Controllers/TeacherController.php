@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Research;
 use App\Models\SubjectModel as Subject;
 use Illuminate\Support\Facades\DB;
+use App\Models\StudentClassModel;
 
 class TeacherController extends Controller
 {
@@ -21,19 +22,37 @@ class TeacherController extends Controller
 
     public function getAll()
     {
-        $teachers = TeacherModel::with('subjects')->get();
+        $teachers = TeacherModel::with(['subjects', 'teacherSubjects.subject'])->get();
 
-        // Optionally, format the response to include subject IDs for each teacher
         $data = $teachers->map(function ($teacher) {
+            // Get advisory classes for this teacher
+            $advisoryClasses = StudentClassModel::where('Adviser_ID', $teacher->Teacher_ID)
+                ->where('isAdvisory', true)
+                ->with('class')
+                ->get()
+                ->map(function($studentClass) {
+                    return [
+                        'class_id' => $studentClass->class->Class_ID,
+                        'class_name' => $studentClass->class->ClassName
+                    ];
+                });
+
             return [
                 'teacher' => $teacher,
-                'Subject_IDs' => $teacher->subjects->pluck('Subject_ID')->toArray(),
-                'subjects' => $teacher->subjects,
+                'subjects' => $teacher->teacherSubjects->map(function($ts) {
+                    return [
+                        'id' => $ts->subject->Subject_ID,
+                        'name' => $ts->subject->SubjectName,
+                        'code' => $ts->subject->SubjectCode
+                    ];
+                })->unique('id')->values(),
+                'advisory_classes' => $advisoryClasses
             ];
         });
 
         return response()->json([
-            'teachers' => $data
+            'status' => 'success',
+            'data' => $data
         ]);
     }
     

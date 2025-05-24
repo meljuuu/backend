@@ -9,7 +9,6 @@ use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\DashboardController;
-// use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminStudentClassController;
 use Illuminate\Http\Exceptions\NotFoundHttpException;
 use App\Http\Controllers\SuperAdminController;
@@ -17,7 +16,12 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherSubjectController;
 use App\Http\Controllers\StudentClassController;
-use App\Http\Controllers\GradesController;
+use App\Http\Controllers\ClassesController;
+use App\Http\Controllers\StudentClassTeacherSubjectController;
+use App\Http\Controllers\GradingController;
+use App\Http\Controllers\AdvisoryController;
+use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\DB;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -47,14 +51,23 @@ Route::get('/student/getAll', [StudentController::class, 'getAll']);
 Route::get('/student/getAllPending', [StudentController::class, 'getPendingStudents']);
 Route::get('/student/getAllAccepted', [StudentController::class, 'getAcceptedStudents']);
 Route::get('/student/get-students-no-class', [StudentController::class, 'getNoClassStudents']);
+Route::get('/student/get-students-no-class', [StudentController::class, 'getNoClassStudents']);
 Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
 Route::post('/student/bulk-upload', [StudentController::class, 'bulkUpload']);
+<<<<<<< HEAD
+Route::get('/student/get-students-no-class', [StudentController::class, 'getStudentsNoClass']);
+
+=======
 Route::put('/students/update/{id}', [StudentController::class, 'update']);
+Route::put('/students/update/{id}', [StudentController::class, 'update']);
+>>>>>>> 08dcd437cc9705d665006fbc55ff1ee00eac979c
 
 //ADMIN API
 Route::post('/assign-students', [AdminStudentClassController::class, 'assignStudentsToClass']);
 Route::post('/get-all-classes', [AdminStudentClassController::class, 'indexClass']);
 Route::get('/get-super-classes', [AdminStudentClassController::class, 'indexExcludeIncomplete']);
+Route::get('/get-accepted-classes', [AdminStudentClassController::class, 'indexAllAccepted']);
+Route::get('/get-classes', [AdminStudentClassController::class, 'indexAllAClasses']);
 Route::get('/get-accepted-classes', [AdminStudentClassController::class, 'indexAllAccepted']);
 Route::get('/get-classes', [AdminStudentClassController::class, 'indexAllAClasses']);
 Route::get('/dashboard/students/count', [AdminDashboardController::class, 'getStudentCount']);
@@ -69,6 +82,7 @@ Route::get('/count-pending-classes', [AdminDashboardController::class, 'countPen
 
 
 //Teacher
+Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
 Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
 
 
@@ -135,7 +149,89 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
+    Route::get('/grades/subject/{subjectId}', [GradingController::class, 'getSubjectGrades']);
+    Route::get('/grades/student/{studentId}/subject/{subjectId}', [GradingController::class, 'getStudentGrades']);
+    Route::post('/grades/bulk', [GradingController::class, 'submitGrades']);
+
+    // Grading routes
+    Route::prefix('grades')->group(function () {
+        Route::get('/subject/{subjectId}', [GradingController::class, 'getSubjectGrades']);
+        Route::get('/student/{studentId}/subject/{subjectId}', [GradingController::class, 'getStudentGrades']);
+        Route::post('/bulk', [GradingController::class, 'submitGrades']);
+        Route::put('/{gradeId}', [GradingController::class, 'updateGrade']);
+    });
+
+    Route::get('/teacher/advisory-students', [AdvisoryController::class, 'getAdvisoryStudents']);
+    Route::get('/student/{studentId}/subjects', [AdvisoryController::class, 'getStudentSubjects']);
+    Route::get('/student/{studentId}/subject/{subjectId}/grades', [AdvisoryController::class, 'getStudentGrades']);
+    Route::get('/teacher/student/{studentId}/grades', [AdvisoryController::class, 'getStudentGrades']);
+
+    // Dashboard Routes
+    Route::prefix('teacher')->group(function () {
+        Route::get('/advisory-stats', [DashboardController::class, 'getAdvisoryStats']);
+        Route::get('/subject-classes', [DashboardController::class, 'getSubjectClasses']);
+        Route::get('/grade-summary', [DashboardController::class, 'getGradeSummary']);
+        Route::get('/recent-grades', [DashboardController::class, 'getRecentGrades']);
+    });
+
+    });
+
+// Classes routes
+Route::prefix('classes')->group(function () {
+    Route::get('/', [ClassesController::class, 'index']);
+    Route::get('/{classId}/subjects', [ClassesController::class, 'showSubjectsForClass']);
+    Route::get('/{classId}/teachers', [ClassesController::class, 'getTeachersForClass']);
+    Route::get('/{subjectId}/students', [ClassesController::class, 'getStudentsForSubject']);
 });
+
+// Student Class Teacher Subject routes
+Route::prefix('student-class-teacher-subject')->group(function () {
+    Route::get('/', [StudentClassTeacherSubjectController::class, 'index']);
+    Route::get('/class/{classId}/subjects', [StudentClassTeacherSubjectController::class, 'getSubjectsForClass']);
+    Route::get('/class/{classId}/subjects-with-teachers', [StudentClassTeacherSubjectController::class, 'getClassSubjectsWithTeachers']);
+    Route::get('/class/{classId}/teachers', [StudentClassTeacherSubjectController::class, 'getTeachersForClass']);
+    Route::post('/assign', [StudentClassTeacherSubjectController::class, 'assignSubjectsToClass']);
+    Route::post('/remove', [StudentClassTeacherSubjectController::class, 'removeSubjectsFromClass']);
+    Route::get('/teacher/{teacherId}/classes', [StudentClassTeacherSubjectController::class, 'getClassesForTeacher']);
+    Route::get('/teacher/{teacherId}/class/{classId}/subjects', [StudentClassTeacherSubjectController::class, 'getTeacherSubjectsInClass']);
+});
+
+// Teacher Subject routes
+Route::prefix('teacher-subjects')->group(function () {
+    Route::get('/', [TeacherSubjectController::class, 'getAllSubject']);
+    Route::get('/teacher/{teacherId}', [TeacherSubjectController::class, 'getSubjectsByTeacher']);
+    Route::get('/subject/{subjectId}', [TeacherSubjectController::class, 'getTeachersBySubject']);
+});
+
+// Subject routes
+Route::prefix('subjects')->group(function () {
+    Route::get('/', [SubjectController::class, 'getAll']);
+    Route::get('/{subjectId}/teachers', [SubjectController::class, 'getTeachers']);
+    Route::get('/{subjectId}/classes', [SubjectController::class, 'getClasses']);
+    Route::post('/grades', [SubjectController::class, 'submitGrades']);
+    Route::get('/{subjectId}/grades', [SubjectController::class, 'getGrades']);
+});
+
+// Student Class routes
+Route::prefix('student-class')->group(function () {
+    Route::get('/', [StudentClassController::class, 'index']);
+    Route::post('/', [StudentClassController::class, 'store']);
+    Route::post('/add-students', [StudentClassController::class, 'addStudentsToClass']);
+    Route::post('/remove-students', [StudentClassController::class, 'removeStudentsFromClass']);
+    Route::get('/{id}/subjects', [StudentClassController::class, 'show']);
+    Route::get('/class/{classId}', [StudentClassController::class, 'getStudentsByClass']);
+    Route::get('/class/{classId}', [StudentClassController::class, 'getStudentsByClass']);
+});
+
+Route::get('/classes/{classId}', [ClassController::class, 'getClassDetails'])
+    ->middleware('auth:sanctum');
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/teacher/advisory-students', [AdvisoryController::class, 'getAdvisoryStudents']);
+    Route::get('/student/{studentId}/subjects', [AdvisoryController::class, 'getStudentSubjects']);
+});
+
+Route::get('/student-class/class/{classId}', [StudentClassController::class, 'getStudentsByClass']);
 
 
 
