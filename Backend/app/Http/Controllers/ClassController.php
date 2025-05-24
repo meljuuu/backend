@@ -89,11 +89,44 @@ class ClassController extends Controller
     public function getClassStudents($classId)
     {
         try {
-            $class = ClassesModel::with('students')->findOrFail($classId);
+            \Log::info('Attempting to find class with ID: ' . $classId);
+            
+            // First try to find the class directly
+            $class = ClassesModel::with(['students', 'studentClasses.teacherSubjects.subject'])
+                ->find($classId);
+            
+            if ($class) {
+                \Log::info('Found class directly: ' . $class->ClassName);
+            } else {
+                \Log::info('Class not found directly, trying through subject relationship');
+                
+                // Try to find it through the subject relationship using the correct pivot tables
+                $class = ClassesModel::whereHas('studentClasses.teacherSubjects', function($query) use ($classId) {
+                    $query->where('teachers_subject.subject_id', $classId);
+                })
+                ->with(['students', 'studentClasses.teacherSubjects.subject'])
+                ->first();
+                
+                if ($class) {
+                    \Log::info('Found class through subject relationship: ' . $class->ClassName);
+                } else {
+                    \Log::info('Class not found through subject relationship either');
+                }
+            }
+            
+            if (!$class) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Class not found'
+                ], 404);
+            }
+            
+            // Get students through the student_class relationship
+            $students = $class->students()->get();
             
             return response()->json([
                 'status' => 'success',
-                'data' => $class->students->map(function ($student) {
+                'data' => $students->map(function ($student) {
                     return [
                         'student_id' => $student->Student_ID,
                         'lrn' => $student->LRN,
@@ -103,11 +136,15 @@ class ClassController extends Controller
                         'sex' => $student->Sex,
                         'birthDate' => $student->BirthDate,
                         'contactNumber' => $student->ContactNumber,
-                        'address' => $student->Address
+                        'houseNo' => $student->HouseNo,
+                        'barangay' => $student->Barangay,
+                        'municipality' => $student->Municipality,
+                        'province' => $student->Province
                     ];
                 })
             ]);
         } catch (\Exception $e) {
+            \Log::error('Error in getClassStudents: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage()
