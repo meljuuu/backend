@@ -232,4 +232,39 @@ class StudentClassController extends Controller
             'isAdvisory' => $isAdvisory
         ]);
     }
+
+    public function getStudentsByClass($classId)
+    {
+        try {
+            $students = StudentClassModel::with(['student' => function($query) {
+                $query->select('Student_ID', 'FirstName', 'MiddleName', 'LastName', 'LRN', 'Sex', 'BirthDate', 'ContactNumber', 'Barangay', 'Municipality', 'Province');
+            }])
+            ->where('Class_ID', $classId)
+            ->get()
+            ->map(function($studentClass) {
+                $student = $studentClass->student;
+                return [
+                    'Student_ID' => $student->Student_ID,
+                    'FirstName' => $student->FirstName,
+                    'MiddleName' => $student->MiddleName,
+                    'LastName' => $student->LastName,
+                    'LRN' => $student->LRN,
+                    'Sex' => $student->Sex,
+                    'BirthDate' => $student->BirthDate,
+                    'ContactNumber' => $student->ContactNumber,
+                    'Barangay' => $student->Barangay,
+                    'Municipality' => $student->Municipality,
+                    'Province' => $student->Province,
+                    'isAdvisory' => $studentClass->isAdvisory
+                ];
+            });
+
+            return response()->json($students);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch students: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

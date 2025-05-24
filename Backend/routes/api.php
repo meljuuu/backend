@@ -20,6 +20,7 @@ use App\Http\Controllers\ClassController;
 use App\Http\Controllers\GradingController;
 use App\Http\Controllers\AdvisoryController;
 use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\DB;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -50,6 +51,7 @@ Route::get('/student/getAllPending', [StudentController::class, 'getPendingStude
 Route::get('/student/getAllAccepted', [StudentController::class, 'getAcceptedStudents']);
 Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
 Route::post('/student/bulk-upload', [StudentController::class, 'bulkUpload']);
+Route::get('/student/get-students-no-class', [StudentController::class, 'getStudentsNoClass']);
 
 
 //ADMIN API
@@ -185,12 +187,14 @@ Route::prefix('subjects')->group(function () {
 });
 
 // Student Class routes
-Route::prefix('student-classes')->group(function () {
+Route::prefix('student-class')->group(function () {
     Route::get('/', [StudentClassController::class, 'index']);
     Route::post('/', [StudentClassController::class, 'store']);
     Route::post('/add-students', [StudentClassController::class, 'addStudentsToClass']);
     Route::post('/remove-students', [StudentClassController::class, 'removeStudentsFromClass']);
     Route::get('/{id}/subjects', [StudentClassController::class, 'show']);
+    Route::get('/class/{classId}', [StudentClassController::class, 'getStudentsByClass']);
+    Route::get('/class/{classId}', [StudentClassController::class, 'getStudentsByClass']);
 });
 
 Route::get('/classes/{classId}', [ClassController::class, 'getClassDetails'])
@@ -200,6 +204,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/teacher/advisory-students', [AdvisoryController::class, 'getAdvisoryStudents']);
     Route::get('/student/{studentId}/subjects', [AdvisoryController::class, 'getStudentSubjects']);
 });
+
+Route::get('/student-class/class/{classId}', [StudentClassController::class, 'getStudentsByClass']);
 
 
 

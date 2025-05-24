@@ -31,20 +31,20 @@ class StudentController extends Controller
         ]);
     }
     
-    public function getAllAcceptedStudents(){
-
+    public function getAllAcceptedStudents()
+    {
+        $students = StudentModel::where('Status', 'accepted')->get();
+        
+        return response()->json([
+            'students' => $students
+        ]);
     }
 
     public function getAcceptedStudents()
     {
-        // Get the list of student IDs that are already in the student_class table
-        $excludedStudentIDs = DB::table('student_class')->pluck('Student_ID');
-    
-        // Get accepted students who are not in the student_class table
-        $students = StudentModel::where('Status', 'accepted')
-            ->whereNotIn('Student_ID', $excludedStudentIDs)
-            ->get();
-    
+        // Get all accepted students without filtering out those in student_class
+        $students = StudentModel::where('Status', 'Accepted')->get();
+        
         return response()->json([
             'students' => $students
         ]);
@@ -417,6 +417,29 @@ class StudentController extends Controller
         'message' => "$updated student profile(s) accepted successfully.",
         'accepted_ids' => $studentIds
     ]);
+}
+
+public function getStudentsNoClass()
+{
+    try {
+        // Get the list of student IDs that are already in the student_class table
+        $excludedStudentIDs = DB::table('student_class')->pluck('Student_ID');
+    
+        // Get accepted students who are not in the student_class table
+        $students = StudentModel::where('Status', 'accepted')
+            ->whereNotIn('Student_ID', $excludedStudentIDs)
+            ->get();
+    
+        return response()->json([
+            'status' => 'success',
+            'data' => $students
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to fetch students without class: ' . $e->getMessage()
+        ], 500);
+    }
 }
 
 }
