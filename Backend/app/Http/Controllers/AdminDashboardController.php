@@ -6,6 +6,7 @@ use App\Models\TeacherModel;
 use App\Models\ClassesModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
@@ -125,6 +126,37 @@ class AdminDashboardController extends Controller
         }
 
         return response()->json($formatted);
+    }
+
+   public function getAcceptedStudentsPerGrade()
+    {
+        $grades = ['7', '8', '9', '10', '11', '12'];
+
+        $results = StudentModel::select('Grade_Level', DB::raw('count(*) as count'))
+            ->where('Status', 'Accepted')
+            ->whereIn('Grade_Level', $grades)
+            ->groupBy('Grade_Level')
+            ->get()
+            ->keyBy('Grade_Level');
+
+        // Build the complete list with default count = 0
+        $finalResults = collect($grades)->map(function ($grade) use ($results) {
+            return [
+                'Grade_Level' => $grade,
+                'count' => $results->has($grade) ? $results[$grade]->count : 0,
+            ];
+        });
+
+        return response()->json($finalResults);
+    }
+
+    public function countPendingClasses()
+    {
+        $pendingCount = ClassesModel::where('Status', 'Pending')->count();
+
+        return response()->json([
+            'pending_classes_count' => $pendingCount
+        ]);
     }
 
 
