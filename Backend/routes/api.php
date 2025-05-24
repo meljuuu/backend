@@ -20,7 +20,6 @@ use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\StudentClassTeacherSubjectController;
 use App\Http\Controllers\GradingController;
 use App\Http\Controllers\AdvisoryController;
-use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\DB;
 /*
 |--------------------------------------------------------------------------
@@ -51,16 +50,10 @@ Route::get('/student/getAll', [StudentController::class, 'getAll']);
 Route::get('/student/getAllPending', [StudentController::class, 'getPendingStudents']);
 Route::get('/student/getAllAccepted', [StudentController::class, 'getAcceptedStudents']);
 Route::get('/student/get-students-no-class', [StudentController::class, 'getNoClassStudents']);
-Route::get('/student/get-students-no-class', [StudentController::class, 'getNoClassStudents']);
 Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
 Route::post('/student/bulk-upload', [StudentController::class, 'bulkUpload']);
-<<<<<<< HEAD
 Route::get('/student/get-students-no-class', [StudentController::class, 'getStudentsNoClass']);
-
-=======
 Route::put('/students/update/{id}', [StudentController::class, 'update']);
-Route::put('/students/update/{id}', [StudentController::class, 'update']);
->>>>>>> 08dcd437cc9705d665006fbc55ff1ee00eac979c
 
 //ADMIN API
 Route::post('/assign-students', [AdminStudentClassController::class, 'assignStudentsToClass']);
