@@ -10,7 +10,6 @@ class ClassesModel extends Model
     use HasFactory;
 
     protected $table = 'classes';
-
     protected $primaryKey = 'Class_ID';
 
     public $incrementing = true;
@@ -29,9 +28,29 @@ class ClassesModel extends Model
         'comments',
     ];
 
-    /**
-     * Define relationship to SchoolYear model
-     */
+    protected $casts = [
+        'Grade_Level' => 'string',
+    ];
+
+    public function students()
+    {
+        return $this->belongsToMany(StudentModel::class, 'student_class', 'Class_ID', 'Student_ID')
+            ->withPivot(['SY_ID', 'Adviser_ID', 'isAdvisory'])
+            ->withTimestamps();
+    }
+
+    public function subjects()
+    {
+        return $this->belongsToMany(SubjectModel::class, 'class_subject', 'Class_ID', 'Subject_ID')
+            ->withPivot(['Student_ID', 'SY_ID', 'Teacher_ID'])
+            ->withTimestamps();
+    }
+
+    public function teacher()
+    {
+        return $this->belongsTo(TeacherModel::class, 'Teacher_ID', 'Teacher_ID');
+    }
+
     public function schoolYear()
     {
         return $this->belongsTo(SchoolYearModel::class, 'SY_ID', 'SY_ID');
@@ -47,18 +66,6 @@ class ClassesModel extends Model
     public function adviser()
     {
         return $this->belongsTo(TeacherModel::class, 'Adviser_ID', 'Teacher_ID');
-    }
-
-    public function subjects()
-    {
-        return $this->hasManyThrough(
-            SubjectModel::class,
-            StudentClassModel::class,
-            'Class_ID',
-            'Subject_ID',
-            'Class_ID',
-            'Subject_ID'
-        )->distinct();
     }
 
     public function teacherSubjects()

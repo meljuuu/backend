@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('Subject_ID');
             $table->string('SubjectName');
             $table->integer('SubjectCode');
+            $table->integer('GradeLevel');
             $table->timestamps();
         
         });

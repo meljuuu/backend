@@ -11,6 +11,8 @@ use App\Models\TeacherModel;
 use App\Models\SchoolYearModel;
 use App\Models\StudentModel;
 use App\Models\SubjectGradeModel;
+use App\Models\LessonPlan;
+
 
 
 class SuperAdminController extends Controller
@@ -91,9 +93,73 @@ class SuperAdminController extends Controller
         ], 200);
     }
 
+    //Lesson Plan Get All
+    public function getAllLessonPlans()
+    {
+        $lessonPlans = LessonPlan::with('teacher')->get();
 
+        $formatted = $lessonPlans->map(function ($lesson) {
+            return [
+                'LessonPlan_ID' => $lesson->LessonPlan_ID,
+                'Teacher_ID' => $lesson->Teacher_ID,
+                'TeacherName' => $lesson->teacher_name,  // Using the accessor here
+                'lesson_plan_no' => $lesson->lesson_plan_no,
+                'grade_level' => $lesson->grade_level,
+                'section' => $lesson->section,
+                'category' => $lesson->category,
+                'link' => $lesson->link,
+                'status' => $lesson->status,
+                'comments' => $lesson->comments,
+                'created_at' => $lesson->created_at,
+                'updated_at' => $lesson->updated_at,
+            ];
+        });
 
+        return response()->json($formatted);
+    }
 
+    //Lesson Plan Accept
+    public function approveLessonPlan($id)
+    {
+        $lessonPlan = LessonPlan::find($id);
+
+        if (!$lessonPlan) {
+            return response()->json(['message' => 'Lesson Plan not found'], 404);
+        }
+
+        $lessonPlan->status = 'Approved';
+        $lessonPlan->save();
+
+        return response()->json(['message' => 'Lesson Plan approved successfully']);
+    }
+
+    // Lesson Plan Reject
+    public function rejectLessonPlan($id)
+    {
+        $lessonPlan = LessonPlan::find($id);
+
+        if (!$lessonPlan) {
+            return response()->json(['message' => 'Lesson Plan not found'], 404);
+        }
+
+        $lessonPlan->status = 'Declined';
+        $lessonPlan->save();
+
+        return response()->json(['message' => 'Lesson Plan declined successfully']);
+    }
+
+    // Get Specific Lesson Plan 
+
+    public function getLessonPlanById($id)
+    {
+        $lessonPlan = LessonPlan::find($id);
+
+        if (!$lessonPlan) {
+            return response()->json(['message' => 'Lesson plan not found'], 404);
+        }
+
+        return response()->json($lessonPlan);
+    }
 
 
 

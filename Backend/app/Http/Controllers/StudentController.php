@@ -50,6 +50,20 @@ class StudentController extends Controller
         ]);
     }
 
+    public function getNoClassStudents()
+    {
+        // Get the list of student IDs that are already in the student_class table
+        $excludedStudentIDs = DB::table('student_class')->pluck('Student_ID');
+    
+        // Get accepted students who are not in the student_class table
+        $students = StudentModel::whereNotIn('Student_ID', $excludedStudentIDs)
+            ->get();
+    
+        return response()->json([
+            'students' => $students
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -185,6 +199,72 @@ class StudentController extends Controller
             ], 500);
         }
     }
+
+    public function update(Request $request, $id)
+    {
+        // Find the student by Student_ID (assuming $id here is Student_ID)
+        $student = StudentModel::where('Student_ID', $id)->firstOrFail();
+    
+        // List of updatable fields
+        $fields = [
+            'LRN', 'Grade_Level', 'FirstName', 'LastName', 'MiddleName', 'Suffix',
+            'BirthDate', 'Sex', 'Age', 'Religion', 'HouseNo', 'Barangay',
+            'Municipality', 'Province', 'MotherName', 'FatherName', 'Guardian',
+            'Relationship', 'ContactNumber', 'Curriculum', 'Track'
+        ];
+    
+        // Prepare validation rules only for provided fields
+        $rules = [];
+        foreach ($fields as $field) {
+            if ($request->has($field)) {
+                switch ($field) {
+                    case 'LRN':
+                        $rules[$field] = 'string|unique:students,LRN,' . $student->Student_ID . ',Student_ID';
+                        break;
+                    case 'Grade_Level':
+                        $rules[$field] = 'in:7,8,9,10,11,12';
+                        break;
+                    case 'Suffix':
+                        $rules[$field] = 'nullable|in:Jr.,Sr.,II,III';
+                        break;
+                    case 'Sex':
+                        $rules[$field] = 'in:M,F';
+                        break;
+                    case 'BirthDate':
+                        $rules[$field] = 'date';
+                        break;
+                    case 'Age':
+                        $rules[$field] = 'string|max:2';
+                        break;
+                    case 'ContactNumber':
+                        $rules[$field] = 'string|max:20';
+                        break;
+                    case 'Curriculum':
+                        $rules[$field] = 'in:JHS,SHS';
+                        break;
+                    default:
+                        $rules[$field] = 'string|max:255';
+                }
+            }
+        }
+    
+        // Validate only the incoming fields
+        $validatedData = $request->validate($rules);
+    
+        // Set status to 'Pending' whenever updating
+        $validatedData['Status'] = 'Pending';
+
+        $validatedData['comments'] = null;
+    
+        // Update the student only with the new fields + status
+        $student->update($validatedData);
+    
+        return response()->json([
+            'message' => 'Student updated successfully.',
+            'student' => $student
+        ]);
+    }
+    
 
     public function acceptProfile(Request $request, $id)
     {

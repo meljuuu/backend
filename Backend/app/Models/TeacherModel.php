@@ -71,7 +71,12 @@ class TeacherModel extends Authenticatable
 
     public function classes()
     {
-        return $this->hasMany(Classes::class, 'Teacher_ID');
+        // return $this->hasMany(ClassesModel::class, 'Teacher_ID');
+        return $this->belongsToMany(ClassesModel::class, 'student_class', 'Teacher_ID', 'Class_ID')
+                ->withPivot('isAdvisory');
+        // return $this->hasMany(ClassesModel::class, 'Teacher_ID');
+        return $this->belongsToMany(ClassesModel::class, 'student_class', 'Teacher_ID', 'Class_ID')
+                ->withPivot('isAdvisory');
     }
 
     public function researches()
