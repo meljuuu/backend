@@ -9,6 +9,10 @@ use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ClassController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ResearchController;
+use App\Http\Controllers\DashboardController;
 // use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminStudentClassController;
 use Illuminate\Http\Exceptions\NotFoundHttpException;
@@ -49,14 +53,18 @@ Route::get('/student/getAll', [StudentController::class, 'getAll']);
 Route::get('/student/getAllPending', [StudentController::class, 'getPendingStudents']);
 Route::get('/student/getAllAccepted', [StudentController::class, 'getAcceptedStudents']);
 Route::get('/student/get-students-no-class', [StudentController::class, 'getNoClassStudents']);
+Route::get('/student/get-students-no-class', [StudentController::class, 'getNoClassStudents']);
 Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
 Route::post('/student/bulk-upload', [StudentController::class, 'bulkUpload']);
+Route::put('/students/update/{id}', [StudentController::class, 'update']);
 Route::put('/students/update/{id}', [StudentController::class, 'update']);
 
 //ADMIN API
 Route::post('/assign-students', [AdminStudentClassController::class, 'assignStudentsToClass']);
 Route::post('/get-all-classes', [AdminStudentClassController::class, 'indexClass']);
 Route::get('/get-super-classes', [AdminStudentClassController::class, 'indexExcludeIncomplete']);
+Route::get('/get-accepted-classes', [AdminStudentClassController::class, 'indexAllAccepted']);
+Route::get('/get-classes', [AdminStudentClassController::class, 'indexAllAClasses']);
 Route::get('/get-accepted-classes', [AdminStudentClassController::class, 'indexAllAccepted']);
 Route::get('/get-classes', [AdminStudentClassController::class, 'indexAllAClasses']);
 Route::get('/dashboard/students/count', [AdminDashboardController::class, 'getStudentCount']);
@@ -66,6 +74,7 @@ Route::get('/dashboard/students/grade-distribution', [AdminDashboardController::
 
 
 //Teacher
+Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
 Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
 
 
