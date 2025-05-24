@@ -130,7 +130,7 @@ public function createTeacherAccount(Request $request)
         'Suffix' => 'nullable|string|max:255',
         'BirthDate' => 'required|date',
         'Sex' => 'required|in:M,F',
-        'Position' => 'required|in:Admin,Book-Keeping,Teacher,SuperAdmin',
+        'Position' => 'required|in:Admin,Book-keeping,Teacher,SuperAdmin',
         'ContactNumber' => 'required|string|max:15',
         'Address' => 'required|string|max:255',
         'Subject_IDs' => 'required_if:Position,Teacher|array|min:1|max:2',
