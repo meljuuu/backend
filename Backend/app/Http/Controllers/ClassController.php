@@ -136,7 +136,10 @@ class ClassController extends Controller
                         'sex' => $student->Sex,
                         'birthDate' => $student->BirthDate,
                         'contactNumber' => $student->ContactNumber,
-                        'address' => $student->Address
+                        'houseNo' => $student->HouseNo,
+                        'barangay' => $student->Barangay,
+                        'municipality' => $student->Municipality,
+                        'province' => $student->Province
                     ];
                 })
             ]);
