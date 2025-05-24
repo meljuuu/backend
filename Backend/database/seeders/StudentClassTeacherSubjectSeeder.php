@@ -12,8 +12,8 @@ class StudentClassTeacherSubjectSeeder extends Seeder
         // Sample data for the pivot table
         $relationships = [
             [
-                'student_class_id' => 1, // Replace with actual student_class_id
-                'teacher_subject_id' => 2, // Replace with actual teacher_subject_id
+                'student_class_id' => 7, // Replace with actual student_class_id
+                'teacher_subject_id' => 1, // Replace with actual teacher_subject_id
             ],
         ];
 
