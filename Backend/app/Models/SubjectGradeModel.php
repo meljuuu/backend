@@ -10,9 +10,6 @@ class SubjectGradeModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'subject_grades';
-
-    protected $table = 'subject_grades';
 
     protected $table = 'subject_grades';
     protected $primaryKey = 'Grade_ID';
