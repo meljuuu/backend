@@ -213,7 +213,6 @@ class StudentClassController extends Controller
     }
 
     public function destroy(Request $request)
-    public function destroy(Request $request)
     {
         $request->validate([
             'class_id' => 'required|exists:classes,Class_ID',
