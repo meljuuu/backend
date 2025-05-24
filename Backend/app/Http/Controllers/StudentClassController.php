@@ -257,7 +257,6 @@ class StudentClassController extends Controller
             'isAdvisory' => $isAdvisory
         ]);
     }
-<<<<<<< HEAD
 
     public function getStudentsByClass($classId)
     {
@@ -293,7 +292,4 @@ class StudentClassController extends Controller
             ], 500);
         }
     }
-=======
-    
->>>>>>> 08dcd437cc9705d665006fbc55ff1ee00eac979c
 }
