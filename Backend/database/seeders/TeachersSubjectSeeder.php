@@ -14,10 +14,40 @@ class TeachersSubjectSeeder extends Seeder
     {
         // Sample data for the teachers_subject table
         $teachersSubjects = [
+            // Teacher 1 (TEACHER001) - Mathematics and Science
             [
-                'teacher_id' => 1, // Ensure this teacher_id exists in the teachers table
-                'subject_id' => 1, // Ensure this subject_id exists in the subjects table
+                'teacher_id' => 3, // TEACHER001
+                'subject_id' => 1, // Mathematics
                 'subject_code' => 'MATH101',
+            ],
+            [
+                'teacher_id' => 3,
+                'subject_id' => 3, // Science
+                'subject_code' => 'SCI101',
+            ],
+
+            // Teacher 2 (TEACHER002) - English and Filipino
+            [
+                'teacher_id' => 4, // TEACHER002
+                'subject_id' => 2, // English
+                'subject_code' => 'ENG101',
+            ],
+            [
+                'teacher_id' => 4,
+                'subject_id' => 4, // Filipino
+                'subject_code' => 'FIL101',
+            ],
+
+            // Teacher 3 (TEACHER003) - Araling Panlipunan and MAPEH
+            [
+                'teacher_id' => 5, // TEACHER003
+                'subject_id' => 5, // Araling Panlipunan
+                'subject_code' => 'AP101',
+            ],
+            [
+                'teacher_id' => 5,
+                'subject_id' => 6, // MAPEH
+                'subject_code' => 'MAPEH101',
             ],
         ];
 
