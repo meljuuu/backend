@@ -46,8 +46,8 @@ class ClassController extends Controller
         try {
             \Log::info('Attempting to fetch class details for ID: ' . $classId);
             
-            // First check if the class exists
-            $class = ClassesModel::find($classId);
+            // First check if the class exists and load the students relationship
+            $class = ClassesModel::with('students')->find($classId);
             
             if (!$class) {
                 \Log::warning('Class not found with ID: ' . $classId);
@@ -57,53 +57,35 @@ class ClassController extends Controller
                 ], 404);
             }
 
-            // Load relationships separately to better handle potential errors
-            try {
-                $class->load(['subjects', 'students']);
-            } catch (\Exception $e) {
-                \Log::error('Error loading relationships: ' . $e->getMessage());
-                throw new \Exception('Error loading class relationships');
-            }
+            // Get total students count
+            $totalStudents = $class->students->count();
 
-            // Calculate counts with null checks
-            $maleCount = $class->students ? $class->students->whereIn('Sex', ['M', 'Male', 'm', 'male'])->count() : 0;
-            $femaleCount = $class->students ? $class->students->whereIn('Sex', ['F', 'Female', 'f', 'female'])->count() : 0;
+            // Count male and female students
+            $maleCount = $class->students->filter(function($student) {
+                return in_array(strtolower($student->Sex), ['m', 'male']);
+            })->count();
 
-            \Log::info('Successfully fetched class details', [
-                'class_id' => $classId,
-                'male_count' => $maleCount,
-                'female_count' => $femaleCount
+            $femaleCount = $class->students->filter(function($student) {
+                return in_array(strtolower($student->Sex), ['f', 'female']);
+            })->count();
+
+            \Log::info('Student counts:', [
+                'total' => $totalStudents,
+                'male' => $maleCount,
+                'female' => $femaleCount
             ]);
 
             return response()->json([
                 'status' => 'success',
                 'data' => [
-                    'class_id' => $class->Class_ID,
-                    'trackStand' => $class->Track,
-                    'classType' => $class->students->first()?->pivot->isAdvisory ? 'Advisory' : 'Subject',
                     'className' => $class->ClassName,
+                    'section' => $class->Section,
                     'gradeLevel' => $class->Grade_Level,
-                    'subject_id' => $class->subjects->first()?->Subject_ID,
-                    'subjectName' => $class->subjects->first()?->SubjectName ?? 'No Subject',
+                    'track' => $class->Track,
+                    'curriculum' => $class->Curriculum,
                     'maleCount' => $maleCount,
                     'femaleCount' => $femaleCount,
-                    'totalStudents' => $class->students ? $class->students->count() : 0,
-                    'students' => $class->students ? $class->students->map(function ($student) {
-                        return [
-                            'student_id' => $student->Student_ID,
-                            'lrn' => $student->LRN,
-                            'firstName' => $student->FirstName,
-                            'lastName' => $student->LastName,
-                            'middleName' => $student->MiddleName,
-                            'sex' => $student->Sex,
-                            'birthDate' => $student->BirthDate,
-                            'contactNumber' => $student->ContactNumber,
-                            'houseNo' => $student->HouseNo,
-                            'barangay' => $student->Barangay,
-                            'municipality' => $student->Municipality,
-                            'province' => $student->Province
-                        ];
-                    }) : []
+                    'totalStudents' => $totalStudents
                 ]
             ]);
         } catch (\Exception $e) {

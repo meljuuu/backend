@@ -216,8 +216,7 @@ Route::prefix('student-class')->group(function () {
     Route::get('/class/{classId}', [StudentClassController::class, 'getStudentsByClass']);
 });
 
-Route::get('/classes/{classId}', [ClassController::class, 'getClassDetails'])
-    ->middleware('auth:sanctum');
+Route::get('/classes/{classId}', [ClassController::class, 'getClassDetails']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/teacher/advisory-students', [AdvisoryController::class, 'getAdvisoryStudents']);
