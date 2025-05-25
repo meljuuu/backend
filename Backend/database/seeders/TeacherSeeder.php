@@ -54,42 +54,42 @@ class TeacherSeeder extends Seeder
         //     'updated_at' => now(),
         // ]);
 
-        // // Create regular Teacher account
-        // DB::table('teachers')->insert([
-        //     'EmployeeNo' => 'TEACHER001',
-        //     'Email' => 'teacher@example.com',
-        //     'Password' => Hash::make('teacher123'),
-        //     'FirstName' => 'Juan',
-        //     'LastName' => 'Dela Cruz',
-        //     'MiddleName' => 'Santos',
-        //     'BirthDate' => '1990-05-10',
-        //     'Sex' => 'F',
-        //     'Position' => 'Teacher',
-        //     'ContactNumber' => '09172345678',
-        //     'Address' => 'Teacher Address',
-        //     'Educational_Attainment' => 'Master\'s Degree',
-        //     'Teaching_Position' => 'Teacher 1',
-        //     'created_at' => now(),
-        //     'updated_at' => now(),
-        // ]);
-
+        // Create regular Teacher account
         DB::table('teachers')->insert([
-            'EmployeeNo' => 'BOOK001',
-            'Email' => 'bookkeeper@example.com',
-            'Password' => Hash::make('bookkeeper123'),
-            'FirstName' => 'Maria',
-            'LastName' => 'Reyes',
-            'MiddleName' => 'Lopez',
-            'BirthDate' => '1988-08-20',
+            'EmployeeNo' => 'TEACHER003',
+            'Email' => 'teacher2@example.com',
+            'Password' => Hash::make('teacher123'),
+            'FirstName' => 'Juan',
+            'LastName' => 'Dela Cruz',
+            'MiddleName' => 'Santos',
+            'BirthDate' => '1990-05-10',
             'Sex' => 'F',
-            'Position' => 'Book-Keeping',
-            'ContactNumber' => '09179876543',
-            'Address' => '123 Bookkeeping St., Manila',
-            'Educational_Attainment' => 'Bachelor of Science in Accountancy',
-            'Teaching_Position' => 'Book-Keeping',
+            'Position' => 'Teacher',
+            'ContactNumber' => '09172345678',
+            'Address' => 'Teacher Address',
+            'Educational_Attainment' => 'Master\'s Degree',
+            'Teaching_Position' => 'Teacher 1',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // DB::table('teachers')->insert([
+        //     'EmployeeNo' => 'BOOK001',
+        //     'Email' => 'bookkeeper@example.com',
+        //     'Password' => Hash::make('bookkeeper123'),
+        //     'FirstName' => 'Maria',
+        //     'LastName' => 'Reyes',
+        //     'MiddleName' => 'Lopez',
+        //     'BirthDate' => '1988-08-20',
+        //     'Sex' => 'F',
+        //     'Position' => 'Book-Keeping',
+        //     'ContactNumber' => '09179876543',
+        //     'Address' => '123 Bookkeeping St., Manila',
+        //     'Educational_Attainment' => 'Bachelor of Science in Accountancy',
+        //     'Teaching_Position' => 'Book-Keeping',
+        //     'created_at' => now(),
+        //     'updated_at' => now(),
+        // ]);
     }
 }
     
