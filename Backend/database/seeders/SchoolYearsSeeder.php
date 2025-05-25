@@ -18,6 +18,38 @@ class SchoolYearsSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'SY_ID' => 2,
+                'Start_Date' => '2026-06-01',
+                'End_Date' => '2027-03-31',
+                'SY_Year' => '2026-2027',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'SY_ID' => 3,
+                'Start_Date' => '2027-06-01',
+                'End_Date' => '2028-03-31',
+                'SY_Year' => '2027-2028',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'SY_ID' => 4,
+                'Start_Date' => '2028-06-01',
+                'End_Date' => '2029-03-31',
+                'SY_Year' => '2028-2029',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'SY_ID' => 5,
+                'Start_Date' => '2029-06-01',
+                'End_Date' => '2030-03-31',
+                'SY_Year' => '2029-2030',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }

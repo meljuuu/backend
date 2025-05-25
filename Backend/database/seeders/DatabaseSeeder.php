@@ -20,15 +20,12 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
         TeacherSeeder::class,
-        SchoolYearsSeeder::class, // Add this line
-        ClassesSeeder::class,
+        SchoolYearsSeeder::class,
         StudentSeeder::class,
-        StudentClassesSeeder::class,
-        LessonPlanSeeder::class,
-        ResearchSeeder::class,
         SubjectSeeder::class,
         TeachersSubjectSeeder::class,
-        ClassSubjectSeeder::class,
+        ClassesSeeder::class,
+        StudentClassesSeeder::class,
 ]);
     }
 }
