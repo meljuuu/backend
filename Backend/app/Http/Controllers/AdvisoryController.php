@@ -150,6 +150,7 @@ class AdvisoryController extends Controller
                     'subject_grades.Q4',
                     'subject_grades.FinalGrade',
                     'subject_grades.Remarks',
+                    'subject_grades.Status',
                     'teachers.FirstName as TeacherFirstName',
                     'teachers.LastName as TeacherLastName'
                 ])
@@ -160,6 +161,7 @@ class AdvisoryController extends Controller
                         'subjectName' => $subject->SubjectName,
                         'subjectCode' => $subject->SubjectCode,
                         'teacher_name' => $subject->TeacherFirstName . ' ' . $subject->TeacherLastName,
+                        'status' => $subject->Status ?? 'pending',
                         'grades' => [
                             'Q1' => $subject->Q1,
                             'Q2' => $subject->Q2,
