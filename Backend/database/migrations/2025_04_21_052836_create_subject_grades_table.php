@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('Q4')->nullable();
             $table->integer('FinalGrade')->nullable();
             $table->enum('Remarks', ['Passed', 'Failed'])->nullable();
-            $table->enum('Status', ['pending', 'accepted', 'declined'])->default('pending');
+            $table->enum('Status', ['Pending', 'Approved', 'Declined'])->default('Pending');
             $table->timestamps();
         
             $table->foreign('Student_ID')->references('Student_ID')->on('students');
