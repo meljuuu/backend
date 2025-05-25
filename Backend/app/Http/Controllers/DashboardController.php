@@ -16,48 +16,44 @@ class DashboardController extends Controller
 {
     public function getAdvisoryStats(Request $request)
     {
-        $teacher = $request->user();
-
-        if (!$teacher) {
-            return response()->json(['error' => 'Teacher not found'], 404);
-        }
-
         try {
-            // Get advisory class where this teacher is the adviser
-            $advisoryClass = DB::table('student_class')
-                ->where('Adviser_ID', $teacher->Teacher_ID)
-                ->where('isAdvisory', true)
-                ->first();
+            $teacherId = $request->user()->Teacher_ID;
 
-            if (!$advisoryClass) {
-                return response()->json([
-                    'advisoryClass' => null,
-                    'totalStudents' => 0,
-                    'maleCount' => 0,
-                    'femaleCount' => 0,
-                ]);
-            }
-
-            // Get student counts with gender information
-            $studentCounts = DB::table('student_class')
+            // Get non-advisory classes for this teacher
+            $subjectClasses = DB::table('student_class')
                 ->join('students', 'student_class.Student_ID', '=', 'students.Student_ID')
-                ->where('student_class.Class_ID', $advisoryClass->Class_ID)
+                ->join('student_class_teacher_subject', 'student_class.StudentClass_ID', '=', 'student_class_teacher_subject.student_class_id')
+                ->join('teachers_subject', 'student_class_teacher_subject.teacher_subject_id', '=', 'teachers_subject.id')
+                ->where('teachers_subject.teacher_id', $teacherId)
+                ->where('student_class.isAdvisory', false)
                 ->select(
-                    DB::raw('COUNT(*) as total'),
-                    DB::raw('SUM(CASE WHEN students.Sex = "M" THEN 1 ELSE 0 END) as male_count'),
-                    DB::raw('SUM(CASE WHEN students.Sex = "F" THEN 1 ELSE 0 END) as female_count')
+                    'students.Student_ID',
+                    'students.FirstName',
+                    'students.LastName',
+                    'students.Sex',
+                    'student_class.ClassName'
                 )
-                ->first();
+                ->get();
+
+            // Count total students and gender distribution
+            $totalStudents = $subjectClasses->count();
+            $maleCount = $subjectClasses->where('Sex', 'M')->count();
+            $femaleCount = $subjectClasses->where('Sex', 'F')->count();
 
             return response()->json([
-                'advisoryClass' => $advisoryClass,
-                'totalStudents' => $studentCounts->total ?? 0,
-                'maleCount' => $studentCounts->male_count ?? 0,
-                'femaleCount' => $studentCounts->female_count ?? 0,
+                'totalStudents' => $totalStudents,
+                'maleCount' => $maleCount,
+                'femaleCount' => $femaleCount,
+                'subjectClasses' => $subjectClasses
             ]);
         } catch (\Exception $e) {
-            Log::error('Error fetching advisory stats: ' . $e->getMessage());
-            return response()->json(['error' => 'Internal Server Error'], 500);
+            Log::error('Error fetching subject classes: ' . $e->getMessage());
+            return response()->json([
+                'totalStudents' => 0,
+                'maleCount' => 0,
+                'femaleCount' => 0,
+                'subjectClasses' => []
+            ]);
         }
     }
 
@@ -70,20 +66,22 @@ class DashboardController extends Controller
         }
 
         try {
-            // Get all classes and subjects for this teacher
-            $subjectClasses = DB::table('student_class_teacher_subject')
-                ->join('student_class', 'student_class_teacher_subject.student_class_id', '=', 'student_class.StudentClass_ID')
+            // Get all classes and subjects for this teacher where isAdvisory is false
+            $subjectClasses = DB::table('student_class')
+                ->join('student_class_teacher_subject', 'student_class.StudentClass_ID', '=', 'student_class_teacher_subject.student_class_id')
                 ->join('teachers_subject', 'student_class_teacher_subject.teacher_subject_id', '=', 'teachers_subject.id')
                 ->join('subjects', 'teachers_subject.subject_id', '=', 'subjects.Subject_ID')
                 ->join('classes', 'student_class.Class_ID', '=', 'classes.Class_ID')
                 ->where('teachers_subject.teacher_id', $teacher->Teacher_ID)
+                ->where('student_class.isAdvisory', false)
                 ->select(
                     'classes.ClassName',
                     'classes.Grade_Level',
                     'subjects.SubjectName',
+                    'student_class.isAdvisory',
                     DB::raw('COUNT(DISTINCT student_class.Student_ID) as student_count')
                 )
-                ->groupBy('classes.ClassName', 'classes.Grade_Level', 'subjects.SubjectName')
+                ->groupBy('classes.ClassName', 'classes.Grade_Level', 'subjects.SubjectName', 'student_class.isAdvisory')
                 ->get();
 
             return response()->json($subjectClasses);
