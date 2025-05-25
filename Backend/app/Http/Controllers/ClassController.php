@@ -44,11 +44,36 @@ class ClassController extends Controller
     public function getClassDetails($classId)
     {
         try {
-            $class = ClassesModel::with(['subjects', 'students'])
-                ->findOrFail($classId);
+            \Log::info('Attempting to fetch class details for ID: ' . $classId);
+            
+            // First check if the class exists
+            $class = ClassesModel::find($classId);
+            
+            if (!$class) {
+                \Log::warning('Class not found with ID: ' . $classId);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Class not found'
+                ], 404);
+            }
 
-            $maleCount = $class->students->whereIn('Sex', ['M', 'Male'])->count();
-            $femaleCount = $class->students->whereIn('Sex', ['F', 'Female'])->count();
+            // Load relationships separately to better handle potential errors
+            try {
+                $class->load(['subjects', 'students']);
+            } catch (\Exception $e) {
+                \Log::error('Error loading relationships: ' . $e->getMessage());
+                throw new \Exception('Error loading class relationships');
+            }
+
+            // Calculate counts with null checks
+            $maleCount = $class->students ? $class->students->whereIn('Sex', ['M', 'Male', 'm', 'male'])->count() : 0;
+            $femaleCount = $class->students ? $class->students->whereIn('Sex', ['F', 'Female', 'f', 'female'])->count() : 0;
+
+            \Log::info('Successfully fetched class details', [
+                'class_id' => $classId,
+                'male_count' => $maleCount,
+                'female_count' => $femaleCount
+            ]);
 
             return response()->json([
                 'status' => 'success',
@@ -62,8 +87,8 @@ class ClassController extends Controller
                     'subjectName' => $class->subjects->first()?->SubjectName ?? 'No Subject',
                     'maleCount' => $maleCount,
                     'femaleCount' => $femaleCount,
-                    'totalStudents' => $class->students->count(),
-                    'students' => $class->students->map(function ($student) {
+                    'totalStudents' => $class->students ? $class->students->count() : 0,
+                    'students' => $class->students ? $class->students->map(function ($student) {
                         return [
                             'student_id' => $student->Student_ID,
                             'lrn' => $student->LRN,
@@ -73,15 +98,23 @@ class ClassController extends Controller
                             'sex' => $student->Sex,
                             'birthDate' => $student->BirthDate,
                             'contactNumber' => $student->ContactNumber,
-                            'address' => $student->Address
+                            'houseNo' => $student->HouseNo,
+                            'barangay' => $student->Barangay,
+                            'municipality' => $student->Municipality,
+                            'province' => $student->Province
                         ];
-                    })
+                    }) : []
                 ]
             ]);
         } catch (\Exception $e) {
+            \Log::error('Error in getClassDetails: ' . $e->getMessage(), [
+                'class_id' => $classId,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage()
+                'message' => 'An error occurred while fetching class details: ' . $e->getMessage()
             ], 500);
         }
     }

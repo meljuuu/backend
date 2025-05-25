@@ -49,7 +49,7 @@ class StudentClassesSeeder extends Seeder
                 'ClassName' => 'Grade 7 B',
                 'SY_ID' => 1,      // School Year ID
                 'Adviser_ID' => 4, // TEACHER002
-                'isAdvisory' => false,
+                'isAdvisory' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -59,7 +59,7 @@ class StudentClassesSeeder extends Seeder
                 'ClassName' => 'Grade 7 B',
                 'SY_ID' => 1,      // School Year ID
                 'Adviser_ID' => 4, // TEACHER002
-                'isAdvisory' => false,
+                'isAdvisory' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -69,7 +69,7 @@ class StudentClassesSeeder extends Seeder
                 'ClassName' => 'Grade 7 B',
                 'SY_ID' => 1,      // School Year ID
                 'Adviser_ID' => 4, // TEACHER002
-                'isAdvisory' => false,
+                'isAdvisory' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -80,8 +80,8 @@ class StudentClassesSeeder extends Seeder
                 'Class_ID' => 3,   // Grade 9 A
                 'ClassName' => 'Grade 8 A',
                 'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 5, // TEACHER003
-                'isAdvisory' => true,
+                'Adviser_ID' => 3, // TEACHER003
+                'isAdvisory' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -90,8 +90,8 @@ class StudentClassesSeeder extends Seeder
                 'Class_ID' => 3,   // Grade 8 A
                 'ClassName' => 'Grade 8 A',
                 'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 5, // TEACHER003
-                'isAdvisory' => true,
+                'Adviser_ID' => 3, // TEACHER003
+                'isAdvisory' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -100,8 +100,8 @@ class StudentClassesSeeder extends Seeder
                 'Class_ID' => 3,   // Grade 8 A
                 'ClassName' => 'Grade 9 A',
                 'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 5, // TEACHER003
-                'isAdvisory' => true,
+                'Adviser_ID' => 3, // TEACHER003
+                'isAdvisory' => false,  
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -112,7 +112,7 @@ class StudentClassesSeeder extends Seeder
                 'Class_ID' => 4,   // Grade 11 A
                 'ClassName' => 'Grade 11 A',
                 'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 3, // TEACHER001
+                'Adviser_ID' => 5, // TEACHER001
                 'isAdvisory' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -122,7 +122,7 @@ class StudentClassesSeeder extends Seeder
                 'Class_ID' => 4,   // Grade 11 A
                 'ClassName' => 'Grade 11 A',
                 'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 3, // TEACHER001
+                'Adviser_ID' => 5, // TEACHER001
                 'isAdvisory' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -132,19 +132,19 @@ class StudentClassesSeeder extends Seeder
                 'Class_ID' => 4,   // Grade 11 A
                 'ClassName' => 'Grade 11 A',
                 'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 3, // TEACHER001
+                'Adviser_ID' => 5, // TEACHER001
                 'isAdvisory' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
 
-            //-----------------------------------Grade 11 A----------------------------------- TEACHER 4
+            //-----------------------------------Grade 12 A----------------------------------- TEACHER 4
             [
                 'Student_ID' => 13, // Mia Fernandez
                 'Class_ID' => 5,   // Grade 12 A
                 'ClassName' => 'Grade 12 A',
                 'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 4, // TEACHER002
+                'Adviser_ID' => 5, // TEACHER002
                 'isAdvisory' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -154,7 +154,7 @@ class StudentClassesSeeder extends Seeder
                 'Class_ID' => 5,   // Grade 12 A
                 'ClassName' => 'Grade 12 A',
                 'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 4, // TEACHER002
+                'Adviser_ID' => 5, // TEACHER002
                 'isAdvisory' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -164,7 +164,7 @@ class StudentClassesSeeder extends Seeder
                 'Class_ID' => 5,   // Grade 12 A
                 'ClassName' => 'Grade 12 A',
                 'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 4, // TEACHER002
+                'Adviser_ID' => 5, // TEACHER002
                 'isAdvisory' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
