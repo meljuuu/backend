@@ -32,7 +32,7 @@ class StudentClassesSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'Student_ID' => 5, // Eve Lopez
+                'Student_ID' => 3, // Eve Lopez
                 'Class_ID' => 1,   // Grade 7 A
                 'ClassName' => 'Grade 7 A',
                 'SY_ID' => 1,      // School Year ID
@@ -44,7 +44,7 @@ class StudentClassesSeeder extends Seeder
 
             //-----------------------------------Grade 8 A----------------------------------- TEACHER 4
             [
-                'Student_ID' => 3, // Carol Baker
+                'Student_ID' => 4, // Carol Baker
                 'Class_ID' => 2,   // Grade 8 A
                 'ClassName' => 'Grade 8 A',
                 'SY_ID' => 1,      // School Year ID
@@ -54,7 +54,7 @@ class StudentClassesSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'Student_ID' => 7, // Grace Nguyen
+                'Student_ID' => 5, // Grace Nguyen
                 'Class_ID' => 2,   // Grade 8 A
                 'ClassName' => 'Grade 8 A',
                 'SY_ID' => 1,      // School Year ID
@@ -64,7 +64,7 @@ class StudentClassesSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'Student_ID' => 8, // Henry Reyes
+                'Student_ID' => 6, // Henry Reyes
                 'Class_ID' => 2,   // Grade 8 A
                 'ClassName' => 'Grade 8 A',
                 'SY_ID' => 1,      // School Year ID
@@ -76,7 +76,7 @@ class StudentClassesSeeder extends Seeder
 
             //-----------------------------------Grade 9 A----------------------------------- TEACHER 5
             [
-                'Student_ID' => 4, // David Cruz
+                'Student_ID' => 7, // David Cruz
                 'Class_ID' => 3,   // Grade 9 A
                 'ClassName' => 'Grade 9 A',
                 'SY_ID' => 1,      // School Year ID
@@ -86,7 +86,7 @@ class StudentClassesSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'Student_ID' => 6, // Frank Garcia
+                'Student_ID' => 8, // Frank Garcia
                 'Class_ID' => 3,   // Grade 9 A
                 'ClassName' => 'Grade 9 A',
                 'SY_ID' => 1,      // School Year ID
@@ -96,7 +96,7 @@ class StudentClassesSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'Student_ID' => 11, // Karen Villanueva
+                'Student_ID' => 9, // Karen Villanueva
                 'Class_ID' => 3,   // Grade 9 A
                 'ClassName' => 'Grade 9 A',
                 'SY_ID' => 1,      // School Year ID
@@ -108,7 +108,7 @@ class StudentClassesSeeder extends Seeder
 
             //-----------------------------------Grade 10 A----------------------------------- TEACHER 3
             [
-                'Student_ID' => 9, // Isla Torres
+                'Student_ID' => 10, // Isla Torres
                 'Class_ID' => 4,   // Grade 10 A
                 'ClassName' => 'Grade 10 A',
                 'SY_ID' => 1,      // School Year ID
@@ -118,7 +118,7 @@ class StudentClassesSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'Student_ID' => 10, // Jake Santos
+                'Student_ID' => 11, // Jake Santos
                 'Class_ID' => 4,   // Grade 10 A
                 'ClassName' => 'Grade 10 A',
                 'SY_ID' => 1,      // School Year ID

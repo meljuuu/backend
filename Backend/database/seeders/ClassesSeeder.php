@@ -59,7 +59,7 @@ class ClassesSeeder extends Seeder
                 'Grade_Level' => '11',
                 'Status' => 'Accepted',
                 'Track' => 'STEM', // You can change to HUMSS, ABM, etc.
-                'Adviser_ID' => 4,
+                'Adviser_ID' => 5,
                 'Curriculum' => 'SHS',
                 'comments' => null,
                 'created_at' => now(),
@@ -72,7 +72,7 @@ class ClassesSeeder extends Seeder
                 'Grade_Level' => '12',
                 'Status' => 'Accepted',
                 'Track' => 'STEM',
-                'Adviser_ID' => 4,
+                'Adviser_ID' => 5,
                 'Curriculum' => 'SHS',
                 'comments' => null,
                 'created_at' => now(),
