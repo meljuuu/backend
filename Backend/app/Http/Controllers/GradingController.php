@@ -21,9 +21,8 @@ class GradingController extends Controller
                 }, 'teacher', 'subject'])
                 ->where('Subject_ID', $subjectId)
                 ->get()
-                ->groupBy('Student_ID')  // Group by Student_ID to handle duplicates
+                ->groupBy('Student_ID')
                 ->map(function($studentGrades) {
-                    // Get the most recent grade entry for each student
                     $latestGrade = $studentGrades->sortByDesc('created_at')->first();
                     return [
                         'student_id' => $latestGrade->student->Student_ID,
@@ -41,10 +40,10 @@ class GradingController extends Controller
                             'fourth' => $latestGrade->Q4,
                         ],
                         'status' => $latestGrade->Status ?? 'pending',
-                        'class_id' => $latestGrade->Class_ID ?? null  // Include Class_ID in response
+                        'class_id' => $latestGrade->Class_ID ?? null
                     ];
                 })
-                ->values();  // Convert to array
+                ->values();
 
             return response()->json([
                 'status' => 'success',
