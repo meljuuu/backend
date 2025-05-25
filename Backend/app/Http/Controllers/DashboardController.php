@@ -151,6 +151,11 @@ class DashboardController extends Controller
             $recentGrades = DB::table('subject_grades')
                 ->join('students', 'subject_grades.Student_ID', '=', 'students.Student_ID')
                 ->join('subjects', 'subject_grades.Subject_ID', '=', 'subjects.Subject_ID')
+                ->leftJoin('student_class', function($join) use ($teacher) {
+                    $join->on('students.Student_ID', '=', 'student_class.Student_ID')
+                        ->where('student_class.Adviser_ID', '=', $teacher->Teacher_ID)
+                        ->where('student_class.isAdvisory', '=', true);
+                })
                 ->where('subject_grades.Teacher_ID', $teacher->Teacher_ID)
                 ->whereNotNull('subject_grades.FinalGrade')
                 ->select(
@@ -158,7 +163,8 @@ class DashboardController extends Controller
                     'subjects.SubjectName',
                     'subject_grades.FinalGrade',
                     'subject_grades.Status',
-                    'subject_grades.updated_at'
+                    'subject_grades.updated_at',
+                    DB::raw('CASE WHEN student_class.StudentClass_ID IS NOT NULL THEN true ELSE false END as is_advisory')
                 )
                 ->orderBy('subject_grades.updated_at', 'desc')
                 ->limit(10)
@@ -169,7 +175,8 @@ class DashboardController extends Controller
                         'subject' => $grade->SubjectName,
                         'grade' => $grade->FinalGrade,
                         'status' => $grade->Status,
-                        'date' => date('M d, Y', strtotime($grade->updated_at))
+                        'date' => date('M d, Y', strtotime($grade->updated_at)),
+                        'isAdvisory' => (bool)$grade->is_advisory
                     ];
                 });
 
