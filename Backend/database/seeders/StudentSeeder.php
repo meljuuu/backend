@@ -13,6 +13,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 1,
                 'LRN' => '123456789012',
+                'Grade_Level' => '7',
                 'FirstName' => 'Alice',
                 'LastName' => 'Smith',
                 'MiddleName' => 'Marie',
@@ -39,6 +40,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 2,
                 'LRN' => '987654321098',
+                'Grade_Level' => '7',
                 'FirstName' => 'Bob',
                 'LastName' => 'Johnson',
                 'MiddleName' => 'Edward',
@@ -65,6 +67,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 3,
                 'LRN' => '111122223333',
+                'Grade_Level' => '7',
                 'FirstName' => 'Carol',
                 'LastName' => 'Baker',
                 'MiddleName' => 'Ann',
@@ -91,6 +94,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 4,
                 'LRN' => '444455556666',
+                'Grade_Level' => '7',
                 'FirstName' => 'David',
                 'LastName' => 'Cruz',
                 'MiddleName' => 'Lee',
@@ -117,6 +121,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 5,
                 'LRN' => '777788889999',
+                'Grade_Level' => '7',
                 'FirstName' => 'Eve',
                 'LastName' => 'Lopez',
                 'MiddleName' => 'Grace',
@@ -143,6 +148,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 6,
                 'LRN' => '999900001111',
+                'Grade_Level' => '7',
                 'FirstName' => 'Frank',
                 'LastName' => 'Garcia',
                 'MiddleName' => 'James',
@@ -169,6 +175,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 7,
                 'LRN' => '222233334444',
+                'Grade_Level' => '8',
                 'FirstName' => 'Grace',
                 'LastName' => 'Nguyen',
                 'MiddleName' => 'Kim',
@@ -195,6 +202,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 8,
                 'LRN' => '555566667777',
+                'Grade_Level' => '8',
                 'FirstName' => 'Henry',
                 'LastName' => 'Reyes',
                 'MiddleName' => 'Joel',
@@ -221,6 +229,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 9,
                 'LRN' => '666677778888',
+                'Grade_Level' => '8',
                 'FirstName' => 'Isla',
                 'LastName' => 'Torres',
                 'MiddleName' => 'Faith',
@@ -247,6 +256,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 10,
                 'LRN' => '333344445555',
+                'Grade_Level' => '11',
                 'FirstName' => 'Jake',
                 'LastName' => 'Santos',
                 'MiddleName' => 'Paul',
@@ -273,6 +283,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 11,
                 'LRN' => '121212121212',
+                'Grade_Level' => '11',
                 'FirstName' => 'Karen',
                 'LastName' => 'Villanueva',
                 'MiddleName' => 'Hope',
@@ -299,6 +310,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 12,
                 'LRN' => '343434343434',
+                'Grade_Level' => '11',
                 'FirstName' => 'Liam',
                 'LastName' => 'Del Rosario',
                 'MiddleName' => 'Jay',
@@ -325,6 +337,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 13,
                 'LRN' => '454545454545',
+                'Grade_Level' => '12',
                 'FirstName' => 'Mia',
                 'LastName' => 'Fernandez',
                 'MiddleName' => 'Rose',
@@ -351,6 +364,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 14,
                 'LRN' => '565656565656',
+                'Grade_Level' => '12',
                 'FirstName' => 'Noah',
                 'LastName' => 'Lim',
                 'MiddleName' => 'Kai',
@@ -377,6 +391,7 @@ class StudentSeeder extends Seeder
             [
                 'Student_ID' => 15,
                 'LRN' => '676767676767',
+                'Grade_Level' => '12',
                 'FirstName' => 'Olivia',
                 'LastName' => 'Ramos',
                 'MiddleName' => 'Grace',
