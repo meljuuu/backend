@@ -19,13 +19,11 @@ class DashboardController extends Controller
         try {
             $teacherId = $request->user()->Teacher_ID;
 
-            // Get non-advisory classes for this teacher
-            $subjectClasses = DB::table('student_class')
+            // Get advisory classes for this teacher
+            $advisoryClasses = DB::table('student_class')
                 ->join('students', 'student_class.Student_ID', '=', 'students.Student_ID')
-                ->join('student_class_teacher_subject', 'student_class.StudentClass_ID', '=', 'student_class_teacher_subject.student_class_id')
-                ->join('teachers_subject', 'student_class_teacher_subject.teacher_subject_id', '=', 'teachers_subject.id')
-                ->where('teachers_subject.teacher_id', $teacherId)
-                ->where('student_class.isAdvisory', false)
+                ->where('student_class.Adviser_ID', $teacherId)
+                ->where('student_class.isAdvisory', true)
                 ->select(
                     'students.Student_ID',
                     'students.FirstName',
@@ -36,18 +34,18 @@ class DashboardController extends Controller
                 ->get();
 
             // Count total students and gender distribution
-            $totalStudents = $subjectClasses->count();
-            $maleCount = $subjectClasses->where('Sex', 'M')->count();
-            $femaleCount = $subjectClasses->where('Sex', 'F')->count();
+            $totalStudents = $advisoryClasses->count();
+            $maleCount = $advisoryClasses->where('Sex', 'M')->count();
+            $femaleCount = $advisoryClasses->where('Sex', 'F')->count();
 
             return response()->json([
                 'totalStudents' => $totalStudents,
                 'maleCount' => $maleCount,
                 'femaleCount' => $femaleCount,
-                'subjectClasses' => $subjectClasses
+                'subjectClasses' => $advisoryClasses
             ]);
         } catch (\Exception $e) {
-            Log::error('Error fetching subject classes: ' . $e->getMessage());
+            Log::error('Error fetching advisory classes: ' . $e->getMessage());
             return response()->json([
                 'totalStudents' => 0,
                 'maleCount' => 0,
