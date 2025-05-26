@@ -19,6 +19,57 @@ use App\Models\ClassSubjectModel;
 
 class SuperAdminController extends Controller
 {
+
+    //Dashboard "Teacher" count pending grades, teacher and students.
+    public function getSummaryStats()
+    {
+        try {
+            $teacherCount = TeacherModel::count();
+            $studentCount = StudentModel::count();
+            $pendingGradesCount = SubjectGradeModel::where('Status', 'Pending')->count();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'total_teachers' => $teacherCount,
+                    'total_students' => $studentCount,
+                    'pending_grades' => $pendingGradesCount,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    //Dashboard "Teacher" get the Recently Added Faculties
+    public function getRecentFaculties(Request $request)
+    {
+        try {
+            // Optional: accept a limit parameter (default to 5)
+            $limit = $request->input('limit', 5);
+
+            $recentFaculties = TeacherModel::whereIn('Position', ['Teacher', 'Admin'])
+                ->orderBy('created_at', 'desc')
+                ->limit($limit)
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $recentFaculties,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
     
     public function getAcceptedClassesWithSubjectsTeachersAndStudents()
     {

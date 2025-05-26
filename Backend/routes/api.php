@@ -87,6 +87,10 @@ Route::get('/superadmin/lesson-plans/{id}', [SuperadminController::class, 'getLe
 Route::put('/superadmin/lesson-plans/{id}/approve', [SuperadminController::class, 'approveLessonPlan']);
 Route::put('/superadmin/lesson-plans/{id}/decline', [SuperadminController::class, 'rejectLessonPlan']);
 Route::get('/superadmin/grading', [SuperadminController::class, 'getAcceptedClassesWithSubjectsTeachersAndStudents']);
+Route::get('/super-admin/summary-stats', [SuperAdminController::class, 'getSummaryStats']);
+Route::get('/super-admin/recent-faculties', [SuperAdminController::class, 'getRecentFaculties']);
+
+
 
 
 
