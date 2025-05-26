@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Carbon;
 use App\Models\ClassesModel;
 use App\Models\User;
 use App\Models\TeacherModel;
 use App\Models\SchoolYearModel;
 use App\Models\StudentModel;
+use App\Models\SubjectModel;
 use App\Models\SubjectGradeModel;
 use App\Models\LessonPlan;
 
@@ -162,6 +163,161 @@ class SuperAdminController extends Controller
     }
 
 
+// Settings
+public function create(Request $request)
+    {
+        $request->validate([
+            'SubjectName' => 'required|string',
+            'GradeLevel' => 'required|integer',
+            'SubjectCode' => 'required|integer|unique:subjects,SubjectCode',
+        ]);
 
+        $subject = SubjectModel::create($request->all());
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $subject
+        ], 201);
+    }
+
+    // READ ALL
+    public function Sample()
+    {
+        $subjects = SubjectModel::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => $subjects
+        ]);
+    }
+
+    // READ ONE
+    public function show($id)
+    {
+        $subject = SubjectModel::find($id);
+
+        if (!$subject) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Subject not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $subject
+        ]);
+    }
+
+    // UPDATE
+    public function update(Request $request, $id)
+    {
+        $subject = SubjectModel::find($id);
+
+        if (!$subject) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Subject not found'
+            ], 404);
+        }
+
+        $request->validate([
+            'SubjectName' => 'sometimes|required|string',
+            'GradeLevel' => 'sometimes|required|integer',
+            'SubjectCode' => 'sometimes|required|integer|unique:subjects,SubjectCode,' . $id . ',Subject_ID',
+        ]);
+
+        $subject->update($request->all());
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $subject
+        ]);
+    }
+
+    // DELETE
+    public function destroy($id)
+    {
+        $subject = SubjectModel::find($id);
+
+        if (!$subject) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Subject` not found'
+            ], 404);
+        }
+
+        $subject->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Subject deleted successfully'
+        ]);
+    }
+
+
+    public function getAllSchoolYears()
+{
+    $schoolYears = SchoolYearModel::all();
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $schoolYears
+    ]);
+}
+
+public function getAllSections()
+{
+   $sections = ClassesModel::all();
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $sections
+    ]);
+}
+public function CreateSchoolYear(Request $request)
+{
+    $validatedData = $request->validate([
+        'Start_Date' => 'required|date',
+        'End_Date' => 'required|date|after:Start_Date',
+        'SY_Year' => 'required|string|unique:school_years,SY_Year',
+    ]);
+
+    $schoolYear = new SchoolYearModel();
+    $schoolYear->Start_Date = $validatedData['Start_Date'];
+    $schoolYear->End_Date = $validatedData['End_Date'];
+    $schoolYear->SY_Year = $validatedData['SY_Year'];
+    $schoolYear->created_at = Carbon::now();
+    $schoolYear->updated_at = Carbon::now();
+    $schoolYear->save();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'School year created successfully',
+        'data' => $schoolYear
+    ], 201);
+}
+
+public function TestSection(Request $request)
+{
+    $validated = $request->validate([
+        'ClassName'    => 'required|string|max:255',
+        'Section'      => 'required|string|max:255',
+        'SY_ID'        => 'required|exists:school_years,SY_ID',
+        'Grade_Level'  => 'required|in:7,8,9,10,11,12',
+        'Track'        => 'nullable|string',
+        'Adviser_ID'   => 'nullable|exists:teachers,Teacher_ID',
+        'Curriculum'   => 'nullable|in:JHS,SHS',
+        'comments'     => 'nullable|string',
+    ]);
+
+  $validated['Status'] = 'Accepted';
+
+    $class = ClassesModel::create($validated);
+
+    return response()->json([
+        'message' => 'Class created successfully',
+        'data' => $class,
+    ], 201);
+}
 
 }

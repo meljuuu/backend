@@ -113,6 +113,7 @@ class GradingController extends Controller
                         'Q4' => $gradeData['Q4'],
                         'FinalGrade' => $finalGrade,
                         'Remarks' => $remarks,
+                        'Status' => 'Pending',
                     ]
                 );
             }
