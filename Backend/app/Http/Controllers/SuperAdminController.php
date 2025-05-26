@@ -13,12 +13,92 @@ use App\Models\StudentModel;
 use App\Models\SubjectModel;
 use App\Models\SubjectGradeModel;
 use App\Models\LessonPlan;
+use App\Models\ClassSubjectModel;
 
 
 
 class SuperAdminController extends Controller
 {
     
+    public function getAcceptedClassesWithSubjectsTeachersAndStudents()
+    {
+        try {
+            // Get all accepted classes
+            $classes = ClassesModel::where('Status', 'Accepted')
+                ->with(['students.subjectGrades']) // eager load students and their grades
+                ->get();
+
+            // Get all subject-teacher links for these classes
+            $classIds = $classes->pluck('Class_ID');
+            $subjectTeacherLinks = \App\Models\StudentClassTeacherSubject::whereHas('studentClass', function($q) use ($classIds) {
+                    $q->whereIn('Class_ID', $classIds);
+                })
+                ->with(['teacherSubject.subject', 'teacherSubject.teacher', 'studentClass'])
+                ->get()
+                ->groupBy(function($item) {
+                    return $item->studentClass->Class_ID ?? null;
+                });
+
+            $data = $classes->map(function ($class) use ($subjectTeacherLinks) {
+                // Get all subject-teacher pairs for this class
+                $subjects = collect($subjectTeacherLinks[$class->Class_ID] ?? [])->map(function ($link) {
+                    return [
+                        'subject_id' => $link->teacherSubject->subject?->Subject_ID,
+                        'subjectName' => $link->teacherSubject->subject?->SubjectName,
+                        'teacher_id' => $link->teacherSubject->teacher?->Teacher_ID,
+                        'teacherName' => $link->teacherSubject->teacher
+                            ? $link->teacherSubject->teacher->FirstName . ' ' . $link->teacherSubject->teacher->LastName
+                            : null,
+                    ];
+                })->unique('subject_id')->values();
+
+                return [
+                    'class_id' => $class->Class_ID,
+                    'className' => $class->ClassName ?? null,
+                    'curriculum' => $class->Curriculum ?? null,
+                    'track' => $class->Track ?? null,
+                    'subjects' => $subjects,
+                    'students' => $class->students->map(function ($student) {
+                        return [
+                            'student_id' => $student->Student_ID,
+                            'firstName' => $student->FirstName,
+                            'lastName' => $student->LastName,
+                            'middleName' => $student->MiddleName,
+                            'lrn' => $student->LRN,
+                            'sex' => $student->Sex,
+                            'birthDate' => $student->BirthDate,
+                            'contactNumber' => $student->ContactNumber,
+                            'address' => $student->Address,
+                            'subject_grades' => $student->subjectGrades->map(function ($grade) {
+                                return [
+                                    'grade_id' => $grade->Grade_ID,
+                                    'subject_id' => $grade->Subject_ID,
+                                    'teacher_id' => $grade->Teacher_ID,
+                                    'Q1' => $grade->Q1,
+                                    'Q2' => $grade->Q2,
+                                    'Q3' => $grade->Q3,
+                                    'Q4' => $grade->Q4,
+                                    'FinalGrade' => $grade->FinalGrade,
+                                    'Remarks' => $grade->Remarks,
+                                    'Status' => $grade->Status,
+                                ];
+                            }),
+                        ];
+                    }),
+                ];
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
     //Classes API
     public function getAllWithStudentCount()
         {

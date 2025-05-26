@@ -62,7 +62,12 @@ class ClassesModel extends Model
         return $this->hasMany(StudentClassModel::class, 'Class_ID', 'Class_ID');
     }
 
-    
+
+    public function classSubjects()
+    {
+        return $this->hasMany(ClassSubjectModel::class, 'Class_ID', 'Class_ID');
+    }
+
     public function adviser()
     {
         return $this->belongsTo(TeacherModel::class, 'Adviser_ID', 'Teacher_ID');

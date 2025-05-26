@@ -48,6 +48,11 @@ class StudentModel extends Model
         return $this->hasMany(SubjectGradeModel::class, 'Student_ID');
     }
 
+    public function subjectGrades()
+    {
+        return $this->hasMany(\App\Models\SubjectGradeModel::class, 'Student_ID', 'Student_ID');
+    }
+
     public function studentClasses()
     {
         return $this->hasMany(StudentClassModel::class, 'Student_ID');
