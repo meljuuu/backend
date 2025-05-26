@@ -18,21 +18,31 @@ class AdminStudentClassController extends Controller
 
     public function indexExcludeIncomplete()
     {
-        $classes = ClassesModel::with(['studentClasses.adviser', 'studentClasses.student']) 
+        $classes = ClassesModel::with(['studentClasses.adviser', 'studentClasses.student'])
             ->withCount('studentClasses')
             ->where('Status', '!=', 'Incomplete')
             ->get()
             ->map(function ($class) {
+                // Filter out studentClasses where the student is already in the student_class table
+                $class->studentClasses = $class->studentClasses->filter(function ($studentClass) {
+                    // Count how many times this student is already in student_class
+                    $existingCount = StudentClassModel::where('Student_ID', $studentClass->Student_ID)->count();
+                    return $existingCount <= 1; // Keep if only one entry (the current one)
+                })->values(); // Reindex the collection
+    
+                // Set adviser info
                 $firstStudentClass = $class->studentClasses->first();
                 $class->adviser_id = $firstStudentClass ? $firstStudentClass->Adviser_ID : null;
                 $class->adviser_name = $firstStudentClass && $firstStudentClass->adviser
-                    ? $firstStudentClass->adviser->name 
+                    ? $firstStudentClass->adviser->name
                     : 'Not assigned';
+    
                 return $class;
             });
     
         return response()->json($classes);
     }
+    
 
     public function indexAllAccepted()
     {

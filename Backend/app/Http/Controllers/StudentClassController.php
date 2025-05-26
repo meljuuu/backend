@@ -34,6 +34,13 @@ class StudentClassController extends Controller
             'is_advisory' => 'boolean',
         ]);
     
+        // ✅ Update adviser_id in the classes table
+        if ($request->adviser_id) {
+            DB::table('classes')
+                ->where('Class_ID', $request->class_id)
+                ->update(['Adviser_ID' => $request->adviser_id]);
+        }
+    
         // If this is an advisory class, ensure only one teacher is marked as advisory
         if ($request->is_advisory) {
             // Remove advisory status from other teachers in this class
@@ -71,6 +78,7 @@ class StudentClassController extends Controller
             'data' => $studentClassRecords
         ]);
     }
+    
 
     public function addStudentsToClass(Request $request)
     {
@@ -80,7 +88,6 @@ class StudentClassController extends Controller
             'class_id' => 'required|exists:classes,Class_ID',
         ]);
     
-        // Fetch existing class setup from any existing student_class row in that class
         $existingStudentClass = StudentClassModel::where('Class_ID', $request->class_id)->first();
     
         if (!$existingStudentClass) {
@@ -89,10 +96,10 @@ class StudentClassController extends Controller
             ], 404);
         }
     
-        // Update class status to 'pending'
         $class = \App\Models\ClassesModel::find($request->class_id);
         if ($class) {
             $class->status = 'pending';
+            $class->comments = null; // ✅ Clear comments
             $class->save();
         }
     
@@ -100,13 +107,12 @@ class StudentClassController extends Controller
         $newStudentClasses = [];
     
         foreach ($request->student_ids as $studentId) {
-            // Skip if student is already in the class
             $alreadyExists = StudentClassModel::where('Class_ID', $request->class_id)
                 ->where('Student_ID', $studentId)
                 ->exists();
     
             if ($alreadyExists) {
-                continue; // Skip existing student
+                continue;
             }
     
             $newStudentClass = StudentClassModel::create([
@@ -129,7 +135,7 @@ class StudentClassController extends Controller
             'data' => $newStudentClasses
         ]);
     }
-
+    
     public function removeStudentsFromClass(Request $request)
     {
         $request->validate([
@@ -137,34 +143,35 @@ class StudentClassController extends Controller
             'student_ids.*' => 'integer|exists:students,Student_ID',
             'class_id' => 'required|exists:classes,Class_ID',
         ]);
-
+    
         $removedStudents = [];
-
+    
         foreach ($request->student_ids as $studentId) {
             $studentClass = StudentClassModel::where('Class_ID', $request->class_id)
                 ->where('Student_ID', $studentId)
                 ->first();
-
+    
             if ($studentClass) {
                 // Detach related teacher subjects if any
                 $studentClass->teacherSubjects()->detach();
-
+    
                 // Delete the student from the class
                 $studentClass->delete();
-
+    
                 $removedStudents[] = $studentId;
             }
         }
-
-        // If at least one student was removed, update class status to 'pending'
+    
+        // If at least one student was removed, update class status to 'pending' and clear comments
         if (count($removedStudents) > 0) {
             $class = \App\Models\ClassesModel::find($request->class_id);
             if ($class) {
                 $class->status = 'pending';
+                $class->comments = null; // ✅ Clear comments
                 $class->save();
             }
         }
-
+    
         return response()->json([
             'message' => count($removedStudents) > 0 
                 ? 'Students successfully removed from class and class status set to pending.'
@@ -292,4 +299,46 @@ class StudentClassController extends Controller
             ], 500);
         }
     }
+
+    public function accept(Request $request)
+    {
+        $request->validate([
+            'class_ids' => 'required|array',
+            'class_ids.*' => 'integer|exists:classes,Class_ID',
+        ]);
+    
+        // Update all specified class statuses to 'accepted'
+        DB::table('classes')
+            ->whereIn('Class_ID', $request->class_ids)
+            ->update(['Status' => 'accepted']);
+    
+        return response()->json([
+            'message' => 'Class statuses updated to accepted.',
+            'updated_ids' => $request->class_ids
+        ]);
+    }
+
+    public function reject(Request $request)
+    {
+        $request->validate([
+            'class_id' => 'required|integer|exists:classes,Class_ID',
+            'comments' => 'required|string|max:1000',
+        ]);
+    
+        // Update status and save comment
+        DB::table('classes')
+            ->where('Class_ID', $request->class_id)
+            ->update([
+                'Status' => 'Declined',
+                'comments' => $request->comments,
+            ]);
+    
+        return response()->json([
+            'message' => 'Class has been rejected with comment.',
+            'rejected_id' => $request->class_id,
+        ]);
+    }
+    
+    
+    
 }

@@ -8,7 +8,7 @@ use League\Csv\Reader;
 use League\Csv\Statement;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\StudentClassModel;
 
 class StudentController extends Controller
 {
@@ -42,13 +42,19 @@ class StudentController extends Controller
 
     public function getAcceptedStudents()
     {
-        // Get all accepted students without filtering out those in student_class
-        $students = StudentModel::where('Status', 'Accepted')->get();
-        
+        // Get all student IDs that already exist in student_class
+        $assignedStudentIds = StudentClassModel::pluck('Student_ID');
+    
+        // Get only accepted students who are NOT already in student_class
+        $students = StudentModel::where('Status', 'Accepted')
+            ->whereNotIn('Student_ID', $assignedStudentIds)
+            ->get();
+    
         return response()->json([
             'students' => $students
         ]);
     }
+    
 
     public function getNoClassStudents()
     {

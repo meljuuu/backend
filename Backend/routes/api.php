@@ -52,7 +52,7 @@ Route::get('/student/getAllAccepted', [StudentController::class, 'getAcceptedStu
 Route::get('/student/get-students-no-class', [StudentController::class, 'getNoClassStudents']);
 Route::put('/student/accept/{id}', [StudentController::class, 'acceptProfile']);
 Route::post('/student/bulk-upload', [StudentController::class, 'bulkUpload']);
-Route::get('/student/get-students-no-class', [StudentController::class, 'getStudentsNoClass']);
+// Route::get('/student/get-students-no-class', [StudentController::class, 'getStudentsNoClass']);
 Route::put('/students/update/{id}', [StudentController::class, 'update']);
 
 //ADMIN API
@@ -67,12 +67,9 @@ Route::get('/dashboard/students/count', [AdminDashboardController::class, 'getSt
 Route::get('/dashboard/teachers/count', [AdminDashboardController::class, 'getTeacherCount']);
 Route::get('/dashboard/students/gender-distribution', [AdminDashboardController::class, 'getStudentGenderDistribution']);
 Route::get('/dashboard/students/grade-distribution', [AdminDashboardController::class, 'getStudentGradeDistribution']);
-Route::get('dashboard/accepted-classes/count', [AdminDashboardController::class, 'countAcceptedClasses']);
 Route::get('/dashboard/students/latest', [AdminDashboardController::class, 'getLatestUpdatedStudents']);
 Route::get('/dashboard/students/status-counts', [AdminDashboardController::class, 'getSubmissionStatusCounts']);
-Route::get('/dashboard/accepted-students-per-grade', [AdminDashboardController::class, 'getAcceptedStudentsPerGrade']);
-Route::get('/count-pending-classes', [AdminDashboardController::class, 'countPendingClasses']);
-
+Route::get('dashboard/accepted-classes/count', [AdminDashboardController::class, 'countAcceptedClasses']);
 
 //Teacher
 Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
@@ -98,13 +95,16 @@ Route::get('/subject/getSubjects', [SubjectController::class, 'getAll']);
 //TEACHER SUBJECTS
 Route::get('/teacher-subjects/getAll', [TeacherSubjectController::class, 'getAllSubject']);
 
+Route::get('/teacher-subjects/getAll', [TeacherSubjectController::class, 'getAllSubject']);
+
 //STUDENTCLASSES
 Route::post('/admin/create-class', [StudentClassController::class, 'store']);
 Route::get('/admin/get-classes', [StudentClassController::class, 'index']);
 Route::post('/admin/add-student-to-class',[StudentClassController::class, 'addStudentsToClass']);
 Route::post('/admin/remove-student-to-class',[StudentClassController::class, 'removeStudentsFromClass']);
 Route::delete('/admin/remove-class',[StudentClassController::class, 'destroy']);
-
+Route::post('/admin/accept-class',[StudentClassController::class, 'accept']);
+Route::post('/admin/decline-class',[StudentClassController::class, 'reject']);
 
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {
