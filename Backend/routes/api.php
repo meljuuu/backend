@@ -86,6 +86,7 @@ Route::get('/superadmin/lesson-plans', [SuperadminController::class, 'getAllLess
 Route::get('/superadmin/lesson-plans/{id}', [SuperadminController::class, 'getLessonPlanById']);
 Route::put('/superadmin/lesson-plans/{id}/approve', [SuperadminController::class, 'approveLessonPlan']);
 Route::put('/superadmin/lesson-plans/{id}/decline', [SuperadminController::class, 'rejectLessonPlan']);
+Route::get('/superadmin/grading', [SuperadminController::class, 'getAcceptedClassesWithSubjectsTeachersAndStudents']);
 
 
 
@@ -225,5 +226,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 Route::get('/student-class/class/{classId}', [StudentClassController::class, 'getStudentsByClass']);
 
+//SASettings
 
+Route::post('test/', [SuperadminController::class, 'create']);
+Route::get('/testing/subjects', [SuperadminController::class, 'sample']);  
+Route::get('testing/{id}', [SuperadminController::class, 'show']); 
+Route::put('test/{id}', [SuperadminController::class, 'update']);  
+Route::delete('testing/{id}', [SuperadminController::class, 'destroy']); 
+Route::get('test/sections', [SuperadminController::class, 'getAllSections']);
+Route::get('testings/school-years', [SuperadminController::class, 'getAllSchoolYears']);
+Route::post('test/school-years', [SuperadminController::class, 'CreateSchoolYear']);
+Route::post('/settings/test/sub', [SuperadminController::class, 'TestSection']);
 

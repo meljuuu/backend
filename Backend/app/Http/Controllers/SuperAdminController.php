@@ -4,20 +4,101 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Carbon;
 use App\Models\ClassesModel;
 use App\Models\User;
 use App\Models\TeacherModel;
 use App\Models\SchoolYearModel;
 use App\Models\StudentModel;
+use App\Models\SubjectModel;
 use App\Models\SubjectGradeModel;
 use App\Models\LessonPlan;
+use App\Models\ClassSubjectModel;
 
 
 
 class SuperAdminController extends Controller
 {
     
+    public function getAcceptedClassesWithSubjectsTeachersAndStudents()
+    {
+        try {
+            // Get all accepted classes
+            $classes = ClassesModel::where('Status', 'Accepted')
+                ->with(['students.subjectGrades']) // eager load students and their grades
+                ->get();
+
+            // Get all subject-teacher links for these classes
+            $classIds = $classes->pluck('Class_ID');
+            $subjectTeacherLinks = \App\Models\StudentClassTeacherSubject::whereHas('studentClass', function($q) use ($classIds) {
+                    $q->whereIn('Class_ID', $classIds);
+                })
+                ->with(['teacherSubject.subject', 'teacherSubject.teacher', 'studentClass'])
+                ->get()
+                ->groupBy(function($item) {
+                    return $item->studentClass->Class_ID ?? null;
+                });
+
+            $data = $classes->map(function ($class) use ($subjectTeacherLinks) {
+                // Get all subject-teacher pairs for this class
+                $subjects = collect($subjectTeacherLinks[$class->Class_ID] ?? [])->map(function ($link) {
+                    return [
+                        'subject_id' => $link->teacherSubject->subject?->Subject_ID,
+                        'subjectName' => $link->teacherSubject->subject?->SubjectName,
+                        'teacher_id' => $link->teacherSubject->teacher?->Teacher_ID,
+                        'teacherName' => $link->teacherSubject->teacher
+                            ? $link->teacherSubject->teacher->FirstName . ' ' . $link->teacherSubject->teacher->LastName
+                            : null,
+                    ];
+                })->unique('subject_id')->values();
+
+                return [
+                    'class_id' => $class->Class_ID,
+                    'className' => $class->ClassName ?? null,
+                    'curriculum' => $class->Curriculum ?? null,
+                    'track' => $class->Track ?? null,
+                    'subjects' => $subjects,
+                    'students' => $class->students->map(function ($student) {
+                        return [
+                            'student_id' => $student->Student_ID,
+                            'firstName' => $student->FirstName,
+                            'lastName' => $student->LastName,
+                            'middleName' => $student->MiddleName,
+                            'lrn' => $student->LRN,
+                            'sex' => $student->Sex,
+                            'birthDate' => $student->BirthDate,
+                            'contactNumber' => $student->ContactNumber,
+                            'address' => $student->Address,
+                            'subject_grades' => $student->subjectGrades->map(function ($grade) {
+                                return [
+                                    'grade_id' => $grade->Grade_ID,
+                                    'subject_id' => $grade->Subject_ID,
+                                    'teacher_id' => $grade->Teacher_ID,
+                                    'Q1' => $grade->Q1,
+                                    'Q2' => $grade->Q2,
+                                    'Q3' => $grade->Q3,
+                                    'Q4' => $grade->Q4,
+                                    'FinalGrade' => $grade->FinalGrade,
+                                    'Remarks' => $grade->Remarks,
+                                    'Status' => $grade->Status,
+                                ];
+                            }),
+                        ];
+                    }),
+                ];
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
     //Classes API
     public function getAllWithStudentCount()
         {
@@ -162,6 +243,161 @@ class SuperAdminController extends Controller
     }
 
 
+// Settings
+public function create(Request $request)
+    {
+        $request->validate([
+            'SubjectName' => 'required|string',
+            'GradeLevel' => 'required|integer',
+            'SubjectCode' => 'required|integer|unique:subjects,SubjectCode',
+        ]);
 
+        $subject = SubjectModel::create($request->all());
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $subject
+        ], 201);
+    }
+
+    // READ ALL
+    public function Sample()
+    {
+        $subjects = SubjectModel::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => $subjects
+        ]);
+    }
+
+    // READ ONE
+    public function show($id)
+    {
+        $subject = SubjectModel::find($id);
+
+        if (!$subject) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Subject not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $subject
+        ]);
+    }
+
+    // UPDATE
+    public function update(Request $request, $id)
+    {
+        $subject = SubjectModel::find($id);
+
+        if (!$subject) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Subject not found'
+            ], 404);
+        }
+
+        $request->validate([
+            'SubjectName' => 'sometimes|required|string',
+            'GradeLevel' => 'sometimes|required|integer',
+            'SubjectCode' => 'sometimes|required|integer|unique:subjects,SubjectCode,' . $id . ',Subject_ID',
+        ]);
+
+        $subject->update($request->all());
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $subject
+        ]);
+    }
+
+    // DELETE
+    public function destroy($id)
+    {
+        $subject = SubjectModel::find($id);
+
+        if (!$subject) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Subject` not found'
+            ], 404);
+        }
+
+        $subject->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Subject deleted successfully'
+        ]);
+    }
+
+
+    public function getAllSchoolYears()
+{
+    $schoolYears = SchoolYearModel::all();
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $schoolYears
+    ]);
+}
+
+public function getAllSections()
+{
+   $sections = ClassesModel::all();
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $sections
+    ]);
+}
+public function CreateSchoolYear(Request $request)
+{
+    $validatedData = $request->validate([
+        'Start_Date' => 'required|date',
+        'End_Date' => 'required|date|after:Start_Date',
+        'SY_Year' => 'required|string|unique:school_years,SY_Year',
+    ]);
+
+    $schoolYear = new SchoolYearModel();
+    $schoolYear->Start_Date = $validatedData['Start_Date'];
+    $schoolYear->End_Date = $validatedData['End_Date'];
+    $schoolYear->SY_Year = $validatedData['SY_Year'];
+    $schoolYear->created_at = Carbon::now();
+    $schoolYear->updated_at = Carbon::now();
+    $schoolYear->save();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'School year created successfully',
+        'data' => $schoolYear
+    ], 201);
+}
+
+public function TestSection(Request $request)
+{
+    $validated = $request->validate([
+        'ClassName'    => 'required|string|max:255',
+        'Section'      => 'required|string|max:255',
+        'SY_ID'        => 'required|exists:school_years,SY_ID',
+        'Grade_Level'  => 'required|in:7,8,9,10,11,12',
+        'Track'        => 'nullable|string',
+        'Adviser_ID'   => 'nullable|exists:teachers,Teacher_ID',
+        'Curriculum'   => 'nullable|in:JHS,SHS',
+        'comments'     => 'nullable|string',
+    ]);
+
+  $validated['Status'] = 'Accepted';
+
+    $class = ClassesModel::create($validated);
+
+    return response()->json([
+        'message' => 'Class created successfully',
+        'data' => $class,
+    ], 201);
+}
 
 }
