@@ -236,4 +236,54 @@ class ClassesController extends Controller
             ], 500);
         }
     }
+
+    public function getStudentsForClass($classId)
+    {
+        try {
+            $students = DB::table('student_class as sc')
+                ->join('students as s', 'sc.Student_ID', '=', 's.Student_ID')
+                ->where('sc.Class_ID', $classId)
+                ->select(
+                    's.Student_ID as student_id',
+                    's.LRN as lrn',
+                    's.FirstName as firstName',
+                    's.MiddleName as middleName',
+                    's.LastName as lastName',
+                    's.Sex as sex',
+                    's.BirthDate as birthDate',
+                    's.ContactNumber as contactNumber',
+                    's.HouseNo',
+                    's.Barangay',
+                    's.Municipality',
+                    's.Province'
+                )
+                ->get()
+                ->map(function($student) {
+                    return [
+                        'student_id' => $student->student_id,
+                        'lrn' => $student->lrn,
+                        'firstName' => $student->firstName,
+                        'middleName' => $student->middleName ?? '',
+                        'lastName' => $student->lastName,
+                        'sex' => $student->sex,
+                        'birthDate' => $student->birthDate,
+                        'contactNumber' => $student->contactNumber,
+                        'address' => $student->HouseNo . ', ' . 
+                                    $student->Barangay . ', ' . 
+                                    $student->Municipality . ', ' . 
+                                    $student->Province
+                    ];
+                });
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $students
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch students: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

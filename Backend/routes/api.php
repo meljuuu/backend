@@ -141,7 +141,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Class Routes
     Route::get('/classes', [ClassController::class, 'getClasses']);
     Route::get('/classes/{classId}', [ClassController::class, 'getClassDetails']);
-    Route::get('/classes/{classId}/students', [ClassController::class, 'getClassStudents']);
+    Route::get('/classes/{classId}/students', [ClassController::class, 'getStudentsForClass']);
 
     Route::post('/grades/bulk', [GradesController::class, 'bulkStore']);
 
