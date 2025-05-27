@@ -15,6 +15,7 @@ class SubjectGradeModel extends Model
     protected $primaryKey = 'Grade_ID';
 
     protected $fillable = [
+        'Class_ID',
         'Q1', 'Q2', 'Q3', 'Q4', 'FinalGrade', 'Remarks',
         'Student_ID', 'Teacher_ID', 'Subject_ID', 'Status'
     ];

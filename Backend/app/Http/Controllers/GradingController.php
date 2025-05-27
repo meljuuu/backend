@@ -13,14 +13,14 @@ class GradingController extends Controller
     /**
      * Get grades for a specific subject
      */
-    public function getSubjectGrades($subjectId, $classId)
+    public function getSubjectGrades($subjectId, $classId = null)
     {
         try {
             $grades = SubjectGradeModel::with(['student' => function($query) {
                     $query->select('Student_ID', 'FirstName', 'MiddleName', 'LastName', 'LRN', 'Sex', 'BirthDate', 'Curriculum');
                 }, 'teacher', 'subject'])
                 ->where('Subject_ID', $subjectId)
-                ->where('Class_ID', $classId)
+                ->when($classId, fn($query) => $query->where('Class_ID', $classId))
                 ->get()
                 ->groupBy('Student_ID')
                 ->map(function($studentGrades) {
@@ -74,6 +74,7 @@ class GradingController extends Controller
                 'grades.*.Q2' => 'nullable|numeric|min:0|max:100',
                 'grades.*.Q3' => 'nullable|numeric|min:0|max:100',
                 'grades.*.Q4' => 'nullable|numeric|min:0|max:100',
+                'grades.*.Class_ID' => 'required|exists:classes,Class_ID',
             ]);
 
             if ($validator->fails()) {
@@ -107,6 +108,7 @@ class GradingController extends Controller
                         'Subject_ID' => $gradeData['Subject_ID'],
                     ],
                     [
+                        'Class_ID' => $gradeData['Class_ID'],
                         'Teacher_ID' => $gradeData['Teacher_ID'],
                         'Q1' => $gradeData['Q1'],
                         'Q2' => $gradeData['Q2'],
