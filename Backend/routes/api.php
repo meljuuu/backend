@@ -21,6 +21,7 @@ use App\Http\Controllers\StudentClassTeacherSubjectController;
 use App\Http\Controllers\GradingController;
 use App\Http\Controllers\AdvisoryController;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\GradesController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -143,11 +144,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/classes/{classId}', [ClassController::class, 'getClassDetails']);
     Route::get('/classes/{classId}/students', [ClassController::class, 'getStudentsForClass']);
 
-    Route::post('/grades/bulk', [GradesController::class, 'bulkStore']);
+    Route::post('/grades/bulk', [GradingController::class, 'submitGrades']);
 
 
 
-    Route::get('/grades/subject/{subjectId}/class/{classId}', [GradingController::class, 'getSubjectGrades']);
+    Route::get('/grades/subject/{subjectId}/class/{classId}', [GradesController::class, 'getGradesBySubjectAndClass']);
     Route::get('/grades/student/{studentId}/subject/{subjectId}', [GradingController::class, 'getStudentGrades']);
     Route::post('/grades/bulk', [GradingController::class, 'submitGrades']);
 

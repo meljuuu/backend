@@ -92,4 +92,52 @@ class GradesController extends Controller
             ], 500);
         }
     }
+
+    public function getGradesBySubjectAndClass($subjectId, $classId)
+    {
+        try {
+            $grades = SubjectGradeModel::where('Subject_ID', $subjectId)
+                ->where('Class_ID', $classId)
+                ->with([
+                    'student' => function($query) {
+                        $query->select('Student_ID', 'FirstName', 'LastName', 'MiddleName', 'LRN', 'sex', 'birthDate');
+                    },
+                    'subject',
+                    'teacher'
+                ])
+                ->get()
+                ->map(function ($grade) {
+                    // Attach grades and calculated fields
+                    return [
+                        'Grade_ID'    => $grade->Grade_ID,
+                        'Student_ID'  => $grade->Student_ID,
+                        'Q1'          => $grade->Q1,
+                        'Q2'          => $grade->Q2,
+                        'Q3'          => $grade->Q3,
+                        'Q4'          => $grade->Q4,
+                        'FinalGrade'  => $grade->FinalGrade,
+                        'Remarks'     => $grade->Remarks,
+                        'Status'      => $grade->Status,
+                        'student'     => $grade->student,
+                        'grades'      => [
+                            'first'  => $grade->Q1,
+                            'second' => $grade->Q2,
+                            'third'  => $grade->Q3,
+                            'fourth' => $grade->Q4,
+                        ]
+                    ];
+                });
+
+            return response()->json([
+                'status' => 'success',
+                'data'   => $grades
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching grades: ' . $e->getMessage());
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Failed to fetch grades.'
+            ], 500);
+        }
+    }
 }
