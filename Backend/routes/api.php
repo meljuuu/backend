@@ -74,7 +74,6 @@ Route::get('dashboard/accepted-classes/count', [AdminDashboardController::class,
 
 //Teacher
 Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
-Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
 
 
 //SUPER ADMIN API
@@ -92,6 +91,10 @@ Route::get('/super-admin/summary-stats', [SuperAdminController::class, 'getSumma
 Route::get('/super-admin/recent-faculties', [SuperAdminController::class, 'getRecentFaculties']);
 
 
+
+Route::put('/teachers/edit/{teacherId}', [TeacherController::class, 'updateTeacherAccount']);
+Route::delete('/teachers/delete/{teacherId}', [TeacherController::class, 'deleteTeacherAccount']);
+Route::post('/teacher/create-teacher', [TeacherController::class, 'createTeacherAccount']);
 
 
 
@@ -115,10 +118,7 @@ Route::post('/admin/decline-class',[StudentClassController::class, 'reject']);
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {
 
-    //PERSONNEL API
-    Route::post('/teacher/create-teacher', [TeacherController::class, 'createTeacherAccount']);
-    Route::put('/teachers/edit/{teacherId}', [TeacherController::class, 'updateTeacherAccount']);
-    Route::delete('/teachers/delete/{teacherId}', [TeacherController::class, 'deleteTeacherAccount']);
+
 
     
     Route::get('/teachers/getAll', [TeacherController::class, 'getAllPersonnel']);

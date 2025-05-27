@@ -137,12 +137,7 @@ public function createTeacherAccount(Request $request)
         'Subject_IDs.*' => 'exists:subjects,Subject_ID',
     ]);
 
-    $authenticatedTeacher = Auth::user(); 
-    if (!in_array($authenticatedTeacher->Position, ['Admin', 'SuperAdmin'])) {
-        return response()->json([
-            'error' => 'Only Admins or SuperAdmins can create teacher accounts.',
-        ], 403);
-    }
+    // No authentication or authorization check here
 
     $teacher = TeacherModel::create([
         'Email' => $request->Email,
@@ -171,7 +166,6 @@ public function createTeacherAccount(Request $request)
             ? Subject::whereIn('Subject_ID', $subjectIds)->get()
             : collect();
 
-        // Prepare and insert into teachers_subject table directly
         $now = now();
         $insertData = [];
         foreach ($subjects as $subject) {
@@ -183,6 +177,7 @@ public function createTeacherAccount(Request $request)
                 'updated_at' => $now,
             ];
         }
+
         if (!empty($insertData)) {
             DB::table('teachers_subject')->insert($insertData);
         }
@@ -194,6 +189,7 @@ public function createTeacherAccount(Request $request)
         'assigned_subjects' => $subjects,
     ], 201);
 }
+
 
 public function updateTeacherAccount(Request $request, $teacherId)
 {
@@ -217,7 +213,7 @@ public function updateTeacherAccount(Request $request, $teacherId)
         'Suffix' => 'nullable|string|max:255',
         'BirthDate' => 'required|date',
         'Sex' => 'required|in:M,F',
-        'Position' => 'required|in:Admin,Book-Keeping,Teacher,SuperAdmin',
+        'Position' => 'required|in:Admin,Book-keeping,Teacher,SuperAdmin',
         'ContactNumber' => 'required|string|max:15',
         'Address' => 'required|string|max:255',
         'Subject_IDs' => 'required_if:Position,Teacher|array|min:1|max:2',
