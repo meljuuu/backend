@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('masterlist', function (Blueprint $table) {
+        Schema::create('acadbase', function (Blueprint $table) {
             $table->id();
             $table->string('lrn')->unique();
             $table->string('name');
             $table->string('track');
-            $table->string('curriculum');
             $table->string('batch');
-            $table->enum('status', ['Approved', 'Review', 'Revised', 'Not-Applicable'])->default('Review');
+            $table->string('curriculum');
+            $table->enum('status', ['Released', 'Unreleased', 'Not-Applicable', 'Dropped-Out']);
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('masterlist');
+        Schema::dropIfExists('acadbase');
     }
 };

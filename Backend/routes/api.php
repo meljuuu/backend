@@ -22,6 +22,9 @@ use App\Http\Controllers\GradingController;
 use App\Http\Controllers\AdvisoryController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\GradesController;
+
+// AVOCADO ACADBASE
+use App\Http\Controllers\acadbase\MasterlistController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -242,4 +245,18 @@ Route::get('test/sections', [SuperadminController::class, 'getAllSections']);
 Route::get('testings/school-years', [SuperadminController::class, 'getAllSchoolYears']);
 Route::post('test/school-years', [SuperadminController::class, 'CreateSchoolYear']);
 Route::post('/settings/test/sub', [SuperadminController::class, 'TestSection']);
+
+
+
+
+
+// AVOCADO ACADBASE// AVOCADO ACADBASE// AVOCADO ACADBASE// AVOCADO ACADBASE
+Route::prefix('masterlist')->group(function () {
+    Route::get('/', [MasterlistController::class, 'index']);
+    Route::post('/', [MasterlistController::class, 'store']);
+    Route::get('/filter', [MasterlistController::class, 'filter']);
+    Route::get('/{id}', [MasterlistController::class, 'show']);
+    Route::put('/{id}', [MasterlistController::class, 'update']);
+    Route::delete('/{id}', [MasterlistController::class, 'destroy']);
+});
 
