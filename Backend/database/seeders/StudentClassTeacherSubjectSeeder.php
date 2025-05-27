@@ -16,60 +16,16 @@ class StudentClassTeacherSubjectSeeder extends Seeder
                 'teacher_subject_id' => 1, // Replace with actual teacher_subject_id
             ],
             [
+                'student_class_id' => 1, // Replace with actual student_class_id
+                'teacher_subject_id' => 2, // Replace with actual teacher_subject_id
+            ],
+            [
+                'student_class_id' => 2, // Replace with actual student_class_id
+                'teacher_subject_id' => 2, // Replace with actual teacher_subject_id
+            ],
+            [
                 'student_class_id' => 2, // Replace with actual student_class_id
                 'teacher_subject_id' => 1, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 3, // Replace with actual student_class_id
-                'teacher_subject_id' => 1, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 4, // Replace with actual student_class_id
-                'teacher_subject_id' => 3, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 5, // Replace with actual student_class_id
-                'teacher_subject_id' => 3, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 6, // Replace with actual student_class_id
-                'teacher_subject_id' => 3, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 7, // Replace with actual student_class_id
-                'teacher_subject_id' => 2, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 8, // Replace with actual student_class_id
-                'teacher_subject_id' => 2, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 9, // Replace with actual student_class_id
-                'teacher_subject_id' => 2, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 10, // Replace with actual student_class_id
-                'teacher_subject_id' => 5, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 11, // Replace with actual student_class_id
-                'teacher_subject_id' => 5, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 12, // Replace with actual student_class_id
-                'teacher_subject_id' => 5, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 13, // Replace with actual student_class_id
-                'teacher_subject_id' => 6, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 14, // Replace with actual student_class_id
-                'teacher_subject_id' => 6, // Replace with actual teacher_subject_id
-            ],
-            [
-                'student_class_id' => 15, // Replace with actual student_class_id
-                'teacher_subject_id' => 6, // Replace with actual teacher_subject_id
             ],
         ];
 

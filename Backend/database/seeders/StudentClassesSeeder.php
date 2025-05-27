@@ -14,7 +14,7 @@ class StudentClassesSeeder extends Seeder
             [
                 'Student_ID' => 1, // Alice Smith
                 'Class_ID' => 1,   // Grade 7 A
-                'ClassName' => 'Grade 7 A',
+                'ClassName' => 'A',
                 'SY_ID' => 1,      // School Year ID
                 'Adviser_ID' => 3, // TEACHER001
                 'isAdvisory' => true,
@@ -23,24 +23,24 @@ class StudentClassesSeeder extends Seeder
             ],
             [
                 'Student_ID' => 2, // Bob Johnson
-                'Class_ID' => 1,   // Grade 7 A
-                'ClassName' => 'Grade 7 B',
+                'Class_ID' => 2,   // A
+                'ClassName' => 'B',
                 'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 3, // TEACHER001
+                'Adviser_ID' => 4, // TEACHER001
                 'isAdvisory' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'Student_ID' => 3, // Eve Lopez
-                'Class_ID' => 1,   // Grade 7 A
-                'ClassName' => 'Grade 7 C',
-                'SY_ID' => 1,      // School Year ID
-                'Adviser_ID' => 3, // TEACHER001
-                'isAdvisory' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            // [
+            //     'Student_ID' => 3, // Eve Lopez
+            //     'Class_ID' => 1,   // Grade 7 A
+            //     'ClassName' => 'Grade 7 C',
+            //     'SY_ID' => 1,      // School Year ID
+            //     'Adviser_ID' => 3, // TEACHER001
+            //     'isAdvisory' => true,
+            //     'created_at' => now(),
+            //     'updated_at' => now(),
+            // ],
 
             //-----------------------------------Grade 8 A----------------------------------- TEACHER 4
             // [

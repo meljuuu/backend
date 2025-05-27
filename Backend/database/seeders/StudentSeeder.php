@@ -62,7 +62,7 @@ class StudentSeeder extends Seeder
                 'Track' => 'Technical-Vocational',
                 'created_at' => now(),
                 'updated_at' => now(),
-                'Status' => 'Pending',
+                'Status' => 'Accepted',
             ],
             [
                 'Student_ID' => 3,
@@ -143,7 +143,7 @@ class StudentSeeder extends Seeder
                 'Track' => 'Sports',
                 'created_at' => now(),
                 'updated_at' => now(),
-                'Status' => 'Pending',
+                'Status' => 'Accepted',
             ],
             [
                 'Student_ID' => 6,
@@ -224,7 +224,7 @@ class StudentSeeder extends Seeder
                 'Track' => 'TVL',
                 'created_at' => now(),
                 'updated_at' => now(),
-                'Status' => 'Pending',
+                'Status' => 'Accepted',
             ],
             [
                 'Student_ID' => 9,
@@ -278,7 +278,7 @@ class StudentSeeder extends Seeder
                 'Track' => 'Academic',
                 'created_at' => now(),
                 'updated_at' => now(),
-                'Status' => 'Pending',
+                'Status' => 'Accepted',
             ],
             [
                 'Student_ID' => 11,
@@ -332,7 +332,7 @@ class StudentSeeder extends Seeder
                 'Track' => 'Academic',
                 'created_at' => now(),
                 'updated_at' => now(),
-                'Status' => 'Pending',
+                'Status' => 'Accepted',
             ],
             [
                 'Student_ID' => 13,

@@ -61,8 +61,8 @@ class TeacherSeeder extends Seeder
             [
                 'Email' => 'teacher@example.com',
                 'Password' => Hash::make('teacher123'),
-                'FirstName' => 'Juan',
-                'LastName' => 'Dela Cruz 1',
+                'FirstName' => 'One',
+                'LastName' => 'One',
                 'MiddleName' => 'Santos',
                 'BirthDate' => '1990-05-10',
                 'Sex' => 'F',
@@ -81,8 +81,8 @@ class TeacherSeeder extends Seeder
             [
                 'Email' => 'teacher2@example.com',
                 'Password' => Hash::make('teacher123'),
-                'FirstName' => 'Juan',
-                'LastName' => 'Dela Cruz',
+                'FirstName' => 'Two',
+                'LastName' => 'Two',
                 'MiddleName' => 'Santos',
                 'BirthDate' => '1990-05-10',
                 'Sex' => 'F',
@@ -101,8 +101,8 @@ class TeacherSeeder extends Seeder
             [
                 'Email' => 'teacher3@example.com',
                 'Password' => Hash::make('teacher123'),
-                'FirstName' => 'Juan',
-                'LastName' => 'Dela Cruz',
+                'FirstName' => 'Three',
+                'LastName' => 'Three',
                 'MiddleName' => 'Santos',
                 'BirthDate' => '1990-05-10',
                 'Sex' => 'F',
