@@ -147,7 +147,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-    Route::get('/grades/subject/{subjectId}', [GradingController::class, 'getSubjectGrades']);
+    Route::get('/grades/subject/{subjectId}/class/{classId}', [GradingController::class, 'getSubjectGrades']);
     Route::get('/grades/student/{studentId}/subject/{subjectId}', [GradingController::class, 'getStudentGrades']);
     Route::post('/grades/bulk', [GradingController::class, 'submitGrades']);
 

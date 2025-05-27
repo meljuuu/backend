@@ -13,13 +13,14 @@ class GradingController extends Controller
     /**
      * Get grades for a specific subject
      */
-    public function getSubjectGrades($subjectId)
+    public function getSubjectGrades($subjectId, $classId)
     {
         try {
             $grades = SubjectGradeModel::with(['student' => function($query) {
                     $query->select('Student_ID', 'FirstName', 'MiddleName', 'LastName', 'LRN', 'Sex', 'BirthDate', 'Curriculum');
                 }, 'teacher', 'subject'])
                 ->where('Subject_ID', $subjectId)
+                ->where('Class_ID', $classId)
                 ->get()
                 ->groupBy('Student_ID')
                 ->map(function($studentGrades) {
