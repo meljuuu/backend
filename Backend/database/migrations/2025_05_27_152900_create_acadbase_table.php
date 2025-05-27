@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('batch');
             $table->string('curriculum');
             $table->enum('status', ['Released', 'Unreleased', 'Not-Applicable', 'Dropped-Out']);
+            $table->string('faculty_name');
+            $table->string('pdf_storage') ->nullable();
             $table->timestamps();
         });
     }
