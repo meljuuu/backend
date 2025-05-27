@@ -23,14 +23,22 @@ class MasterlistController extends Controller
             'track' => 'required|string',
             'batch' => 'required|string',
             'curriculum' => 'required|string',
-            'status' => 'required|in:Released,Unreleased,Not-Applicable,Dropped-Out'
+            'status' => 'required|in:Released,Unreleased,Not-Applicable,Dropped-Out',
+            'pdf_file' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $student = MasterlistModel::create($request->all());
+        $data = $request->except('pdf_file');
+        if ($request->hasFile('pdf_file')) {
+            $file = $request->file('pdf_file');
+            $path = $file->store('pdfs', 'public'); // Store in storage/app/public/pdfs
+            $data['pdf_storage'] = $path;
+        }
+
+        $student = MasterlistModel::create($data);
         return response()->json($student, 201);
     }
 
