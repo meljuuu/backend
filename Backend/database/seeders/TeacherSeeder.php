@@ -125,11 +125,11 @@ class TeacherSeeder extends Seeder
         //     'MiddleName' => 'Lopez',
         //     'BirthDate' => '1988-08-20',
         //     'Sex' => 'F',
-        //     'Position' => 'Book-Keeping',
+        //     'Position' => 'Book-keeping',
         //     'ContactNumber' => '09179876543',
         //     'Address' => '123 Bookkeeping St., Manila',
         //     'Educational_Attainment' => 'Bachelor of Science in Accountancy',
-        //     'Teaching_Position' => 'Book-Keeping',
+        //     'Teaching_Position' => 'Book-keeping',
         //     'created_at' => now(),
         //     'updated_at' => now(),
         // ]);

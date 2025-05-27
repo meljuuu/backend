@@ -20,6 +20,59 @@ use App\Models\ClassSubjectModel;
 class SuperAdminController extends Controller
 {
 
+    public function getStudentsPerGradeLevel()
+    {
+        $studentsPerGradeLevel = SubjectGradeModel::select(
+                'students.Grade_Level',
+                DB::raw("SUM(CASE WHEN subject_grades.FinalGrade BETWEEN 90 AND 100 THEN 1 ELSE 0 END) as very_good"),
+                DB::raw("SUM(CASE WHEN subject_grades.FinalGrade BETWEEN 75 AND 89 THEN 1 ELSE 0 END) as good"),
+                DB::raw("SUM(CASE WHEN subject_grades.FinalGrade BETWEEN 60 AND 74 THEN 1 ELSE 0 END) as failed")
+            )
+            ->join('students', 'subject_grades.Student_ID', '=', 'students.Student_ID')
+            ->whereNotNull('subject_grades.FinalGrade')
+            ->groupBy('students.Grade_Level')
+            ->orderBy('students.Grade_Level')
+            ->get();
+
+        return response()->json($studentsPerGradeLevel);
+    }
+
+
+
+    public function getCountByStatus()
+    {
+        $rawCounts = SubjectGradeModel::select(
+                'Status',
+                DB::raw('count(*) as total')
+            )
+            ->whereIn('Status', ['Approved', 'Declined', 'Pending'])
+            ->groupBy('Status')
+            ->get()
+            ->pluck('total', 'Status')
+            ->toArray();
+
+        $mappedStatuses = [
+            'Approved' => 'approved',
+            'Declined' => 'decline', // 👈 match frontend key exactly
+            'Pending' => 'pending',
+        ];
+
+        $statusCounts = collect($mappedStatuses)->map(function ($frontendKey, $dbKey) use ($rawCounts) {
+            return [
+                'Status' => $frontendKey,
+                'total' => $rawCounts[$dbKey] ?? 0
+            ];
+        })->values();
+
+        return response()->json($statusCounts);
+    }
+
+
+
+
+
+
+
     //Dashboard "Teacher" count pending grades, teacher and students.
     public function getSummaryStats()
     {

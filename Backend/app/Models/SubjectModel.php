@@ -19,7 +19,7 @@ class SubjectModel extends Model
         'SubjectName', 
         'SubjectCode', 
         'GradeLevel', 
-        ];
+    ];
 
     public function grades()
     {
@@ -28,13 +28,14 @@ class SubjectModel extends Model
 
     public function teachers()
     {
-        return $this->belongsTo(TeacherModel::class, 'Teacher_ID');
+        // Many-to-many relationship through pivot table teachers_subject
         return $this->belongsToMany(TeacherModel::class, 'teachers_subject', 'subject_id', 'teacher_id')
                     ->withPivot('subject_code')
                     ->withTimestamps();
     }
 
-    public function teachersSubjects() {
+    public function teacherSubjects() {
+        // One-to-many to the pivot model for detailed pivot info if needed
         return $this->hasMany(TeachersSubject::class, 'subject_id', 'Subject_ID');
     }
 }
