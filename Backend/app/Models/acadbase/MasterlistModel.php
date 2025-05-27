@@ -14,7 +14,9 @@ class MasterlistModel extends Model
         'track',
         'batch',
         'curriculum',
-        'status'
+        'status',
+        'faculty_name',
+        'pdf_storage'
     ];
 
     protected $casts = [
