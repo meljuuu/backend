@@ -220,12 +220,6 @@ public function updateTeacherAccount(Request $request, $teacherId)
         'Subject_IDs.*' => 'exists:subjects,Subject_ID',
     ]);
 
-    $authenticatedTeacher = Auth::user();
-    if (!in_array($authenticatedTeacher->Position, ['Admin', 'SuperAdmin'])) {
-        return response()->json([
-            'error' => 'Only Admins or SuperAdmins can update teacher accounts.',
-        ], 403);
-    }
 
     $teacher->update([
         'Email' => $request->Email,
