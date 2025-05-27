@@ -89,6 +89,9 @@ Route::put('/superadmin/lesson-plans/{id}/decline', [SuperadminController::class
 Route::get('/superadmin/grading', [SuperadminController::class, 'getAcceptedClassesWithSubjectsTeachersAndStudents']);
 Route::get('/super-admin/summary-stats', [SuperAdminController::class, 'getSummaryStats']);
 Route::get('/super-admin/recent-faculties', [SuperAdminController::class, 'getRecentFaculties']);
+Route::get('/super-admin/getcountofstudents', [SuperAdminController::class, 'getStudentsPerGradeLevel']);
+Route::get('/super-admin/status-counts', [SuperAdminController::class, 'getCountByStatus']);
+
 
 
 
