@@ -17,11 +17,11 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherSubjectController;
 use App\Http\Controllers\StudentClassController;
 use App\Http\Controllers\ClassesController;
-use App\Http\Controllers\StudentClassTeacherSubjectController;
 use App\Http\Controllers\GradingController;
 use App\Http\Controllers\AdvisoryController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\GradesController;
+use App\Http\Controllers\acadbase\ReleaseController;
 
 // AVOCADO ACADBASE
 use App\Http\Controllers\acadbase\MasterlistController;
@@ -274,5 +274,7 @@ Route::prefix('masterlist')->group(function () {
 });
 
 Route::delete('/testing/Subjects/{id}', [SuperadminController::class, 'deleteClass']);
+
+Route::post('/pdf/add-overlay', [ReleaseController::class, 'addImageOverlay']);
 
 

@@ -36,7 +36,7 @@ class MasterlistController extends Controller
 
         $data = $request->except('pdf_file');
         if ($request->hasFile('pdf_file')) {
-            $path = $request->file('pdf_file')->store('public/pdfs');
+            $path = $request->file('pdf_file')->store('pdfs', 'public');
             $data['pdf_storage'] = $path;
             \Log::info("PDF Path: " . $data['pdf_storage']);
         }
