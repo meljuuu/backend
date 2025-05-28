@@ -262,5 +262,8 @@ Route::prefix('masterlist')->group(function () {
     Route::put('/{id}', [MasterlistController::class, 'update']);
     Route::delete('/{id}', [MasterlistController::class, 'destroy']);
     Route::post('/bulk', [MasterlistController::class, 'bulkStore']);
+    Route::get('/{id}', [MasterlistController::class, 'show']);
 });
+
+
 

@@ -33,9 +33,9 @@ class MasterlistController extends Controller
 
         $data = $request->except('pdf_file');
         if ($request->hasFile('pdf_file')) {
-            $file = $request->file('pdf_file');
-            $path = $file->store('pdfs', 'public'); // Store in storage/app/public/pdfs
+            $path = $request->file('pdf_file')->store('public/pdfs');
             $data['pdf_storage'] = $path;
+            \Log::info("PDF Path: " . $data['pdf_storage']);
         }
 
         $student = MasterlistModel::create($data);
