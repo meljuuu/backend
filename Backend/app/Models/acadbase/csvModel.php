@@ -23,20 +23,24 @@ class CsvModel extends Model implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-        // Validate required fields
-        if (empty($row['lrn']) || empty($row['name'])) {
-            return null; // Skip invalid rows
+        // Convert scientific notation LRN to string
+        $lrn = isset($row['lrn']) 
+            ? str_replace('.', '', (string)$row['lrn'])
+            : null;
+
+        if (empty($lrn) || empty($row['name'])) {
+            return null;
         }
 
         return new MasterlistModel([
-            'lrn' => $row['lrn'],
-            'name' => $row['name'],
-            'track' => $row['track'] ?? 'SPJ', // Default value
-            'batch' => $row['batch'] ?? '2023-2024', // Default value
-            'curriculum' => $row['curriculum'] ?? 'JHS', // Default value
-            'status' => $row['status'] ?? 'Unreleased', // Default value
+            'lrn' => $lrn,
+            'name' => $row['name'] ?? '',
+            'track' => $row['track'] ?? 'SPJ',
+            'batch' => $row['batch'] ?? date('Y') . '-' . (date('Y') + 1),
+            'curriculum' => $row['curriculum'] ?? 'JHS',
+            'status' => $row['status'] ?? 'Unreleased',
             'birthdate' => $row['birthdate'] ?? null,
-            'faculty_name' => $row['faculty_name'] ?? 'System', // Default value
+            'faculty_name' => $row['faculty_name'] ?? 'System'
         ]);
     }
 }
