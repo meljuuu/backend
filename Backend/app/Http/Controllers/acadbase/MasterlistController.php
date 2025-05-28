@@ -170,11 +170,27 @@ class MasterlistController extends Controller
                 $spreadsheet = $reader->load($file->getPathname());
                 $worksheet = $spreadsheet->getActiveSheet();
                 
-                foreach ($worksheet->getRowIterator() as $row) {
+                // Write headers
+                $headers = [];
+                foreach ($worksheet->getRowIterator(1, 1) as $row) {
+                    foreach ($row->getCellIterator() as $cell) {
+                        $headers[] = $cell->getValue();
+                    }
+                }
+                // Add status header if it doesn't exist
+                if (!in_array('status', array_map('strtolower', $headers))) {
+                    $headers[] = 'status';
+                }
+                fputcsv($handle, $headers);
+                
+                // Write data rows
+                foreach ($worksheet->getRowIterator(2) as $row) {
                     $rowData = [];
                     foreach ($row->getCellIterator() as $cell) {
                         $rowData[] = $cell->getValue();
                     }
+                    // Force status to Not-Applicable
+                    $rowData[] = 'Not-Applicable';
                     fputcsv($handle, $rowData);
                 }
                 

@@ -78,7 +78,7 @@ class CsvModel extends Model
                         'track' => $track ?: 'SPJ',
                         'batch' => $batch ?: (date('Y') . '-' . (date('Y') + 1)),
                         'curriculum' => $curriculum ?: 'JHS',
-                        'status' => 'Unreleased',
+                        'status' => 'Not-Applicable',
                         'birthdate' => $formattedBirthdate,
                         'faculty_name' => 'System'
                     ]);
@@ -91,7 +91,7 @@ class CsvModel extends Model
                         'track' => $track ?: 'SPJ',
                         'batch' => $batch ?: (date('Y') . '-' . (date('Y') + 1)),
                         'curriculum' => $curriculum ?: 'JHS',
-                        'status' => 'Unreleased',
+                        'status' => 'Not-Applicable',
                         'birthdate' => $formattedBirthdate,
                         'faculty_name' => 'System'
                     ]);
