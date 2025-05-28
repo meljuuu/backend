@@ -74,6 +74,11 @@ Route::get('/dashboard/students/grade-distribution', [AdminDashboardController::
 Route::get('/dashboard/students/latest', [AdminDashboardController::class, 'getLatestUpdatedStudents']);
 Route::get('/dashboard/students/status-counts', [AdminDashboardController::class, 'getSubmissionStatusCounts']);
 Route::get('dashboard/accepted-classes/count', [AdminDashboardController::class, 'countAcceptedClasses']);
+Route::get('/dashboard/accepted-students-per-grade', [AdminDashboardController::class, 'getAcceptedStudentsPerGrade']);
+Route::get('/count-pending-classes', [AdminDashboardController::class, 'countPendingClasses']);
+Route::get('/pending-gradelevel', [AdminDashboardController::class, 'countPendingClassesPerGrade']);
+Route::get('/pending-students', [AdminDashboardController::class, 'countTotalPendingStudents']);
+
 
 //Teacher
 Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
@@ -262,4 +267,7 @@ Route::prefix('masterlist')->group(function () {
     Route::put('/{id}', [MasterlistController::class, 'update']);
     Route::delete('/{id}', [MasterlistController::class, 'destroy']);
 });
+
+Route::delete('/testing/Subjects/{id}', [SuperadminController::class, 'deleteClass']);
+
 

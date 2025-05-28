@@ -494,7 +494,7 @@ public function TestSection(Request $request)
         'comments'     => 'nullable|string',
     ]);
 
-  $validated['Status'] = 'Accepted';
+  $validated['Status'] = 'Incomplete';
 
     $class = ClassesModel::create($validated);
 
@@ -502,6 +502,23 @@ public function TestSection(Request $request)
         'message' => 'Class created successfully',
         'data' => $class,
     ], 201);
+}
+
+public function deleteClass($id)
+{
+    $class = ClassesModel::find($id);
+
+    if (!$class) {
+        return response()->json([
+            'message' => 'Class not found.'
+        ], 404);
+    }
+
+    $class->delete();
+
+    return response()->json([
+        'message' => 'Class deleted successfully.'
+    ], 200);
 }
 
 }
