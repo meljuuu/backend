@@ -7,7 +7,7 @@ use App\Models\acadbase\MasterlistModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\acadbase\CsvModel;
-use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Storage;
 
 class MasterlistController extends Controller
@@ -149,7 +149,7 @@ class MasterlistController extends Controller
     public function bulkStore(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'file' => 'required|file|mimes:csv,txt,xlsx',
+            'file' => 'required|file|mimes:csv,txt,xlsx,xls',
         ]);
 
         if ($validator->fails()) {
@@ -157,10 +157,53 @@ class MasterlistController extends Controller
         }
 
         try {
-            Excel::import(new CsvModel, $request->file('file'));
-            return response()->json(['message' => 'Students imported successfully'], 201);
+            $file = $request->file('file');
+            $extension = strtolower($file->getClientOriginalExtension());
+
+            if ($extension === 'xlsx' || $extension === 'xls') {
+                // For Excel files, we'll need to convert to CSV first
+                $csvFile = tempnam(sys_get_temp_dir(), 'csv_');
+                $handle = fopen($csvFile, 'w');
+                
+                // Read Excel file and write to CSV
+                $reader = IOFactory::createReader('Xlsx');
+                $spreadsheet = $reader->load($file->getPathname());
+                $worksheet = $spreadsheet->getActiveSheet();
+                
+                foreach ($worksheet->getRowIterator() as $row) {
+                    $rowData = [];
+                    foreach ($row->getCellIterator() as $cell) {
+                        $rowData[] = $cell->getValue();
+                    }
+                    fputcsv($handle, $rowData);
+                }
+                
+                fclose($handle);
+                
+                // Import the CSV
+                $result = CsvModel::importFromFile(new \Illuminate\Http\UploadedFile($csvFile, 'temp.csv'));
+                
+                // Clean up
+                unlink($csvFile);
+
+                return response()->json([
+                    'message' => 'Students imported successfully',
+                    'stats' => $result
+                ], 201);
+            } else {
+                // For CSV files, import directly
+                $result = CsvModel::importFromFile($file);
+                return response()->json([
+                    'message' => 'Students imported successfully',
+                    'stats' => $result
+                ], 201);
+            }
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            \Log::error('File import error: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to process file',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 }

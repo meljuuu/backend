@@ -280,4 +280,8 @@ Route::get('/pdf/check-stamped-status/{studentId}', [ReleaseController::class, '
 Route::get('/pdf/download-stamped/{studentId}', [ReleaseController::class, 'downloadStampedPdf']);
 Route::post('/pdf/update-status/{studentId}', [ReleaseController::class, 'updateStatus']);
 
+Route::get('/phpinfo', function() {
+    return phpinfo();
+});
+
 

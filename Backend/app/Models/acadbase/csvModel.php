@@ -3,11 +3,9 @@
 namespace App\Models\acadbase;
 
 use Illuminate\Database\Eloquent\Model;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Carbon\Carbon;
 
-class CsvModel extends Model implements ToModel, WithHeadingRow
+class CsvModel extends Model
 {
     protected $table = 'acadbase';
 
@@ -22,46 +20,96 @@ class CsvModel extends Model implements ToModel, WithHeadingRow
         'faculty_name',
     ];
 
-    public function model(array $row)
+    public static function importFromFile($file)
     {
-        // Normalize keys to lowercase for case-insensitive matching
-        $normalizedRow = [];
-        foreach ($row as $key => $value) {
-            $normalizedKey = strtolower(trim(str_replace(' ', '_', $key)));
-            $normalizedRow[$normalizedKey] = $value;
+        $handle = fopen($file->getPathname(), 'r');
+        
+        // Get headers
+        $headers = fgetcsv($handle);
+        if (!$headers) {
+            throw new \Exception('Invalid CSV file: No headers found');
         }
 
-        // Map your CSV headers to expected fields
-        $lrn = $this->getLrnValue($normalizedRow);
-        $name = $this->getValueByKeys($normalizedRow, ['student_name', 'name', 'student']);
-        $track = $this->getValueByKeys($normalizedRow, ['academic_track', 'track']);
-        $curriculum = $this->getValueByKeys($normalizedRow, ['curriculum']);
-        $batch = $this->getValueByKeys($normalizedRow, ['batch', 's.y_batch', 'sy_batch', 'school_year']);
-        $birthdate = $this->getValueByKeys($normalizedRow, ['birthday', 'birthdate', 'birth_date']);
-
-        // Skip if required fields are missing
-        if (empty($lrn) || empty($name)) {
-            return null;
+        // Normalize headers
+        $normalizedHeaders = [];
+        foreach ($headers as $header) {
+            $normalizedHeaders[] = strtolower(trim(str_replace(' ', '_', $header)));
         }
 
-        // Format birthdate
-        $formattedBirthdate = $this->formatBirthdate($birthdate);
+        $stats = [
+            'total' => 0,
+            'imported' => 0,
+            'updated' => 0,
+            'skipped' => 0,
+            'errors' => []
+        ];
 
-        return new MasterlistModel([
-            'lrn' => $lrn,
-            'name' => $name,
-            'track' => $track ?: 'SPJ',
-            'batch' => $batch ?: (date('Y') . '-' . (date('Y') + 1)),
-            'curriculum' => $curriculum ?: 'JHS',
-            'status' => 'Unreleased',
-            'birthdate' => $formattedBirthdate,
-            'faculty_name' => 'System'
-        ]);
+        // Process rows
+        while (($row = fgetcsv($handle)) !== false) {
+            $stats['total']++;
+            $data = array_combine($normalizedHeaders, $row);
+            
+            try {
+                // Map your CSV headers to expected fields
+                $lrn = self::getLrnValue($data);
+                $name = self::getValueByKeys($data, ['student_name', 'name', 'student']);
+                $track = self::getValueByKeys($data, ['academic_track', 'track']);
+                $curriculum = self::getValueByKeys($data, ['curriculum']);
+                $batch = self::getValueByKeys($data, ['batch', 's.y_batch', 'sy_batch', 'school_year']);
+                $birthdate = self::getValueByKeys($data, ['birthday', 'birthdate', 'birth_date']);
+
+                // Skip if required fields are missing
+                if (empty($lrn) || empty($name)) {
+                    $stats['skipped']++;
+                    $stats['errors'][] = "Row {$stats['total']}: Missing required fields (LRN or Name)";
+                    continue;
+                }
+
+                // Format birthdate
+                $formattedBirthdate = self::formatBirthdate($birthdate);
+
+                // Check if student exists
+                $existingStudent = MasterlistModel::where('lrn', $lrn)->first();
+
+                if ($existingStudent) {
+                    // Update existing student
+                    $existingStudent->update([
+                        'name' => $name,
+                        'track' => $track ?: 'SPJ',
+                        'batch' => $batch ?: (date('Y') . '-' . (date('Y') + 1)),
+                        'curriculum' => $curriculum ?: 'JHS',
+                        'status' => 'Unreleased',
+                        'birthdate' => $formattedBirthdate,
+                        'faculty_name' => 'System'
+                    ]);
+                    $stats['updated']++;
+                } else {
+                    // Create new student
+                    MasterlistModel::create([
+                        'lrn' => $lrn,
+                        'name' => $name,
+                        'track' => $track ?: 'SPJ',
+                        'batch' => $batch ?: (date('Y') . '-' . (date('Y') + 1)),
+                        'curriculum' => $curriculum ?: 'JHS',
+                        'status' => 'Unreleased',
+                        'birthdate' => $formattedBirthdate,
+                        'faculty_name' => 'System'
+                    ]);
+                    $stats['imported']++;
+                }
+            } catch (\Exception $e) {
+                $stats['skipped']++;
+                $stats['errors'][] = "Row {$stats['total']}: " . $e->getMessage();
+            }
+        }
+
+        fclose($handle);
+        return $stats;
     }
 
-    private function getLrnValue($row)
+    private static function getLrnValue($row)
     {
-        $lrn = $this->getValueByKeys($row, ['lrn']);
+        $lrn = self::getValueByKeys($row, ['lrn']);
         
         if (empty($lrn)) {
             return null;
@@ -78,7 +126,7 @@ class CsvModel extends Model implements ToModel, WithHeadingRow
         return $lrn;
     }
 
-    private function getValueByKeys($row, $possibleKeys)
+    private static function getValueByKeys($row, $possibleKeys)
     {
         foreach ($possibleKeys as $key) {
             if (isset($row[$key]) && !empty(trim($row[$key]))) {
@@ -88,7 +136,7 @@ class CsvModel extends Model implements ToModel, WithHeadingRow
         return null;
     }
 
-    private function formatBirthdate($birthdate)
+    private static function formatBirthdate($birthdate)
     {
         if (empty($birthdate)) {
             return null;
