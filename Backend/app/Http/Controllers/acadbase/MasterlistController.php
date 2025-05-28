@@ -18,11 +18,11 @@ class MasterlistController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'lrn' => 'required|unique:acadbase,lrn',
+            'lrn' => 'required|unique:acadbase,lrn|regex:/^[0-9]+$/',
             'name' => 'required|string',
-            'track' => 'required|string',
-            'batch' => 'required|string',
-            'curriculum' => 'required|string',
+            'track' => 'required|in:SPJ,BEC,SPA',
+            'batch' => 'required|regex:/^\d{4}-\d{4}$/',
+            'curriculum' => 'required|in:JHS,SHS',
             'status' => 'required|in:Released,Unreleased,Not-Applicable,Dropped-Out',
             'pdf_file' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
         ]);

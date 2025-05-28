@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('lrn')->unique();
             $table->string('name');
-            $table->string('track');
+            $table->enum('track', ['SPJ', 'BEC', 'SPA']);
             $table->string('batch');
-            $table->string('curriculum');
+            $table->enum('curriculum', ['JHS', 'SHS']);
             $table->enum('status', ['Released', 'Unreleased', 'Not-Applicable', 'Dropped-Out']);
             $table->string('faculty_name');
-            $table->string('pdf_storage') ->nullable();
+            $table->string('pdf_storage')->nullable();
             $table->timestamps();
         });
     }
