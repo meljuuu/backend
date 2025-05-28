@@ -18,12 +18,13 @@ class MasterlistController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'lrn' => 'required|unique:acadbase,lrn',
+            'lrn' => 'required|unique:acadbase,lrn|regex:/^[0-9]+$/',
             'name' => 'required|string',
-            'track' => 'required|string',
-            'batch' => 'required|string',
-            'curriculum' => 'required|string',
+            'track' => 'required|in:SPJ,BEC,SPA',
+            'batch' => 'required|regex:/^\d{4}-\d{4}$/',
+            'curriculum' => 'required|in:JHS,SHS',
             'status' => 'required|in:Released,Unreleased,Not-Applicable,Dropped-Out',
+            'birthdate' => 'required|date',
             'pdf_file' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
         ]);
 
@@ -33,9 +34,9 @@ class MasterlistController extends Controller
 
         $data = $request->except('pdf_file');
         if ($request->hasFile('pdf_file')) {
-            $file = $request->file('pdf_file');
-            $path = $file->store('pdfs', 'public'); // Store in storage/app/public/pdfs
+            $path = $request->file('pdf_file')->store('public/pdfs');
             $data['pdf_storage'] = $path;
+            \Log::info("PDF Path: " . $data['pdf_storage']);
         }
 
         $student = MasterlistModel::create($data);
@@ -111,5 +112,34 @@ class MasterlistController extends Controller
             'total' => $students->total(),
             'per_page' => $students->perPage()
         ]);
+    }
+
+    public function bulkStore(Request $request)
+    {
+        \Log::info('Bulk upload request received:', $request->all());
+        $validator = Validator::make($request->all(), [
+            'students' => 'required|array',
+            'students.*.lrn' => 'required|unique:acadbase,lrn',
+            'students.*.name' => 'required|string',
+            'students.*.track' => 'required|in:SPJ,BEC,SPA',
+            'students.*.batch' => 'required|regex:/^\d{4}-\d{4}$/',
+            'students.*.curriculum' => 'required|in:JHS,SHS',
+            // 'status' is optional (handled by frontend)
+        ]);
+
+        if ($validator->fails()) {
+            \Log::error('Bulk upload validation failed:', $validator->errors()->toArray()); // Debug log
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $students = $request->students;
+            \Log::info('Inserting students:', $students); // Debug log
+            MasterlistModel::insert($students);
+            return response()->json(['message' => 'Students imported successfully'], 201);
+        } catch (\Exception $e) {
+            \Log::error('Bulk upload failed:', ['error' => $e->getMessage()]); // Debug log
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

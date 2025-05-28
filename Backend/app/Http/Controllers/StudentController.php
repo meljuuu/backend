@@ -528,4 +528,41 @@ public function getStudentsNoClass()
     }
 }
 
+public function markAsDropOut(Request $request)
+{
+    $request->validate([
+        'student_id' => 'required|exists:students,Student_ID',
+        'drop_out_comments' => 'nullable|string'
+    ]);
+
+    $student = StudentModel::find($request->student_id);
+
+    $student->status = 'Drop-Out';
+    $student->drop_out_comments = $request->drop_out_comments; // Save the comment
+    $student->save();
+
+    return response()->json([
+        'message' => 'Student marked as Drop-Out successfully.',
+        'student' => $student
+    ]);
+}
+
+public function approveDropOut(Request $request)
+{
+    $request->validate([
+        'student_id' => 'required|exists:students,Student_ID'
+    ]);
+
+    $student = StudentModel::find($request->student_id);
+
+    $student->status = 'Dropped-Out';
+    $student->save();
+
+    return response()->json([
+        'message' => 'Student marked as Drop-Out successfully.',
+        'student' => $student
+    ]);
+}
+
+
 }

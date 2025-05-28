@@ -16,7 +16,8 @@ class MasterlistModel extends Model
         'curriculum',
         'status',
         'faculty_name',
-        'pdf_storage'
+        'pdf_storage',
+        'birthdate'
     ];
 
     protected $casts = [
