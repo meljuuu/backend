@@ -277,5 +277,6 @@ Route::delete('/testing/Subjects/{id}', [SuperadminController::class, 'deleteCla
 
 Route::post('/pdf/add-overlay', [ReleaseController::class, 'addImageOverlay']);
 Route::get('/pdf/check-stamped-status/{studentId}', [ReleaseController::class, 'checkStampedStatus']);
+Route::get('/pdf/download-stamped/{studentId}', [ReleaseController::class, 'downloadStampedPdf']);
 
 

@@ -151,4 +151,35 @@ class ReleaseController extends Controller
             ], 500);
         }
     }
+
+    public function downloadStampedPdf($studentId)
+    {
+        try {
+            $student = \App\Models\acadbase\MasterlistModel::findOrFail($studentId);
+            
+            if (!$student->stamped_pdf_storage) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No stamped PDF found for this student'
+                ], 404);
+            }
+
+            $path = storage_path('app/' . $student->stamped_pdf_storage);
+            
+            if (!file_exists($path)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stamped PDF file not found on server'
+                ], 404);
+            }
+
+            return response()->download($path, 'stamped_document.pdf');
+        } catch (Exception $e) {
+            \Log::error('Download Stamped PDF Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to download stamped PDF: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
