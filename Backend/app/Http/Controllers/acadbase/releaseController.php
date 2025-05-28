@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use FPDF;
 use setasign\Fpdi\Fpdi;
 use Exception;
+use Carbon\Carbon;
 
 class ReleaseController extends Controller
 {
@@ -28,7 +29,7 @@ class ReleaseController extends Controller
                 ], 404);
             }
 
-            // Get the PDF path - Modified to correctly access storage/app/public/pdfs
+            // Get the PDF path
             $pdfPath = storage_path('app/public/pdfs/' . basename($student->pdf_storage));
             
             // Verify PDF exists
@@ -56,6 +57,10 @@ class ReleaseController extends Controller
             // Add the existing PDF
             $pageCount = $pdf->setSourceFile($pdfPath);
             
+            // Get current date and time with timezone
+            $now = Carbon::now()->setTimezone('Asia/Manila'); // Set to Philippine timezone
+            $formattedDate = $now->format('F d, Y h:i A');
+
             // Process all pages
             for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
                 // Import the page
@@ -65,13 +70,19 @@ class ReleaseController extends Controller
                 $pdf->AddPage();
                 $pdf->useTemplate($tplId);
                 
-                // Add the stamp image to each page with adjusted position
+                // First add the stamp image
                 $pdf->Image(
                     $stampPath,
-                    120,  // X position (adjusted for better placement)
-                    120,  // Y position (adjusted for better placement)
-                    80    // Width (adjusted for better visibility)
+                    120,  // X position
+                    120,  // Y position
+                    80    // Width
                 );
+
+                // Then add the date text on top of the image
+                $pdf->SetFont('Arial', 'B', 18);
+                $pdf->SetTextColor(0, 0, 0); // Black color
+                $pdf->SetXY(120, 125); // Moved down from 120 to 130
+                $pdf->Cell(80, 10, $formattedDate, 0, 1, 'C');
             }
             
             // Create a temporary file for the output
@@ -100,14 +111,16 @@ class ReleaseController extends Controller
                 throw new Exception('Failed to save stamped PDF file');
             }
 
-            // Update the student record with the new stamped PDF path
+            // Update the student record with the new stamped PDF path and dates
             $student->stamped_pdf_storage = 'public/stamped_pdfs/' . $stampedFilename;
+            $student->furnished_date = $now->format('Y-m-d H:i:s');
             $student->save();
 
             return response()->json([
                 'success' => true,
                 'message' => 'PDF stamped successfully',
-                'stamped_pdf_path' => $student->stamped_pdf_storage
+                'stamped_pdf_path' => $student->stamped_pdf_storage,
+                'furnished_date' => $student->furnished_date
             ]);
             
         } catch (Exception $e) {
@@ -127,7 +140,8 @@ class ReleaseController extends Controller
             return response()->json([
                 'success' => true,
                 'has_stamped_pdf' => !empty($student->stamped_pdf_storage),
-                'stamped_pdf_path' => $student->stamped_pdf_storage
+                'stamped_pdf_path' => $student->stamped_pdf_storage,
+                'furnished_date' => $student->furnished_date
             ]);
         } catch (Exception $e) {
             \Log::error('Check Stamped Status Error: ' . $e->getMessage());
