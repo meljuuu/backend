@@ -82,14 +82,29 @@ class ReleaseController extends Controller
                 throw new Exception('Failed to create temporary PDF file');
             }
             
-            // Move the temporary file to the original location
-            if (!rename($tempPath, $pdfPath)) {
-                throw new Exception('Failed to update original PDF file');
+            // Create stamped_pdfs directory if it doesn't exist
+            $stampedDir = storage_path('app/public/stamped_pdfs');
+            if (!file_exists($stampedDir)) {
+                mkdir($stampedDir, 0755, true);
             }
-            
+
+            // Generate new filename for stamped PDF
+            $stampedFilename = 'stamped_' . basename($student->pdf_storage);
+            $stampedPath = $stampedDir . '/' . $stampedFilename;
+
+            // Move the temporary file to the stamped_pdfs directory
+            if (!rename($tempPath, $stampedPath)) {
+                throw new Exception('Failed to save stamped PDF file');
+            }
+
+            // Update the student record with the new stamped PDF path
+            $student->stamped_pdf_storage = 'public/stamped_pdfs/' . $stampedFilename;
+            $student->save();
+
             return response()->json([
                 'success' => true,
-                'message' => 'PDF updated successfully'
+                'message' => 'PDF stamped successfully',
+                'stamped_pdf_path' => $student->stamped_pdf_storage
             ]);
             
         } catch (Exception $e) {
