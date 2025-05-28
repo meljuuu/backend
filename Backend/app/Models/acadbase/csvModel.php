@@ -4,6 +4,7 @@ namespace App\Models\acadbase;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class CsvModel extends Model
 {
@@ -58,15 +59,15 @@ class CsvModel extends Model
                 $batch = self::getValueByKeys($data, ['batch', 's.y_batch', 'sy_batch', 'school_year']);
                 $birthdate = self::getValueByKeys($data, ['birthday', 'birthdate', 'birth_date']);
 
+                // Format birthdate
+                $formattedBirthdate = self::formatBirthdate($birthdate);
+
                 // Skip if required fields are missing
                 if (empty($lrn) || empty($name)) {
                     $stats['skipped']++;
                     $stats['errors'][] = "Row {$stats['total']}: Missing required fields (LRN or Name)";
                     continue;
                 }
-
-                // Format birthdate
-                $formattedBirthdate = self::formatBirthdate($birthdate);
 
                 // Check if student exists
                 $existingStudent = MasterlistModel::where('lrn', $lrn)->first();
@@ -142,33 +143,31 @@ class CsvModel extends Model
             return null;
         }
 
-        // Trim and clean the birthdate string
-        $birthdate = trim($birthdate);
-        if (empty($birthdate)) {
-            return null;
-        }
-
         try {
-            // Handle different date formats
-            if (strpos($birthdate, '/') !== false) {
-                $parts = explode('/', $birthdate);
-                if (count($parts) === 3) {
-                    // Assume MM/DD/YYYY if first part <= 12, otherwise DD/MM/YYYY
-                    if ($parts[0] <= 12) {
-                        return Carbon::createFromFormat('m/d/Y', $birthdate)->format('Y-m-d');
-                    } else {
-                        return Carbon::createFromFormat('d/m/Y', $birthdate)->format('Y-m-d');
-                    }
-                }
-            } elseif (strpos($birthdate, '-') !== false) {
-                // Already in YYYY-MM-DD format or similar
-                return Carbon::parse($birthdate)->format('Y-m-d');
-            } else {
-                // Try to parse any other format
-                return Carbon::parse($birthdate)->format('Y-m-d');
+            // If it's an Excel date number
+            if (is_numeric($birthdate)) {
+                $date = Date::excelToDateTimeObject($birthdate);
+                return $date->format('Y-m-d');
             }
+
+            // Try different date formats
+            $formats = [
+                'Y-m-d', 'd/m/Y', 'm/d/Y', 'Y/m/d',
+                'd-m-Y', 'm-d-Y', 'Y-m-d',
+                'd.m.Y', 'm.d.Y', 'Y.m.d'
+            ];
+
+            foreach ($formats as $format) {
+                $date = \DateTime::createFromFormat($format, $birthdate);
+                if ($date !== false) {
+                    return $date->format('Y-m-d');
+                }
+            }
+
+            // If all else fails, try PHP's date parser
+            $date = new \DateTime($birthdate);
+            return $date->format('Y-m-d');
         } catch (\Exception $e) {
-            // Log the error for debugging
             \Log::error("Failed to parse birthdate: " . $birthdate . " - Error: " . $e->getMessage());
             return null;
         }
