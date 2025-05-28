@@ -24,6 +24,7 @@ class MasterlistController extends Controller
             'batch' => 'required|regex:/^\d{4}-\d{4}$/',
             'curriculum' => 'required|in:JHS,SHS',
             'status' => 'required|in:Released,Unreleased,Not-Applicable,Dropped-Out',
+            'birthdate' => 'required|date',
             'pdf_file' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
         ]);
 

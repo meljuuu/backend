@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('status', ['Released', 'Unreleased', 'Not-Applicable', 'Dropped-Out']);
             $table->string('faculty_name');
             $table->string('pdf_storage')->nullable();
+            $table->date('birthdate');
             $table->timestamps();
         });
     }
