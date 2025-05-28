@@ -119,7 +119,7 @@ class MasterlistController extends Controller
     public function bulkStore(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'file' => 'required|file|mimes:csv,txt',
+            'file' => 'required|file|mimes:csv,txt,xlsx',
         ]);
 
         if ($validator->fails()) {
