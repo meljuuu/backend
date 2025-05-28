@@ -40,7 +40,7 @@ class ReleaseController extends Controller
             }
 
             // Get the stamp image path
-            $stampPath = storage_path('app/public/images/stamp.png');
+            $stampPath = storage_path('app/public/images/stamp.jpg');
             
             // Verify stamp exists
             if (!file_exists($stampPath)) {
@@ -56,20 +56,23 @@ class ReleaseController extends Controller
             // Add the existing PDF
             $pageCount = $pdf->setSourceFile($pdfPath);
             
-            // Import the first page
-            $tplId = $pdf->importPage(1);
-            
-            // Add the page
-            $pdf->AddPage();
-            $pdf->useTemplate($tplId);
-            
-            // Add the stamp image (position can be adjusted here)
-            $pdf->Image(
-                $stampPath,
-                50,  // X position
-                50,  // Y position
-                50   // Width (adjust as needed)
-            );
+            // Process all pages
+            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                // Import the page
+                $tplId = $pdf->importPage($pageNo);
+                
+                // Add the page
+                $pdf->AddPage();
+                $pdf->useTemplate($tplId);
+                
+                // Add the stamp image to each page with adjusted position
+                $pdf->Image(
+                    $stampPath,
+                    120,  // X position (adjusted for better placement)
+                    120,  // Y position (adjusted for better placement)
+                    80    // Width (adjusted for better visibility)
+                );
+            }
             
             // Create a temporary file for the output
             $tempPath = storage_path('app/temp_' . time() . '.pdf');
