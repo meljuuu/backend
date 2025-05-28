@@ -118,4 +118,23 @@ class ReleaseController extends Controller
             ], 500);
         }
     }
+
+    public function checkStampedStatus($studentId)
+    {
+        try {
+            $student = \App\Models\acadbase\MasterlistModel::findOrFail($studentId);
+            
+            return response()->json([
+                'success' => true,
+                'has_stamped_pdf' => !empty($student->stamped_pdf_storage),
+                'stamped_pdf_path' => $student->stamped_pdf_storage
+            ]);
+        } catch (Exception $e) {
+            \Log::error('Check Stamped Status Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to check stamped status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

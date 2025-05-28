@@ -276,5 +276,6 @@ Route::prefix('masterlist')->group(function () {
 Route::delete('/testing/Subjects/{id}', [SuperadminController::class, 'deleteClass']);
 
 Route::post('/pdf/add-overlay', [ReleaseController::class, 'addImageOverlay']);
+Route::get('/pdf/check-stamped-status/{studentId}', [ReleaseController::class, 'checkStampedStatus']);
 
 
