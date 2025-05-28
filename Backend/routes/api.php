@@ -94,7 +94,8 @@ Route::get('/super-admin/summary-stats', [SuperAdminController::class, 'getSumma
 Route::get('/super-admin/recent-faculties', [SuperAdminController::class, 'getRecentFaculties']);
 Route::get('/super-admin/getcountofstudents', [SuperAdminController::class, 'getStudentsPerGradeLevel']);
 Route::get('/super-admin/status-counts', [SuperAdminController::class, 'getCountByStatus']);
-
+Route::post('/subject-grades/accept', [SuperadminController::class, 'acceptSubjectGrades']);
+Route::post('/subject-grades/reject', [SuperadminController::class, 'declineSubjectGrades']);
 
 
 
@@ -120,6 +121,8 @@ Route::post('/admin/remove-student-to-class',[StudentClassController::class, 're
 Route::delete('/admin/remove-class',[StudentClassController::class, 'destroy']);
 Route::post('/admin/accept-class',[StudentClassController::class, 'accept']);
 Route::post('/admin/decline-class',[StudentClassController::class, 'reject']);
+Route::post('/students/mark-dropout', [StudentController::class, 'markAsDropOut']);
+Route::post('/students/approve-mark-dropout', [StudentController::class, 'approveDropOut']);
 
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {

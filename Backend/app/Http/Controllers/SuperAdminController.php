@@ -124,15 +124,89 @@ class SuperAdminController extends Controller
 
 
     
+    public function acceptSubjectGrades(Request $request)
+    {
+        $request->validate([
+            'student_id' => ['required'],
+            'grade_ids' => 'required|array',
+            'grade_ids.*' => 'integer|exists:subject_grades,Grade_ID',
+        ]);
+
+        $studentIds = is_array($request->student_id) ? $request->student_id : [$request->student_id];
+
+        $validStudentCount = StudentModel::whereIn('Student_ID', $studentIds)->count();
+        if ($validStudentCount !== count($studentIds)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'One or more student_id values are invalid.'
+            ], 422);
+        }
+    
+        try {
+            SubjectGradeModel::whereIn('Student_ID', $studentIds)
+                ->whereIn('Grade_ID', $request->grade_ids)
+                ->update(['Status' => 'Approved']);
+    
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Subject grades have been accepted successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function declineSubjectGrades(Request $request)
+    {
+        $request->validate([
+            'student_id' => ['required'],
+            'grade_ids' => 'required|array',
+            'grade_ids.*' => 'integer|exists:subject_grades,Grade_ID',
+            'comments' => 'nullable|string|max:1000',
+        ]);
+
+        $studentIds = is_array($request->student_id) ? $request->student_id : [$request->student_id];
+
+        $validStudentCount = StudentModel::whereIn('Student_ID', $studentIds)->count();
+        if ($validStudentCount !== count($studentIds)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'One or more student_id values are invalid.'
+            ], 422);
+        }
+
+        try {
+            SubjectGradeModel::whereIn('Student_ID', $studentIds)
+                ->whereIn('Grade_ID', $request->grade_ids)
+                ->update([
+                    'Status' => 'Declined',
+                    'Comments' => $request->comments,
+                ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Subject grades have been declined successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    
+
     public function getAcceptedClassesWithSubjectsTeachersAndStudents()
     {
         try {
-            // Get all accepted classes
             $classes = ClassesModel::where('Status', 'Accepted')
                 ->with(['students.subjectGrades']) // eager load students and their grades
                 ->get();
 
-            // Get all subject-teacher links for these classes
             $classIds = $classes->pluck('Class_ID');
             $subjectTeacherLinks = \App\Models\StudentClassTeacherSubject::whereHas('studentClass', function($q) use ($classIds) {
                     $q->whereIn('Class_ID', $classIds);
@@ -173,6 +247,8 @@ class SuperAdminController extends Controller
                             'birthDate' => $student->BirthDate,
                             'contactNumber' => $student->ContactNumber,
                             'address' => $student->Address,
+                            'track' => $student->Track,
+                            'curriculum' => $student->Curriculum,
                             'subject_grades' => $student->subjectGrades->map(function ($grade) {
                                 return [
                                     'grade_id' => $grade->Grade_ID,
@@ -494,7 +570,7 @@ public function TestSection(Request $request)
         'comments'     => 'nullable|string',
     ]);
 
-  $validated['Status'] = 'Accepted';
+  $validated['Status'] = 'Incomplete';
 
     $class = ClassesModel::create($validated);
 

@@ -35,8 +35,9 @@ return new class extends Migration
             $table->enum('Curriculum', ['JHS', 'SHS']);
             $table->string('Track');
             $table->timestamps();
-            $table->enum('Status', ['Pending', 'Accepted', 'Declined']);
+            $table->enum('Status', ['Pending', 'Accepted', 'Declined', 'Dropped-Out', 'Drop-Out']);
             $table->string('comments')->nullable();
+            $table->string('drop_out_comments')->nullable();
         });
     }
 

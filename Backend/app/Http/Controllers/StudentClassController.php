@@ -58,7 +58,7 @@ class StudentClassController extends Controller
                 'ClassName' => $request->class_name,
                 'SY_ID' => $request->sy_id,
                 'Adviser_ID' => $request->adviser_id,
-                'isAdvisory' => $request->is_advisory ?? false,
+                'isAdvisory' => $request->is_advisory ?? true,
             ]);
     
             // Attach teacher_subjects via pivot
@@ -338,7 +338,4 @@ class StudentClassController extends Controller
             'rejected_id' => $request->class_id,
         ]);
     }
-    
-    
-    
 }
