@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\acadbase\MasterlistModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\acadbase\CsvModel;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MasterlistController extends Controller
 {
@@ -116,29 +118,18 @@ class MasterlistController extends Controller
 
     public function bulkStore(Request $request)
     {
-        \Log::info('Bulk upload request received:', $request->all());
         $validator = Validator::make($request->all(), [
-            'students' => 'required|array',
-            'students.*.lrn' => 'required|unique:acadbase,lrn',
-            'students.*.name' => 'required|string',
-            'students.*.track' => 'required|in:SPJ,BEC,SPA',
-            'students.*.batch' => 'required|regex:/^\d{4}-\d{4}$/',
-            'students.*.curriculum' => 'required|in:JHS,SHS',
-            // 'status' is optional (handled by frontend)
+            'file' => 'required|file|mimes:csv,txt',
         ]);
 
         if ($validator->fails()) {
-            \Log::error('Bulk upload validation failed:', $validator->errors()->toArray()); // Debug log
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
         try {
-            $students = $request->students;
-            \Log::info('Inserting students:', $students); // Debug log
-            MasterlistModel::insert($students);
+            Excel::import(new CsvModel, $request->file('file'));
             return response()->json(['message' => 'Students imported successfully'], 201);
         } catch (\Exception $e) {
-            \Log::error('Bulk upload failed:', ['error' => $e->getMessage()]); // Debug log
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
