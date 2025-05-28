@@ -159,5 +159,23 @@ class AdminDashboardController extends Controller
         ]);
     }
 
+    public function countPendingClassesPerGrade()
+{
+    $pendingCounts = ClassesModel::where('Status', 'Pending')
+        ->selectRaw('Grade_Level, COUNT(*) as count')
+        ->groupBy('Grade_Level')
+        ->get();
 
+    return response()->json([
+        'pending_classes_per_grade' => $pendingCounts
+    ]);
+}
+public function countTotalPendingStudents()
+{
+     $count = StudentModel::where('Status', 'Pending')->count();
+
+    return response()->json([
+        'total_pending_students' => $count
+    ]);
+}
 }

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('FinalGrade')->nullable();
             $table->enum('Remarks', ['Passed', 'Failed'])->nullable();
             $table->enum('Status', ['Pending', 'Approved', 'Declined'])->default('Pending');
+            $table->text('comments')->nullable();
             $table->timestamps();
         
             $table->foreign('Student_ID')->references('Student_ID')->on('students');
