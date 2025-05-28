@@ -21,13 +21,13 @@ class MasterlistController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'lrn' => 'required|unique:acadbase,lrn|regex:/^[0-9]+$/',
-            'name' => 'required|string',
-            'track' => 'required|in:SPJ,BEC,SPA',
-            'batch' => 'required|regex:/^\d{4}-\d{4}$/',
-            'curriculum' => 'required|in:JHS,SHS',
-            'status' => 'required|in:Released,Unreleased,Not-Applicable,Dropped-Out',
-            'birthdate' => 'required|date',
+            'lrn' => 'nullable|unique:acadbase,lrn|regex:/^[0-9]+$/',
+            'name' => 'nullable|string',
+            'track' => 'nullable|in:SPJ,BEC,SPA',
+            'batch' => 'nullable|regex:/^\d{4}-\d{4}$/',
+            'curriculum' => 'nullable|in:JHS,SHS',
+            'status' => 'nullable|in:Released,Unreleased,Not-Applicable,Dropped-Out',
+            'birthdate' => 'nullable|date',
             'pdf_file' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
         ]);
 
