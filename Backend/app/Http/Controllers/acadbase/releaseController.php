@@ -182,4 +182,29 @@ class ReleaseController extends Controller
             ], 500);
         }
     }
+
+    public function updateStatus($studentId, Request $request)
+    {
+        try {
+            $request->validate([
+                'status' => 'required|string'
+            ]);
+
+            $student = \App\Models\acadbase\MasterlistModel::findOrFail($studentId);
+            $student->status = $request->status;
+            $student->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Student status updated successfully',
+                'status' => $student->status
+            ]);
+        } catch (Exception $e) {
+            \Log::error('Update Status Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
