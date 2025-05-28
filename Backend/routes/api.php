@@ -284,4 +284,14 @@ Route::get('/phpinfo', function() {
     return phpinfo();
 });
 
+// Dashboard Routes
+Route::prefix('dashboard')->group(function () {
+    Route::get('/student-stats', [DashboardController::class, 'getStudentStats']);
+    Route::get('/latest-students', [DashboardController::class, 'getLatestStudents']);
+    Route::get('/released-docs-stats', [DashboardController::class, 'getReleasedDocsStats']);
+    Route::get('/student-status-counts', [DashboardController::class, 'getStudentStatusCounts']);
+    Route::get('/recent-added', [DashboardController::class, 'getRecentAddedStudents']);
+    Route::get('/recent-released', [DashboardController::class, 'getRecentReleasedStudents']);
+});
+
 
