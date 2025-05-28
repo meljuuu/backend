@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('acadbase', function (Blueprint $table) {
             $table->id();
-            $table->string('lrn')->unique();
-            $table->string('name');
-            $table->enum('track', ['SPJ', 'BEC', 'SPA']);
-            $table->string('batch');
-            $table->enum('curriculum', ['JHS', 'SHS']);
-            $table->enum('status', ['Released', 'Unreleased', 'Not-Applicable', 'Dropped-Out']);
-            $table->string('faculty_name');
+            $table->string('lrn')->unique()->nullable();
+            $table->string('name')->nullable();
+            $table->enum('track', ['SPJ', 'BEC', 'SPA'])->nullable();
+            $table->string('batch')->nullable();
+            $table->enum('curriculum', ['JHS', 'SHS'])->nullable();
+            $table->enum('status', ['Released', 'Unreleased', 'Not-Applicable', 'Dropped-Out'])
+                  ->default('Not-Applicable');
+            $table->string('faculty_name')->nullable();
             $table->string('pdf_storage')->nullable();
-            $table->date('birthdate');
+            $table->date('birthdate')->nullable();
             $table->timestamps();
         });
     }
