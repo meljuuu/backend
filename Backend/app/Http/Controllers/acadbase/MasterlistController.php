@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\acadbase\CsvModel;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class MasterlistController extends Controller
 {
@@ -56,10 +57,12 @@ class MasterlistController extends Controller
         $validator = Validator::make($request->all(), [
             'lrn' => 'required|unique:acadbase,lrn,' . $id,
             'name' => 'required|string',
-            'track' => 'required|string',
-            'batch' => 'required|string',
-            'curriculum' => 'required|string',
-            'status' => 'required|in:Released,Unreleased,Not-Applicable,Dropped-Out'
+            'track' => 'required|in:SPJ,BEC,SPA',
+            'batch' => 'required|regex:/^\d{4}-\d{4}$/',
+            'curriculum' => 'required|in:JHS,SHS',
+            'status' => 'required|in:Released,Unreleased,Not-Applicable,Dropped-Out',
+            'birthdate' => 'required|date',
+            'pdf_file' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
         ]);
 
         if ($validator->fails()) {
@@ -67,8 +70,35 @@ class MasterlistController extends Controller
         }
 
         $student = MasterlistModel::findOrFail($id);
-        $student->update($request->all());
-        return response()->json($student);
+        
+        // Handle PDF file upload if present
+        if ($request->hasFile('pdf_file')) {
+            // Delete old PDF if exists
+            if ($student->pdf_storage) {
+                Storage::disk('public')->delete($student->pdf_storage);
+            }
+            
+            $path = $request->file('pdf_file')->store('pdfs', 'public');
+            $student->pdf_storage = $path;
+        }
+
+        // Update other fields
+        $student->lrn = $request->lrn;
+        $student->name = $request->name;
+        $student->track = $request->track;
+        $student->batch = $request->batch;
+        $student->curriculum = $request->curriculum;
+        $student->status = $request->status;
+        $student->birthdate = $request->birthdate;
+        $student->faculty_name = $request->faculty_name;
+        
+        $student->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Student updated successfully',
+            'data' => $student
+        ]);
     }
 
     public function destroy($id)
