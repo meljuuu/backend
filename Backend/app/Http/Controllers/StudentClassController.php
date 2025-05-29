@@ -34,7 +34,7 @@ class StudentClassController extends Controller
             'is_advisory' => 'boolean',
         ]);
     
-        // ✅ Update adviser_id in the classes table
+        // Update adviser_id in the classes table
         if ($request->adviser_id) {
             DB::table('classes')
                 ->where('Class_ID', $request->class_id)
@@ -67,7 +67,7 @@ class StudentClassController extends Controller
             $studentClassRecords[] = $studentClass;
         }
     
-        // ✅ Update class status from 'incomplete' to 'pending'
+        // Update class status from 'incomplete' to 'pending'
         DB::table('classes')
             ->where('Class_ID', $request->class_id)
             ->where('Status', 'incomplete')
