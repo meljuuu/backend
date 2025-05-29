@@ -128,6 +128,7 @@ Route::post('/admin/accept-class',[StudentClassController::class, 'accept']);
 Route::post('/admin/decline-class',[StudentClassController::class, 'reject']);
 Route::post('/students/mark-dropout', [StudentController::class, 'markAsDropOut']);
 Route::post('/students/approve-mark-dropout', [StudentController::class, 'approveDropOut']);
+Route::post('/students/reject-mark-dropout', [StudentController::class, 'rejectDropout']);
 
 // Protected Routes Here
 Route::middleware('auth:sanctum')->group(function () {

@@ -564,5 +564,29 @@ public function approveDropOut(Request $request)
     ]);
 }
 
+public function rejectDropout(Request $request)
+{
+    $request->validate([
+        'student_id' => 'required|exists:students,Student_ID',
+    ]);
+
+    $student = StudentModel::find($request->student_id);
+
+    if ($student->Status !== 'Drop-Out') {
+        return response()->json([
+            'message' => 'Action not allowed. Student is not marked as Drop-Out.',
+        ], 400); // Bad Request
+    }
+
+    $student->Status = 'Pending';
+    $student->drop_out_comments = null; // Clear the comment
+    $student->save();
+
+    return response()->json([
+        'message' => 'Student status updated to Pending and drop-out comments cleared.',
+        'student' => $student
+    ]);
+}
+
 
 }

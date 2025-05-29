@@ -118,6 +118,7 @@ class GradesController extends Controller
                         'FinalGrade'  => $grade->FinalGrade,
                         'Remarks'     => $grade->Remarks,
                         'Status'      => $grade->Status,
+                        'comments'    => $grade->comments,
                         'student'     => $grade->student,
                         'grades'      => [
                             'first'  => $grade->Q1,

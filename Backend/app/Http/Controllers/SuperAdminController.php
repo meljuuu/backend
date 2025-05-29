@@ -121,9 +121,6 @@ class SuperAdminController extends Controller
         }
     }
 
-
-
-    
     public function acceptSubjectGrades(Request $request)
     {
         $request->validate([
