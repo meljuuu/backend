@@ -133,7 +133,7 @@ public function createTeacherAccount(Request $request)
         'Position' => 'required|in:Admin,Book-keeping,Teacher,SuperAdmin',
         'ContactNumber' => 'required|string|max:15',
         'Address' => 'required|string|max:255',
-        'Subject_IDs' => 'required_if:Position,Teacher|array|min:1|max:2',
+        'Subject_IDs' => 'required_if:Position,Teacher|array|min:1|max:5',
         'Subject_IDs.*' => 'exists:subjects,Subject_ID',
     ]);
 
@@ -216,7 +216,7 @@ public function updateTeacherAccount(Request $request, $teacherId)
         'Position' => 'required|in:Admin,Book-keeping,Teacher,SuperAdmin',
         'ContactNumber' => 'required|string|max:15',
         'Address' => 'required|string|max:255',
-        'Subject_IDs' => 'required_if:Position,Teacher|array|min:1|max:2',
+        'Subject_IDs' => 'required_if:Position,Teacher|array|min:1|max:5',
         'Subject_IDs.*' => 'exists:subjects,Subject_ID',
     ]);
 
