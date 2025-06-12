@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\SubjectGradeModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class GradesController extends Controller
 {
     public function bulkStore(Request $request)
     {
         try {
+            \Log::info('Received grades data:', $request->all());
+
             $request->validate([
                 'grades' => 'required|array',
                 'grades.*.Student_ID' => 'required|exists:students,Student_ID',
@@ -18,40 +21,45 @@ class GradesController extends Controller
                 'grades.*.Teacher_ID' => 'required|exists:teachers,Teacher_ID',
                 'grades.*.Class_ID' => 'required|exists:classes,Class_ID',
                 'grades.*.Q1' => 'nullable|numeric|min:0|max:100',
-                'grades.*.Q2' => 'nullable|numeric|min:60|max:100',
-                'grades.*.Q3' => 'nullable|numeric|min:60|max:100',
-                'grades.*.Q4' => 'nullable|numeric|min:60|max:100',
-                'grades.*.FinalGrade' => 'nullable|numeric|min:60|max:100',
+                'grades.*.Q2' => 'nullable|numeric|min:0|max:100',
+                'grades.*.Q3' => 'nullable|numeric|min:0|max:100',
+                'grades.*.Q4' => 'nullable|numeric|min:0|max:100',
+                'grades.*.FinalGrade' => 'nullable|numeric|min:0|max:100',
                 'grades.*.Remarks' => 'nullable|string',
             ]);
 
             $successCount = 0;
             $errorCount = 0;
+            $errors = [];
+
+            DB::beginTransaction();
 
             foreach ($request->grades as $gradeData) {
-                // Check if grade entry already exists
-                $existingGrade = SubjectGradeModel::where('Student_ID', $gradeData['Student_ID'])
-                    ->where('Subject_ID', $gradeData['Subject_ID'])
-                    ->first();
-
                 try {
+                    \Log::info('Processing grade:', $gradeData);
+
+                    // Check if grade entry already exists
+                    $existingGrade = SubjectGradeModel::where('Student_ID', $gradeData['Student_ID'])
+                        ->where('Subject_ID', $gradeData['Subject_ID'])
+                        ->first();
+
                     if ($existingGrade) {
-                        $updated = $existingGrade->update([
+                        // Update existing grade
+                        $existingGrade->update([
                             'Class_ID' => $gradeData['Class_ID'],
-                            'Q1' => $gradeData['Q1'] ?? $existingGrade->Q1,
-                            'Q2' => $gradeData['Q2'] ?? $existingGrade->Q2,
-                            'Q3' => $gradeData['Q3'] ?? $existingGrade->Q3,
-                            'Q4' => $gradeData['Q4'] ?? $existingGrade->Q4,
-                            'FinalGrade' => $gradeData['FinalGrade'] ?? $existingGrade->FinalGrade,
-                            'Remarks' => $gradeData['Remarks'] ?? $existingGrade->Remarks,
-                            'Teacher_ID' => $gradeData['Teacher_ID']
+                            'Teacher_ID' => $gradeData['Teacher_ID'],
+                            'Q1' => $gradeData['Q1'],
+                            'Q2' => $gradeData['Q2'],
+                            'Q3' => $gradeData['Q3'],
+                            'Q4' => $gradeData['Q4'],
+                            'FinalGrade' => $gradeData['FinalGrade'],
+                            'Remarks' => $gradeData['Remarks'],
+                            'Status' => 'Pending'
                         ]);
-                        if (!$updated) {
-                            throw new \Exception("Failed to update grade for student {$gradeData['Student_ID']}");
-                        }
+                        \Log::info('Updated existing grade:', $existingGrade->toArray());
                     } else {
                         // Create new grade
-                        $created = SubjectGradeModel::create([
+                        $newGrade = SubjectGradeModel::create([
                             'Class_ID' => $gradeData['Class_ID'],
                             'Student_ID' => $gradeData['Student_ID'],
                             'Subject_ID' => $gradeData['Subject_ID'],
@@ -61,30 +69,33 @@ class GradesController extends Controller
                             'Q3' => $gradeData['Q3'],
                             'Q4' => $gradeData['Q4'],
                             'FinalGrade' => $gradeData['FinalGrade'],
-                            'Remarks' => $gradeData['Remarks']
+                            'Remarks' => $gradeData['Remarks'],
+                            'Status' => 'Pending'
                         ]);
-                        if (!$created) {
-                            throw new \Exception("Failed to create grade for student {$gradeData['Student_ID']}");
-                        }
+                        \Log::info('Created new grade:', $newGrade->toArray());
                     }
 
-                    Log::info('Incoming grade data:', $gradeData);
                     $successCount++;
                 } catch (\Exception $e) {
-                    Log::error('Grade save failed:', ['error' => $e->getMessage(), 'data' => $gradeData]);
                     $errorCount++;
+                    $errors[] = "Failed to save grade for student {$gradeData['Student_ID']}: {$e->getMessage()}";
+                    \Log::error('Error saving grade:', ['error' => $e->getMessage(), 'gradeData' => $gradeData]);
                     continue;
                 }
             }
 
+            DB::commit();
+
             return response()->json([
                 'status' => 'success',
                 'message' => "$successCount grades have been saved successfully.",
-                'errors' => $errorCount > 0 ? "$errorCount grades failed to save." : null
+                'errors' => $errorCount > 0 ? "$errorCount grades failed to save." : null,
+                'detailed_errors' => $errors
             ]);
             
         } catch (\Exception $e) {
-            Log::error('Error saving grades: ' . $e->getMessage());
+            DB::rollBack();
+            \Log::error('Error saving grades: ' . $e->getMessage());
             
             return response()->json([
                 'status' => 'error',

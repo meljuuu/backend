@@ -88,6 +88,12 @@ class GradingController extends Controller
             DB::beginTransaction();
 
             foreach ($request->grades as $gradeData) {
+                // Verify student exists
+                $student = StudentModel::find($gradeData['Student_ID']);
+                if (!$student) {
+                    throw new \Exception("Student with ID {$gradeData['Student_ID']} not found");
+                }
+
                 // Calculate final grade if all quarters are present
                 $finalGrade = null;
                 if ($gradeData['Q1'] !== null && $gradeData['Q2'] !== null && 
