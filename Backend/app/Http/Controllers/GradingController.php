@@ -86,52 +86,65 @@ class GradingController extends Controller
             }
 
             DB::beginTransaction();
+            $successCount = 0;
+            $errorCount = 0;
+            $errors = [];
 
             foreach ($request->grades as $gradeData) {
-                // Verify student exists
-                $student = StudentModel::find($gradeData['Student_ID']);
-                if (!$student) {
-                    throw new \Exception("Student with ID {$gradeData['Student_ID']} not found");
-                }
+                try {
+                    // Verify student exists
+                    $student = StudentModel::find($gradeData['Student_ID']);
+                    if (!$student) {
+                        throw new \Exception("Student with ID {$gradeData['Student_ID']} not found");
+                    }
 
-                // Calculate final grade if all quarters are present
-                $finalGrade = null;
-                if ($gradeData['Q1'] !== null && $gradeData['Q2'] !== null && 
-                    $gradeData['Q3'] !== null && $gradeData['Q4'] !== null) {
-                    $finalGrade = round(($gradeData['Q1'] + $gradeData['Q2'] + $gradeData['Q3'] + $gradeData['Q4']) / 4, 2);
-                }
+                    // Calculate final grade if all quarters are present
+                    $finalGrade = null;
+                    if ($gradeData['Q1'] !== null && $gradeData['Q2'] !== null && 
+                        $gradeData['Q3'] !== null && $gradeData['Q4'] !== null) {
+                        $finalGrade = round(($gradeData['Q1'] + $gradeData['Q2'] + $gradeData['Q3'] + $gradeData['Q4']) / 4, 2);
+                    }
 
-                // Determine remarks based on final grade
-                $remarks = null;
-                if ($finalGrade !== null) {
-                    $remarks = $finalGrade >= 75 ? 'Passed' : 'Failed';
-                }
+                    // Determine remarks based on final grade
+                    $remarks = null;
+                    if ($finalGrade !== null) {
+                        $remarks = $finalGrade >= 75 ? 'Passed' : 'Failed';
+                    }
 
-                // Update or create grade record
-                SubjectGradeModel::updateOrCreate(
-                    [
-                        'Student_ID' => $gradeData['Student_ID'],
-                        'Subject_ID' => $gradeData['Subject_ID'],
-                    ],
-                    [
-                        'Class_ID' => $gradeData['Class_ID'],
-                        'Teacher_ID' => $gradeData['Teacher_ID'],
-                        'Q1' => $gradeData['Q1'],
-                        'Q2' => $gradeData['Q2'],
-                        'Q3' => $gradeData['Q3'],
-                        'Q4' => $gradeData['Q4'],
-                        'FinalGrade' => $finalGrade,
-                        'Remarks' => $remarks,
-                        'Status' => 'Pending',
-                    ]
-                );
+                    // Update or create grade record
+                    SubjectGradeModel::updateOrCreate(
+                        [
+                            'Student_ID' => $gradeData['Student_ID'],
+                            'Subject_ID' => $gradeData['Subject_ID'],
+                        ],
+                        [
+                            'Class_ID' => $gradeData['Class_ID'],
+                            'Teacher_ID' => $gradeData['Teacher_ID'],
+                            'Q1' => $gradeData['Q1'],
+                            'Q2' => $gradeData['Q2'],
+                            'Q3' => $gradeData['Q3'],
+                            'Q4' => $gradeData['Q4'],
+                            'FinalGrade' => $finalGrade,
+                            'Remarks' => $remarks,
+                            'Status' => 'Pending',
+                        ]
+                    );
+                    $successCount++;
+                } catch (\Exception $e) {
+                    $errorCount++;
+                    $errors[] = "Error processing student ID {$gradeData['Student_ID']}: " . $e->getMessage();
+                    continue; // Skip this record and continue with the next one
+                }
             }
 
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Grades submitted successfully'
+                'message' => "Successfully processed $successCount records" . ($errorCount > 0 ? " ($errorCount failed)" : ""),
+                'success_count' => $successCount,
+                'error_count' => $errorCount,
+                'errors' => $errors
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
