@@ -16,11 +16,11 @@ return new class extends Migration
             $table->unsignedBigInteger('Student_ID');
             $table->unsignedBigInteger('Teacher_ID');
             $table->unsignedBigInteger('Subject_ID');
-            $table->integer('Q1')->nullable();
-            $table->integer('Q2')->nullable();
-            $table->integer('Q3')->nullable();
-            $table->integer('Q4')->nullable();
-            $table->integer('FinalGrade')->nullable();
+            $table->floatval('Q1')->nullable();
+            $table->floatval('Q2')->nullable();
+            $table->floatval('Q3')->nullable();
+            $table->floatval('Q4')->nullable();
+            $table->floatval('FinalGrade')->nullable();
             $table->enum('Remarks', ['Passed', 'Failed'])->nullable();
             $table->enum('Status', ['Pending', 'Approved', 'Declined'])->default('Pending');
             $table->text('comments')->nullable();
