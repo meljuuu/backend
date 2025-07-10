@@ -7,41 +7,45 @@ use App\Models\ClassesModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
+use App\Models\acadbase\MasterlistModel;
 
-class DashboardController extends Controller
+class acadDashboardController extends Controller
 {
-    public function getStudentStats(): JsonResponse
-    {
-        try {
-            // Get total students count
-            $totalStudents = StudentModel::count();
+    public function acadlist(): JsonResponse
+{
+    try {
+        // Group by SY_Year > Curriculum > Track
+        $results = MasterlistModel::selectRaw('
+                acadbase.curriculum,
+                acadbase.batch,
+                acadbase.track,
+                COUNT(*) as total
+            ')
+            ->groupBy('acadbase.batch', 'acadbase.curriculum', 'acadbase.track')
+            ->orderBy('acadbase.batch', 'desc')
+            ->get();
 
-            // Get students by curriculum
-            $curriculumStats = StudentModel::select('Curriculum', DB::raw('count(*) as count'))
-                ->groupBy('Curriculum')
-                ->get()
-                ->pluck('count', 'Curriculum')
-                ->toArray();
+        $organizedStats = [];
 
-            // Get students by track
-            $trackStats = StudentModel::select('Track', DB::raw('count(*) as count'))
-                ->groupBy('Track')
-                ->get()
-                ->pluck('count', 'Track')
-                ->toArray();
+        foreach ($results as $row) {
+            $year = $row->batch;
+            $curriculum = $row->curriculum ?? 'Unknown';
+            $track = $row->track ?? 'Unknown';
 
-            return response()->json([
-                'total_students' => $totalStudents,
-                'curriculum_stats' => $curriculumStats,
-                'track_stats' => $trackStats
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to fetch student statistics',
-                'message' => $e->getMessage()
-            ], 500);
+            $organizedStats[$year][$curriculum][$track] = $row->total;
         }
+
+        return response()->json([
+            'track_stats' => $organizedStats
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Failed to fetch student statistics',
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
 
     public function getLatestStudents(): JsonResponse
     {
@@ -118,6 +122,28 @@ class DashboardController extends Controller
             ], 500);
         }
     }
+ public function acadbaseGenderDistribution(): JsonResponse
+    {
+   
+        $counts = MasterlistModel::selectRaw('Curriculum, Gender, COUNT(*) as total')
+            ->whereIn('Curriculum', ['JHS', 'SHS'])
+            ->whereIn('Gender', ['Male', 'Female'])
+            ->groupBy('Curriculum', 'Gender')
+            ->get();
 
+        $data = [
+            'JHS_Male' => 0,
+            'JHS_Female' => 0,
+            'SHS_Male' => 0,
+            'SHS_Fe' => 0,
+        ];
+
+        foreach ($counts as $count) {
+            $key = $count->Curriculum . '_' . $count->Gender;
+            $data[$key] = $count->total;
+        }
+
+        return response()->json($data);
+    }
     
 }

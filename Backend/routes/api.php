@@ -22,6 +22,8 @@ use App\Http\Controllers\AdvisoryController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\GradesController;
 use App\Http\Controllers\acadbase\ReleaseController;
+use App\Http\Controllers\acadDashboardController;
+
 
 // AVOCADO ACADBASE
 use App\Http\Controllers\acadbase\MasterlistController;
@@ -296,6 +298,8 @@ Route::prefix('dashboard')->group(function () {
     Route::get('/recent-released-SY', [AdminDashboardController::class, 'getReleasedStudents']);
     Route::get('/students/grade-distribution-SY', [AdminDashboardController::class, 'getCurriculumBatchDistribution']);
     Route::get('/students/grade-distribution-Year', [AdminDashboardController::class, 'getStudentGradeDistributionYR']);
+    Route::get('/students/Grade-Gender', [acadDashboardController::class, 'acadbaseGenderDistribution']);
+     Route::get('/students/Acadlist', [acadDashboardController::class, 'acadlist']);
 
 
     
