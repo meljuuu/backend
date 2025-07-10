@@ -83,7 +83,7 @@ class CsvModel extends Model
                         'curriculum' => $curriculum ?: 'JHS',
                         'status' => 'Not-Applicable',
                         'birthdate' => $formattedBirthdate,
-                        'faculty_name' => 'System',
+                        'faculty_name' => null, // Leave blank for now
                         'gender' => $gender ?: null
                     ]);
                     $stats['updated']++;
@@ -97,7 +97,7 @@ class CsvModel extends Model
                         'curriculum' => $curriculum ?: 'JHS',
                         'status' => 'Not-Applicable',
                         'birthdate' => $formattedBirthdate,
-                        'faculty_name' => 'System',
+                        'faculty_name' => null, // Leave blank for now
                         'gender' => $gender ?: null
                     ]);
                     $stats['imported']++;
