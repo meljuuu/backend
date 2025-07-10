@@ -122,28 +122,43 @@ class acadDashboardController extends Controller
             ], 500);
         }
     }
- public function acadbaseGenderDistribution(): JsonResponse
+ public function acadbaseGenderDistribution(Request $request): JsonResponse
     {
    
-        $counts = MasterlistModel::selectRaw('Curriculum, Gender, COUNT(*) as total')
-            ->whereIn('Curriculum', ['JHS', 'SHS'])
-            ->whereIn('Gender', ['Male', 'Female'])
-            ->groupBy('Curriculum', 'Gender')
-            ->get();
+        $curriculum = $request->input('curriculum'); // e.g. "JHS" or "SHS"
+
+        $query = \App\Models\acadbase\MasterlistModel::selectRaw('curriculum, gender, COUNT(*) as total')
+            ->whereIn('curriculum', ['JHS', 'SHS'])
+            ->whereIn('gender', ['M', 'F']);
+
+        if ($curriculum) {
+            $query->where('curriculum', $curriculum);
+        }
+
+        $counts = $query->groupBy('curriculum', 'gender')->get();
 
         $data = [
             'JHS_Male' => 0,
             'JHS_Female' => 0,
             'SHS_Male' => 0,
-            'SHS_Fe' => 0,
+            'SHS_Female' => 0,
         ];
 
         foreach ($counts as $count) {
-            $key = $count->Curriculum . '_' . $count->Gender;
+            $genderLabel = $count->gender === 'M' ? 'Male' : 'Female';
+            $key = $count->curriculum . '_' . $genderLabel;
             $data[$key] = $count->total;
         }
 
         return response()->json($data);
     }
     
+    public function getGenderDistributionYears(): JsonResponse
+    {
+        $years = MasterlistModel::select('Batch')
+            ->distinct()
+            ->orderBy('Batch', 'desc')
+            ->pluck('Batch');
+        return response()->json($years);
+    }
 }
