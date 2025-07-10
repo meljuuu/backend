@@ -41,7 +41,7 @@ class ReleaseController extends Controller
             }
 
             // Get the stamp image path
-            $stampPath = storage_path('app/public/images/stamp.jpg');
+            $stampPath = storage_path('app/public/images/stamp.png');
             
             // Verify stamp exists
             if (!file_exists($stampPath)) {
@@ -73,15 +73,15 @@ class ReleaseController extends Controller
                 // First add the stamp image
                 $pdf->Image(
                     $stampPath,
-                    120,  // X position
-                    120,  // Y position
+                    110,  // X position
+                    110,  // Y position
                     80    // Width
                 );
 
                 // Then add the date text on top of the image
                 $pdf->SetFont('Arial', 'B', 18);
                 $pdf->SetTextColor(0, 0, 0); // Black color
-                $pdf->SetXY(120, 125); // Moved down from 120 to 130
+                $pdf->SetXY(125, 122); // x-axis, y-axis
                 $pdf->Cell(80, 10, $formattedDate, 0, 1, 'C');
             }
             
