@@ -79,7 +79,6 @@ Route::get('/count-pending-classes', [AdminDashboardController::class, 'countPen
 Route::get('/pending-gradelevel', [AdminDashboardController::class, 'countPendingClassesPerGrade']);
 Route::get('/pending-students', [AdminDashboardController::class, 'countTotalPendingStudents']);
 
-
 //Teacher
 Route::get('/teacher/getAll', [TeacherController::class, 'getAll']);
 
@@ -293,6 +292,13 @@ Route::prefix('dashboard')->group(function () {
     Route::get('/student-status-counts', [DashboardController::class, 'getStudentStatusCounts']);
     Route::get('/recent-added', [DashboardController::class, 'getRecentAddedStudents']);
     Route::get('/recent-released', [DashboardController::class, 'getRecentReleasedStudents']);
+    // Arjay
+    Route::get('/recent-released-SY', [AdminDashboardController::class, 'getReleasedStudents']);
+    Route::get('/students/grade-distribution-SY', [AdminDashboardController::class, 'getCurriculumBatchDistribution']);
+    Route::get('/students/grade-distribution-Year', [AdminDashboardController::class, 'getStudentGradeDistributionYR']);
+
+
+    
 });
 
 

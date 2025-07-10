@@ -184,38 +184,43 @@ class DashboardController extends Controller
         }
     }
 
-    public function getStudentStats(): JsonResponse
-    {
-        try {
-            // Get total students count
-            $totalStudents = StudentModel::count();
+ public function getStudentStats(): JsonResponse
+{
+    try {
+        // Group by SY_Year > Curriculum > Track
+        $results = StudentModel::selectRaw('
+                students.Curriculum,
+                school_years.SY_Year,
+                students.Track,
+                COUNT(*) as total
+            ')
+            ->join('student_class', 'students.Student_ID', '=', 'student_class.Student_ID')
+            ->join('school_years', 'student_class.SY_ID', '=', 'school_years.SY_ID')
+            ->groupBy('school_years.SY_Year', 'students.Curriculum', 'students.Track')
+            ->orderBy('school_years.SY_Year', 'desc')
+            ->get();
 
-            // Get students by curriculum
-            $curriculumStats = StudentModel::select('Curriculum', DB::raw('count(*) as count'))
-                ->groupBy('Curriculum')
-                ->get()
-                ->pluck('count', 'Curriculum')
-                ->toArray();
+        $organizedStats = [];
 
-            // Get students by track
-            $trackStats = StudentModel::select('Track', DB::raw('count(*) as count'))
-                ->groupBy('Track')
-                ->get()
-                ->pluck('count', 'Track')
-                ->toArray();
+        foreach ($results as $row) {
+            $year = $row->SY_Year;
+            $curriculum = $row->Curriculum ?? 'Unknown';
+            $track = $row->Track ?? 'Unknown';
 
-            return response()->json([
-                'total_students' => $totalStudents,
-                'curriculum_stats' => $curriculumStats,
-                'track_stats' => $trackStats
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to fetch student statistics',
-                'message' => $e->getMessage()
-            ], 500);
+            $organizedStats[$year][$curriculum][$track] = $row->total;
         }
+
+        return response()->json([
+            'track_stats' => $organizedStats
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Failed to fetch student statistics',
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
 
     public function getLatestStudents(): JsonResponse
     {

@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
+    private function getSchoolYearLabel($syId): string
+{
+    // This assumes you have a `school_years` table with columns: SY_ID, school_year (e.g., "2024 - 2025")
+    $year = DB::table('school_years')->where('SY_ID', $syId)->value('SY_ID');
+
+    // If not found, fallback to raw ID
+    return $year ?? "SY $syId";
+}
     public function getStudentCount()
     {
         $count = StudentModel::count();
@@ -72,6 +80,19 @@ class AdminDashboardController extends Controller
 
         return response()->json($data);
     }
+
+
+
+public function getReleasedStudents(): JsonResponse
+{
+    $students = DB::table('acadbase')
+        ->select('name', 'track', 'curriculum', 'updated_at')
+        ->where('status', 'Released')
+        ->limit(10)
+        ->get();
+
+    return response()->json($students);
+}
 
   public function countAcceptedClasses()
     {
@@ -178,4 +199,50 @@ public function countTotalPendingStudents()
         'total_pending_students' => $count
     ]);
 }
+
+// Arjay
+public function getCurriculumBatchDistribution(): JsonResponse
+{
+    $results = DB::table('acadbase')
+        ->select('curriculum', 'batch', 'track', DB::raw('COUNT(*) as total'))
+        ->whereNotNull('curriculum')
+        ->whereNotNull('batch')
+        ->whereNotNull('track')
+        ->groupBy('curriculum', 'batch', 'track')
+        ->orderBy('batch', 'asc')
+        ->get();
+
+    $data = [];
+    $totals = []; // ← for total per track
+
+    foreach ($results as $row) {
+        $curriculum = $row->curriculum;
+        $batch = $row->batch;
+        $track = $row->track;
+        $total = $row->total;
+
+        // Build grouped structure
+        if (!isset($data[$curriculum])) {
+            $data[$curriculum] = [];
+        }
+
+        if (!isset($data[$curriculum][$batch])) {
+            $data[$curriculum][$batch] = [];
+        }
+
+        $data[$curriculum][$batch][$track] = $total;
+
+        // Tally totals by track
+        if (!isset($totals[$track])) {
+            $totals[$track] = 0;
+        }
+        $totals[$track] += $total;
+    }
+
+    return response()->json([
+        'distribution' => $data,
+        'totals' => $totals,
+    ]);
+}
+
 }
