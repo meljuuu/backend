@@ -42,6 +42,14 @@ class MasterlistController extends Controller
             \Log::info("PDF Path: " . $data['pdf_storage']);
         }
 
+        // --- FIX: Enforce correct status based on PDF presence ---
+        if (empty($data['pdf_storage'])) {
+            $data['status'] = 'Not-Applicable';
+        } else if (empty($data['status']) || $data['status'] === 'Not-Applicable') {
+            $data['status'] = 'Unreleased';
+        }
+        // --------------------------------------------------------
+
         $student = MasterlistModel::create($data);
         return response()->json($student, 201);
     }
@@ -92,6 +100,14 @@ class MasterlistController extends Controller
         $student->birthdate = $request->birthdate;
         $student->faculty_name = $request->faculty_name;
         
+        // --- FIX: Enforce correct status based on PDF presence ---
+        if (empty($student->pdf_storage)) {
+            $student->status = 'Not-Applicable';
+        } else if (empty($student->status) || $student->status === 'Not-Applicable') {
+            $student->status = 'Unreleased';
+        }
+        // --------------------------------------------------------
+
         $student->save();
 
         return response()->json([
