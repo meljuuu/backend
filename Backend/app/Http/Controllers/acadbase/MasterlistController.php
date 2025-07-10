@@ -131,6 +131,10 @@ class MasterlistController extends Controller
     {
         $query = MasterlistModel::query();
 
+        if ($request->has('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
         if ($request->filled('batch')) {
             $query->where('batch', $request->batch);
         }
@@ -141,10 +145,6 @@ class MasterlistController extends Controller
 
         if ($request->filled('track')) {
             $query->where('track', $request->track);
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
         }
 
         if ($request->filled('search')) {
