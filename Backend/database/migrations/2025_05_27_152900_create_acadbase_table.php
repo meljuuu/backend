@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('curriculum', ['JHS', 'SHS'])->nullable();
             $table->enum('status', ['Released', 'Unreleased', 'Not-Applicable', 'Dropped-Out'])
                   ->default('Not-Applicable');
+            $table->enum('gender', ['M', 'F'])->nullable();
             $table->string('faculty_name')->nullable();
             $table->string('pdf_storage')->nullable();
             $table->date('birthdate')->nullable();

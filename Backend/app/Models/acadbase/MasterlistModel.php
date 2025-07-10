@@ -15,6 +15,7 @@ class MasterlistModel extends Model
         'batch',
         'curriculum',
         'status',
+        'gender',
         'faculty_name',
         'pdf_storage',
         'birthdate'

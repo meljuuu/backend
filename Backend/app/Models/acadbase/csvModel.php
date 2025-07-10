@@ -19,6 +19,7 @@ class CsvModel extends Model
         'status',
         'birthdate',
         'faculty_name',
+        'gender'
     ];
 
     public static function importFromFile($file)
@@ -58,6 +59,7 @@ class CsvModel extends Model
                 $curriculum = self::getValueByKeys($data, ['curriculum']);
                 $batch = self::getValueByKeys($data, ['batch', 's.y_batch', 'sy_batch', 'school_year']);
                 $birthdate = self::getValueByKeys($data, ['birthday', 'birthdate', 'birth_date']);
+                $gender = self::getValueByKeys($data, ['gender', 'sex']);
 
                 // Format birthdate
                 $formattedBirthdate = self::formatBirthdate($birthdate);
@@ -81,7 +83,8 @@ class CsvModel extends Model
                         'curriculum' => $curriculum ?: 'JHS',
                         'status' => 'Not-Applicable',
                         'birthdate' => $formattedBirthdate,
-                        'faculty_name' => 'System'
+                        'faculty_name' => 'System',
+                        'gender' => $gender ?: null
                     ]);
                     $stats['updated']++;
                 } else {
@@ -94,7 +97,8 @@ class CsvModel extends Model
                         'curriculum' => $curriculum ?: 'JHS',
                         'status' => 'Not-Applicable',
                         'birthdate' => $formattedBirthdate,
-                        'faculty_name' => 'System'
+                        'faculty_name' => 'System',
+                        'gender' => $gender ?: null
                     ]);
                     $stats['imported']++;
                 }

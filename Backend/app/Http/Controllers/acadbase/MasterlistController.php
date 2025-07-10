@@ -27,6 +27,7 @@ class MasterlistController extends Controller
             'batch' => 'nullable|regex:/^\d{4}-\d{4}$/',
             'curriculum' => 'nullable|in:JHS,SHS',
             'status' => 'nullable|in:Released,Unreleased,Not-Applicable,Dropped-Out',
+            'gender' => 'nullable|in:M,F',
             'birthdate' => 'nullable|date',
             'pdf_file' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
         ]);
@@ -69,6 +70,7 @@ class MasterlistController extends Controller
             'batch' => 'required|regex:/^\d{4}-\d{4}$/',
             'curriculum' => 'required|in:JHS,SHS',
             'status' => 'required|in:Released,Unreleased,Not-Applicable,Dropped-Out',
+            'gender' => 'required|in:M,F',
             'birthdate' => 'required|date',
             'pdf_file' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
         ]);
@@ -99,6 +101,7 @@ class MasterlistController extends Controller
         $student->status = $request->status;
         $student->birthdate = $request->birthdate;
         $student->faculty_name = $request->faculty_name;
+        $student->gender = $request->gender;
         
         // --- FIX: Enforce correct status based on PDF presence ---
         if (empty($student->pdf_storage)) {
